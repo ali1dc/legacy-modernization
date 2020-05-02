@@ -1,0 +1,82 @@
+version: '2'
+services:
+  my-dev-box:
+    image: openjdk:8
+    volumes:
+      - /Users/ali/confluent-5.1.0:/confluent
+    command: tail -F anything
+    environment:
+      ZK: zookeeper:2181
+      KAFKA: kafka:9092
+
+  zookeeper:
+    image: debezium/zookeeper:latest
+    ports:
+     - 2181:2181
+     - 2888:2888
+     - 3888:3888
+    volumes:
+      - /Users/ali/projects/ali1dc/legacy-modernization/data/zk:/zookeeper/data
+
+  kafka:
+    image: debezium/kafka:latest
+    ports:
+     - 9092:9092
+    links:
+     - zookeeper
+    environment:
+     - ZOOKEEPER_CONNECT=zookeeper:2181
+    volumes:
+      - /Users/ali/projects/ali1dc/legacy-modernization/data/kafka:/kafka/data
+
+  mysql:
+    image: debezium/example-mysql:latest
+    hostname: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - /Users/ali/projects/ali1dc/legacy-modernization/data/mysql:/var/lib/mysql
+    ports:
+     -  3306:3306
+    environment:
+     - MYSQL_ROOT_PASSWORD=root
+     - MYSQL_USER=ali
+     - MYSQL_PASSWORD=password
+     - MYSQL_DATABASE=order
+  adminer:
+    image: adminer:latest
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql
+    ports:
+      - 8080:8080
+
+  # postgres:
+  #   image: debezium/postgres:9.6
+  #   ports:
+  #    - "5432:5432"
+  #   environment:
+  #    - POSTGRES_USER=postgresuser
+  #    - POSTGRES_PASSWORD=postgrespw
+
+  connect:
+    image: debezium/connect:latest
+    ports:
+     - 8083:8083
+    links:
+     - kafka
+     - mysql
+    #  - postgres
+    environment:
+     - BOOTSTRAP_SERVERS=kafka:9092
+     - GROUP_ID=1
+     - CONFIG_STORAGE_TOPIC=my_connect_configs
+     - OFFSET_STORAGE_TOPIC=my_connect_offsets
+     - STATUS_STORAGE_TOPIC=my_connect_statuses
+  # elastic:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:5.5.2
+  #   ports:
+  #    - "9200:9200"
+  #   environment:
+  #    - http.host=0.0.0.0
+  #    - transport.host=127.0.0.1
+  #    - xpack.security.enabled=false
+ 
