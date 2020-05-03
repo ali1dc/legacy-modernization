@@ -1,0 +1,87 @@
+CREATE DATABASE order
+  WITH 
+  OWNER = postgres
+  ENCODING = 'UTF8'
+  CONNECTION LIMIT = -1;
+
+---------------- TABLES ----------------
+CREATE TABLE public.customers
+(
+  id INT PRIMARY KEY,
+  first_name VARCHAR(200) NOT NULL,
+  last_name VARCHAR(200) NOT NULL,
+  address_1 VARCHAR(300) NOT NULL,
+  address_2 VARCHAR(200),
+  city VARCHAR(100) NOT NULL,
+  zip VARCHAR(10) NOT NULL,
+  email VARCHAR(200) NOT NULL,
+  phone VARCHAR(15),
+  created_by VARCHAR(50) NOT NULL,
+  created_date TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_by VARCHAR(50) NOT NULL,
+  updated_date TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+)
+WITH (
+  OIDS = FALSE
+);
+
+ALTER TABLE public.customers
+    OWNER to postgres;
+
+----------------------------------------
+CREATE TABLE orders(
+  id SERIAL PRIMARY KEY,
+  customer_id INT NOT NULL,
+  status VARCHAR(50) DEFAULT 'pending',
+  created_by VARCHAR(50) NOT NULL,
+  created_date TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_by VARCHAR(50) NOT NULL,
+  updated_date TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (customer_id) REFERENCES customers(id)
+)
+WITH (
+  OIDS = FALSE
+);
+
+ALTER TABLE public.orders
+  OWNER to postgres;
+
+----------------------------------------
+CREATE TABLE products(
+  id INT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description VARCHAR(255),
+  list_price MONEY NOT NULL,
+  quantity INT NOT NULL,
+  created_by VARCHAR(50) NOT NULL,
+  created_date TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_by VARCHAR(50) NOT NULL,
+  updated_date TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+)
+WITH (
+  OIDS = FALSE
+);
+
+ALTER TABLE public.products
+  OWNER to postgres;
+
+----------------------------------------
+CREATE TABLE order_items(
+  id SERIAL PRIMARY KEY,
+  order_id INT NOT NULL,
+  product_id INT NOT NULL,
+  quantity INT NOT NULL,
+  unit_price MONEY NOT NULL,
+  created_by VARCHAR(50) NOT NULL,
+  created_date TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_by VARCHAR(50) NOT NULL,
+  updated_date TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (order_id) REFERENCES orders(id),
+  FOREIGN KEY (product_id) REFERENCES products(id)
+)
+WITH (
+  OIDS = FALSE
+);
+
+ALTER TABLE public.order_items
+  OWNER to postgres;

@@ -11,7 +11,7 @@ VALUES ('Beverages'),
        ('Mobil'),
        ('Flowers'),
        ('Books'),
-       ('Cleaning Supplies '),
+       ('Cleaning Supplies'),
        ('Medical Supplies')
 
 create table products(
