@@ -12,6 +12,7 @@
     "database.history.kafka.bootstrap.servers": "kafka:9092", 
     "database.history.kafka.topic": "dbhistory.legacy", 
     "include.schema.changes": "true",
+    "database.tcpKeepAlive": true,
     "transforms": "unwrap",
     "transforms.unwrap.type": "io.debezium.transforms.UnwrapFromEnvelope",
     "transforms.unwrap.drop.tombstones": "false"
