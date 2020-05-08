@@ -19,13 +19,20 @@ services:
     #   - /Users/ali/projects/ali1dc/legacy-modernization/data/zk:/zookeeper/data
 
   kafka:
-    image: debezium/kafka:latest
+    image: confluentinc/cp-kafka:latest
+    hostname: kafka
     ports:
-     - 9092:9092
-    links:
-     - zookeeper
+      - "19092:19092"
+    depends_on:
+      - zookeeper
     environment:
-     - ZOOKEEPER_CONNECT=zookeeper:2181
+      KAFKA_CLIENT_PORT: 19092
+      KAFKA_BROKER_ID: 1
+      KAFKA_BROKER_RACK: rack-a
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:19092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     # volumes:
     #   - /Users/ali/projects/ali1dc/legacy-modernization/data/kafka:/kafka/data
 
