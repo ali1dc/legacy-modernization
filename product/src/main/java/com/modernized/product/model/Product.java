@@ -2,8 +2,8 @@ package com.modernized.product.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.apache.kafka.connect.data.Decimal;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.Date;
@@ -21,6 +21,8 @@ public class Product {
     @Getter @Setter
     Integer legacyId;
     @Getter @Setter
+    @JsonProperty("category_id")
+    @Transient
     Integer categoryId;
     @JsonProperty("product_name")
     @Getter @Setter
@@ -28,7 +30,8 @@ public class Product {
     @Getter @Setter
     String description;
     @Getter @Setter
-    Decimal listPrice;
+    @JsonProperty("list_price")
+    Float listPrice;
     @Getter @Setter
     Integer quantity;
     @Getter @Setter

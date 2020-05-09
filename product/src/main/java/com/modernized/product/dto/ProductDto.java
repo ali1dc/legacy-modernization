@@ -8,13 +8,22 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CategoryDto {
+public class ProductDto {
+
     @Getter @Setter
     Integer id;
+//    @Getter @Setter
+//    Integer legacyId;
+//    @Getter @Setter
+//    Integer categoryId;
     @Getter @Setter
     String name;
     @Getter @Setter
     String description;
+    @Getter @Setter
+    Float listPrice;
+    @Getter @Setter
+    Integer quantity;
     @Getter @Setter
     String createdBy;
     @Getter @Setter
