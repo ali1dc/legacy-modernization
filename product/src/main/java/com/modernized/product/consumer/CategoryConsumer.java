@@ -1,6 +1,5 @@
 package com.modernized.product.consumer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.modernized.product.model.Category;
@@ -10,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.annotation.PartitionOffset;
-import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -44,7 +41,6 @@ public class CategoryConsumer {
                                    Acknowledgment ack)  {
 
         try {
-            ack.acknowledge();
             JsonNode jsonNode = jsonMapper.readTree(message).at("/payload");
             Category category = jsonMapper.readValue(jsonNode.toString(), Category.class);
             category.setLegacyId(category.getId());
@@ -53,7 +49,7 @@ public class CategoryConsumer {
             category.setUpdatedBy("system");
             categoryRepository.save(category).subscribe();
             logger.info("record saved: {}", category);
-//            ack.acknowledge();
+            ack.acknowledge();
         } catch(DataIntegrityViolationException e) {
             logger.info("duplicate name detected, do not add it again!");
         } catch (Exception e) {
