@@ -5,9 +5,13 @@ logging:
   level:
     root: INFO
 
-endpoints:
-  health:
-    enabled: true
+management:
+  endpoints:
+    web.base-path: /
+    enabled-by-default: false
+  endpoint:
+    health.enabled: true
+    health.show-details: always
 
 spring:
   datasource:
