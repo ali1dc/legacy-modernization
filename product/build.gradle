@@ -20,6 +20,7 @@ ext {
 }
 
 dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.apache.kafka:kafka-streams'
@@ -34,6 +35,7 @@ dependencies {
 	implementation 'io.r2dbc:r2dbc-h2'
 	implementation 'org.postgresql:postgresql'
 	implementation 'org.yaml:snakeyaml:1.25'
+	implementation 'org.modelmapper:modelmapper:2.3.7'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
