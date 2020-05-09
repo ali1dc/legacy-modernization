@@ -1,6 +1,5 @@
 package com.modernized.product.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -21,13 +20,14 @@ public class Category {
     @JsonProperty("category_name")
     @Getter @Setter
     String name;
+    @Getter @Setter
     String description;
-    @JsonIgnore
-    @Getter @Setter String createdBy;
-    @JsonIgnore
+    @Getter @Setter
+    String createdBy;
+    @Getter
     Date createdDate;
-    @JsonIgnore
-    @Getter @Setter String updatedBy;
-    @JsonIgnore
+    @Getter @Setter
+    String updatedBy;
+    @Getter
     Date updatedDate;
 }
