@@ -12,6 +12,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.PartitionOffset;
 import org.springframework.kafka.annotation.TopicPartition;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -37,10 +38,13 @@ public class CategoryConsumer {
 //            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) throws JsonProcessingException {
 
     @KafkaListener(topics = { "legacy.order.categories" }, containerFactory = "kafkaListenerContainerFactory")
-    public void listenToCategories(@Payload(required = false) String message, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-                       @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key)  {
+    public void listenToCategories(@Payload(required = false) String message,
+                                   @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
+                                   @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
+                                   Acknowledgment ack)  {
 
         try {
+            ack.acknowledge();
             JsonNode jsonNode = jsonMapper.readTree(message).at("/payload");
             Category category = jsonMapper.readValue(jsonNode.toString(), Category.class);
             category.setLegacyId(category.getId());
@@ -49,6 +53,7 @@ public class CategoryConsumer {
             category.setUpdatedBy("system");
             categoryRepository.save(category).subscribe();
             logger.info("record saved: {}", category);
+//            ack.acknowledge();
         } catch(DataIntegrityViolationException e) {
             logger.info("duplicate name detected, do not add it again!");
         } catch (Exception e) {
