@@ -1,6 +1,5 @@
 package com.modernized.product.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.apache.kafka.connect.data.Decimal;
@@ -19,6 +18,10 @@ public class Product {
     @JsonProperty("product_id")
     @Getter @Setter
     Integer id;
+    @Getter @Setter
+    Integer legacyId;
+    @Getter @Setter
+    Integer categoryId;
     @JsonProperty("product_name")
     @Getter @Setter
     String name;

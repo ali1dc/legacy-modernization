@@ -17,6 +17,8 @@ public class Category {
     @JsonProperty("category_id")
     @Getter @Setter
     Integer id;
+    @Getter @Setter
+    Integer legacyId;
     @JsonProperty("category_name")
     @Getter @Setter
     String name;

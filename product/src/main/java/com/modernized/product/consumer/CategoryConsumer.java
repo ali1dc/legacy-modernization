@@ -38,19 +38,21 @@ public class CategoryConsumer {
 
     @KafkaListener(topics = { "legacy.order.categories" }, containerFactory = "kafkaListenerContainerFactory")
     public void listenToCategories(@Payload(required = false) String message, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-                       @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key) throws Exception {
+                       @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key)  {
 
-
-        JsonNode jsonNode = jsonMapper.readTree(message).at("/payload");
-        Category category = jsonMapper.readValue(jsonNode.toString(), Category.class);
-        category.setId(null);
-        category.setCreatedBy("system");
-        category.setUpdatedBy("system");
         try {
+            JsonNode jsonNode = jsonMapper.readTree(message).at("/payload");
+            Category category = jsonMapper.readValue(jsonNode.toString(), Category.class);
+            category.setLegacyId(category.getId());
+            category.setId(null);
+            category.setCreatedBy("system");
+            category.setUpdatedBy("system");
             categoryRepository.save(category).subscribe();
             logger.info("record saved: {}", category);
         } catch(DataIntegrityViolationException e) {
             logger.info("duplicate name detected, do not add it again!");
+        } catch (Exception e) {
+            logger.error(e.getMessage());
         }
     }
 }
