@@ -12,8 +12,6 @@ management:
   endpoint:
     health.enabled: true
     health.show-details: always
-#  health:
-#    db.enable: true
 
 spring:
   datasource:
