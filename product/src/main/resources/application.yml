@@ -37,7 +37,7 @@ spring:
     consumer:
       auto-offset-reset: earliest
       group-id: product-group
-      enable-auto-commit: true
+      enable-auto-commit: false
       auto-commit-interval-ms: 100
       session-timeout-ms: 15000
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -46,13 +46,13 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
-  flyway:
-    driver-class-name: org.postgresql.Driver
-    # url: jdbc:postgresql://\${POSTGRES_HOST}:\${POSTGRES_PORT}/product
-    url: jdbc:postgresql://localhost:5432/product
-    user: postgres
-    password: postgres
-    enable: true
-    test-on-borrow: true
-    validation-query: SELECT 1
-    log-validation-errors: true
+flyway:
+  driver-class-name: org.postgresql.Driver
+  # url: jdbc:postgresql://\${POSTGRES_HOST}:\${POSTGRES_PORT}/product
+  url: jdbc:postgresql://localhost:5432/product
+  user: postgres
+  password: postgres
+  enable: true
+  test-on-borrow: true
+  validation-query: SELECT 1
+  log-validation-errors: true

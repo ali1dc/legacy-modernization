@@ -15,6 +15,7 @@
     "database.tcpKeepAlive": true,
     "transforms": "unwrap",
     "transforms.unwrap.type": "io.debezium.transforms.UnwrapFromEnvelope",
-    "transforms.unwrap.drop.tombstones": "false"
+    "transforms.unwrap.drop.tombstones": "false",
+    "decimal.handling.mode": "double"
   }
 }
