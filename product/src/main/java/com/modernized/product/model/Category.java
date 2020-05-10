@@ -25,6 +25,7 @@ public class Category {
     @Getter @Setter
     String description;
     @Getter @Setter
+    @JsonProperty("created_by")
     String createdBy;
     @Getter
     Date createdDate;

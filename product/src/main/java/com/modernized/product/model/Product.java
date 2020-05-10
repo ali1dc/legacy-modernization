@@ -35,6 +35,7 @@ public class Product {
     @Getter @Setter
     Integer quantity;
     @Getter @Setter
+    @JsonProperty("created_by")
     String createdBy;
     @Getter @Setter
     Date createdDate;
