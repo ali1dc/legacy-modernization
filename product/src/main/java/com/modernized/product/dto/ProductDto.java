@@ -2,8 +2,12 @@ package com.modernized.product.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
+import reactor.core.Disposable;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Date;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,14 +16,12 @@ public class ProductDto {
 
     @Getter @Setter
     Integer id;
-//    @Getter @Setter
-//    Integer legacyId;
-//    @Getter @Setter
-//    Integer categoryId;
     @Getter @Setter
     String name;
     @Getter @Setter
     String description;
+    @Getter @Setter
+    List<String> categories;
     @Getter @Setter
     Float listPrice;
     @Getter @Setter

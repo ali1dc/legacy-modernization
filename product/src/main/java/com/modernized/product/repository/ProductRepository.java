@@ -5,8 +5,8 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface ProductRepository extends ReactiveCrudRepository<Product, Long> {
+public interface ProductRepository extends ReactiveCrudRepository<Product, Integer> {
 
     Flux<Product> findAll();
-    Mono<Product> findById(Long id);
+    Mono<Product> findById(Integer id);
 }
