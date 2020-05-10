@@ -1,7 +1,6 @@
 package com.modernized.product.controller;
 
 import com.modernized.product.dto.CategoryDto;
-import com.modernized.product.model.Category;
 import com.modernized.product.repository.CategoryRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
