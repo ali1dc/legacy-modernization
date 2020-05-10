@@ -1,5 +1,5 @@
 {
-  "name": "mysql-order-connector", 
+  "name": "legacy-mysql", 
   "config": {
     "connector.class": "io.debezium.connector.mysql.MySqlConnector", 
     "database.hostname": "mysql", 
@@ -16,6 +16,7 @@
     "transforms": "unwrap",
     "transforms.unwrap.type": "io.debezium.transforms.UnwrapFromEnvelope",
     "transforms.unwrap.drop.tombstones": "false",
-    "decimal.handling.mode": "double"
+    "decimal.handling.mode": "double",
+    "slot.name" : "legacy_slot"
   }
 }

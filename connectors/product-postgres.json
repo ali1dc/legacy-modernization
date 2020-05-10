@@ -1,0 +1,21 @@
+{
+  "name": "product-postgres",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "tasks.max": "1",
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "postgres",
+    "database.password": "postgres",
+    "database.dbname": "product",
+    "database.server.name": "product",
+    "database.tcpKeepAlive": true,
+    "table.blacklist": "public.flyway_schema_history",
+    "schema.whitelist": "public",
+    "transforms": "unwrap",
+    "transforms.unwrap.type": "io.debezium.transforms.UnwrapFromEnvelope",
+    "transforms.unwrap.drop.tombstones": "false",
+    "decimal.handling.mode": "double",
+    "slot.name" : "product_slot"
+  }
+}
