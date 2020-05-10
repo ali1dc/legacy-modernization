@@ -1,6 +1,7 @@
 create table categories(
   category_id INT AUTO_INCREMENT PRIMARY KEY,
-  category_name VARCHAR(255) NOT NULL
+  category_name VARCHAR(255) NOT NULL,
+  created_by VARCHAR(50)
 );
 INSERT INTO categories (category_name)
 VALUES ('Beverages'),
@@ -12,7 +13,7 @@ VALUES ('Beverages'),
        ('Flowers'),
        ('Books'),
        ('Cleaning Supplies'),
-       ('Medical Supplies')
+       ('Medical Supplies');
 
 create table products(
   product_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -21,16 +22,9 @@ create table products(
   list_price decimal(15,2) NOT NULL,
   quantity int NOT NULL,
   category_id int,
+  created_by VARCHAR(50),
   FOREIGN KEY (category_id) REFERENCES categories(category_id)
 );
--- INSERT INTO products (name, description)
--- VALUES ('ipad', 'ipad model 2');
-
--- create table inventories(
---   product_id INT NOT NULL,
---   quantity int NOT NULL,
---   FOREIGN KEY (product_id) REFERENCES products(product_id)
--- );
 
 create table customers(
   customer_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -39,7 +33,8 @@ create table customers(
   billing_address VARCHAR(300) NOT NULL,
   shipping_address VARCHAR(300),
   email VARCHAR(200) NOT NULL,
-  phone VARCHAR(15) NOT NULL
+  phone VARCHAR(15) NOT NULL,
+  created_by VARCHAR(50)
 );
 
 create table orders(
@@ -47,6 +42,7 @@ create table orders(
   customer_id int NOT NULL,
   status VARCHAR(50) DEFAULT 'pending',
   order_date datetime DEFAULT now(),
+  created_by VARCHAR(50),
   FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
 );
 
@@ -56,6 +52,7 @@ create table order_items(
   product_id int NOT NULL,
   quantity int NOT NULL,
   unit_price decimal(15,2) NOT NULL,
+  created_by VARCHAR(50),
   FOREIGN KEY (order_id) REFERENCES orders(order_id),
   FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
@@ -66,6 +63,7 @@ create table payments(
   order_id int NOT NULL,
   charged_amount decimal(15,2) NOT NULL,
   successfull boolean,
+  created_by VARCHAR(50),
   FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
   FOREIGN KEY (order_id) REFERENCES orders(order_id)
 );
@@ -76,6 +74,7 @@ create table shipping(
   order_id int NOT NULL,
   shipping_date datetime DEFAULT now(),
   delivered boolean,
+  created_by VARCHAR(50),
   FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
   FOREIGN KEY (order_id) REFERENCES orders(order_id)
 );
