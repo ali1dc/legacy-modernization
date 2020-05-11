@@ -3,17 +3,17 @@ create table categories(
   category_name VARCHAR(255) NOT NULL,
   created_by VARCHAR(50)
 );
-INSERT INTO categories (category_name)
-VALUES ('Beverages'),
-       ('Bakery'),
-       ('Goods'),
-       ('Electronics'),
-       ('Laptop'),
-       ('Mobil'),
-       ('Flowers'),
-       ('Books'),
-       ('Cleaning Supplies'),
-       ('Medical Supplies');
+INSERT INTO categories (category_name, created_by)
+VALUES ('Beverages', 'legacy'),
+       ('Bakery', 'legacy'),
+       ('Goods', 'legacy'),
+       ('Electronics', 'legacy'),
+       ('Laptop', 'legacy'),
+       ('Mobil', 'legacy'),
+       ('Flowers', 'legacy'),
+       ('Books', 'legacy'),
+       ('Cleaning Supplies', 'legacy'),
+       ('Medical Supplies', 'legacy');
 
 create table products(
   product_id INT AUTO_INCREMENT PRIMARY KEY,

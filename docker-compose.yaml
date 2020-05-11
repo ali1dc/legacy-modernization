@@ -68,7 +68,7 @@ services:
       - /Users/ali/projects/ali1dc/legacy-modernization/data/pg:/var/lib/postgresql/data
 
   connect:
-    image: debezium/connect:latest
+    image: debezium/connect:1.1.1.Final
     ports:
      - 8083:8083
     links:
