@@ -56,3 +56,6 @@ flyway:
   test-on-borrow: true
   validation-query: SELECT 1
   log-validation-errors: true
+
+legacy:
+  mod.created-by: modernized

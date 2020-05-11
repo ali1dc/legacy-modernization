@@ -1,13 +1,12 @@
-package com.modernized.product.consumer;
+package com.legacy.ingestor.consumer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.modernized.product.model.Category;
-import com.modernized.product.repository.CategoryRepository;
+import com.legacy.ingestor.model.Category;
+import com.legacy.ingestor.repository.CategoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -16,7 +15,7 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
+import java.util.Optional;
 
 @Component
 public class CategoryConsumer {
@@ -26,20 +25,8 @@ public class CategoryConsumer {
     private ObjectMapper jsonMapper;
     @Autowired
     private CategoryRepository categoryRepository;
-    @Value(value = "${legacy.mod.created-by}")
-    private String legacyModCreatedBy;
 
-//    @KafkaListener(
-//            topicPartitions = @TopicPartition(topic = "legacy.order.categories",
-//                    partitionOffsets = {
-//                            @PartitionOffset(partition = "0", initialOffset = "0")
-////                            @PartitionOffset(partition = "3", initialOffset = "0")
-//                    }))
-//    public void listenToCategories(
-//            @Payload String message,
-//            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) throws JsonProcessingException {
-
-    @KafkaListener(topics = { "legacy.order.categories" }, containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = { "product.public.categories" }, containerFactory = "kafkaListenerContainerFactory")
     public void listenToCategories(@Payload(required = false) String message,
                                    @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
                                    @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
@@ -48,17 +35,20 @@ public class CategoryConsumer {
         try {
             JsonNode jsonNode = jsonMapper.readTree(message).at("/payload");
             Category category = jsonMapper.readValue(jsonNode.toString(), Category.class);
-            String legacyCreatedBy = jsonNode.at("/created_by").textValue();
-            if(!Objects.equals(legacyModCreatedBy, legacyCreatedBy)) {
-                category.setLegacyId(category.getId());
-                category.setId(null);
-                category.setCreatedBy("system");
-                category.setUpdatedBy("system");
-                categoryRepository.save(category).subscribe();
-                logger.info("record saved: {}", category);
+            int legacyId = jsonNode.at("/legacy_id").asInt();
+            if(legacyId == 0) {
+                category.setCategoryId(null);
+                category.setCreatedBy("modernized");
+                categoryRepository.save(category);
+                logger.info("saved category: {}, {}, {}",
+                        category.getCategoryId(),
+                        category.getCategoryName(),
+                        category.getCreatedBy());
             } else {
-                logger.info("event is coming from modernized services" +
-                        " and no need to insert it again: {}", category);
+                logger.info("we do not need to insert category: {}, {}, {}",
+                        category.getCategoryId(),
+                        category.getCategoryName(),
+                        category.getCreatedBy());
             }
             ack.acknowledge();
         } catch(DataIntegrityViolationException e) {
