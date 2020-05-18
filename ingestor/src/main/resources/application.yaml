@@ -1,1 +1,33 @@
+server.port: 8092
+management:
+  endpoint.health.enabled: true
+  endpoint.health.show-details: always
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include:
+          - health
+          - metrics
+          - info
+          - bindings
 
+spring.jpa.show-sql: true
+spring.jpa.hibernate.ddl-auto: none
+spring.datasource.url: jdbc:mysql://localhost:3306/order
+spring.datasource.username: root
+spring.datasource.password: root
+
+spring.kafka.bootstrap-servers: localhost:19092
+
+spring.cloud.stream.bindings.processedCategory-in-0.destination: product.public.categories
+spring.cloud.stream.bindings.processedCategory-out-0.destination: processed-categories
+spring.cloud.stream.bindings.processedProduct-in-0.destination: product.public.products
+spring.cloud.stream.bindings.processedProduct-out-0.destination: processed-products
+
+spring.cloud.stream.bindings.legacy-in-0.destination: product.public.products_categories
+
+spring.cloud.stream.function.definition: processedCategory;processedProduct;legacy
+
+spring.cloud.stream.kafka.streams.binder.state-store-retry.max-attempts: 10
+spring.cloud.stream.kafka.streams.binder.state-store-retry.backoff-period: 1000

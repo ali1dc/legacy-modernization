@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,11 +16,17 @@ public class Category {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @JsonProperty("id")
     @Getter @Setter
-    Integer categoryId;
+    @Column(name = "category_id")
+    Long id;
     @JsonProperty("name")
     @Getter @Setter
-    String categoryName;
+    @Column(name = "category_name")
+    String name;
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @Getter @Setter
+    Set<Product> products;
     @Getter @Setter
     @JsonProperty("created_by")
+    @Column(name = "created_by")
     String createdBy;
 }
