@@ -10,7 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = "com.modernized.product")
 public class ProductApplication {
 
-	private static Logger logger = LoggerFactory.getLogger(ProductApplication.class);
+	private static final Logger logger = LoggerFactory.getLogger(ProductApplication.class);
 
 	public static void main(String[] args) {
 

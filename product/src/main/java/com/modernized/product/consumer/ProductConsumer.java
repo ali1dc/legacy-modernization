@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -53,7 +52,7 @@ public class ProductConsumer {
             // if record exists skip adding
             Mono<Product> productExists = productRepository.findTopByName(product.getName());
             if(productExists.hasElement().block()) {
-                logger.info("duplicate product: {} detected, do not add it again!", product.getName());
+                logger.info("duplicate product: {} detected, do not insert it again!", product.getName());
                 return;
             }
             if(!Objects.equals(modCreatedBy, product.getCreatedBy())) {
@@ -72,7 +71,7 @@ public class ProductConsumer {
                 logger.info("event is coming from modernized services" +
                         " and no need to insert it again: {}", product);
             }
-//            ack.acknowledge();
+            ack.acknowledge();
         } catch (Exception e) {
             logger.error(e.getMessage());
         }

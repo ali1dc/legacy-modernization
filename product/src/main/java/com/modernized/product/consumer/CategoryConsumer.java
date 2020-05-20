@@ -56,8 +56,8 @@ public class CategoryConsumer {
                 logger.info("duplicate category: {} detected, do not add it again!", category.getName());
                 return;
             }
-            String legacyCreatedBy = jsonNode.at("/created_by").textValue();
-            if(!Objects.equals(modCreatedBy, legacyCreatedBy)) {
+            String createdBy = jsonNode.at("/created_by").textValue();
+            if(!Objects.equals(modCreatedBy, createdBy)) {
                 category.setLegacyId(category.getId());
                 category.setId(null);
                 category.setCreatedBy(legacyCreatedBy);
@@ -67,7 +67,7 @@ public class CategoryConsumer {
                 logger.info("event is coming from modernized services" +
                         " and no need to insert it again: {}", category);
             }
-//            ack.acknowledge();
+            ack.acknowledge();
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
