@@ -48,7 +48,6 @@ spring:
 
 flyway:
   driver-class-name: org.postgresql.Driver
-  # url: jdbc:postgresql://\${POSTGRES_HOST}:\${POSTGRES_PORT}/product
   url: jdbc:postgresql://localhost:5432/product
   user: postgres
   password: postgres
@@ -57,5 +56,6 @@ flyway:
   validation-query: SELECT 1
   log-validation-errors: true
 
-legacy:
-  mod.created-by: modernized
+created-by:
+  mod: modernized
+  legacy: legacy

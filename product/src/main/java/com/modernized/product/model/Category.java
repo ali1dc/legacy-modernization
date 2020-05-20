@@ -29,6 +29,7 @@ public class Category {
     String createdBy;
     @Getter
     Date createdDate;
+    @JsonProperty("updated_by")
     @Getter @Setter
     String updatedBy;
     @Getter

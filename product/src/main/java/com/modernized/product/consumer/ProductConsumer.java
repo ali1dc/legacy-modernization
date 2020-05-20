@@ -19,6 +19,7 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
@@ -35,8 +36,10 @@ public class ProductConsumer {
     private CategoryRepository categoryRepository;
     @Autowired
     private ProductCategoryRepository productCategoryRepository;
-    @Value(value = "${legacy.mod.created-by}")
-    private String legacyModCreatedBy;
+    @Value(value = "${created-by.legacy}")
+    private String legacyCreatedBy;
+    @Value(value = "${created-by.mod}")
+    private String modCreatedBy;
 
     @KafkaListener(topics = { "legacy.order.products" }, containerFactory = "kafkaListenerContainerFactory")
     public void listenToProducts(@Payload(required = false) String message,
@@ -47,11 +50,16 @@ public class ProductConsumer {
         try {
             JsonNode jsonNode = jsonMapper.readTree(message).at("/payload");
             Product product = jsonMapper.readValue(jsonNode.toString(), Product.class);
-            if(!Objects.equals(legacyModCreatedBy, product.getCreatedBy())) {
+            // if record exists skip adding
+            Mono<Product> productExists = productRepository.findTopByName(product.getName());
+            if(productExists.hasElement().block()) {
+                logger.info("duplicate product: {} detected, do not add it again!", product.getName());
+                return;
+            }
+            if(!Objects.equals(modCreatedBy, product.getCreatedBy())) {
                 product.setLegacyId(product.getId());
                 product.setId(null);
-                product.setCreatedBy("system");
-                product.setUpdatedBy("system");
+                product.setCreatedBy(legacyCreatedBy);
                 product = productRepository.save(product).block();
                 // now get category id and set products_category entity
                 Category category = categoryRepository.findByLegacyId(product.getCategoryId()).block();
@@ -64,9 +72,7 @@ public class ProductConsumer {
                 logger.info("event is coming from modernized services" +
                         " and no need to insert it again: {}", product);
             }
-            ack.acknowledge();
-        } catch(DataIntegrityViolationException e) {
-            logger.warn("duplicate name detected, do not add it again!");
+//            ack.acknowledge();
         } catch (Exception e) {
             logger.error(e.getMessage());
         }

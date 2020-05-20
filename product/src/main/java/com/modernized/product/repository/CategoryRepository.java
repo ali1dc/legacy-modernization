@@ -10,7 +10,7 @@ public interface CategoryRepository extends ReactiveCrudRepository<Category, Int
 
     Flux<Category> findAll();
     Mono<Category> findById(Integer id);
-
+    Mono<Category> findTopByName(String name);
     @Query("SELECT * FROM categories WHERE legacy_id = :legacyId")
     Mono<Category> findByLegacyId(Integer legacyId);
 }
