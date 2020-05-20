@@ -8,13 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
@@ -26,8 +26,10 @@ public class CategoryConsumer {
     private ObjectMapper jsonMapper;
     @Autowired
     private CategoryRepository categoryRepository;
-    @Value(value = "${legacy.mod.created-by}")
-    private String legacyModCreatedBy;
+    @Value(value = "${created-by.legacy}")
+    private String legacyCreatedBy;
+    @Value(value = "${created-by.mod}")
+    private String modCreatedBy;
 
 //    @KafkaListener(
 //            topicPartitions = @TopicPartition(topic = "legacy.order.categories",
@@ -48,12 +50,17 @@ public class CategoryConsumer {
         try {
             JsonNode jsonNode = jsonMapper.readTree(message).at("/payload");
             Category category = jsonMapper.readValue(jsonNode.toString(), Category.class);
-            String legacyCreatedBy = jsonNode.at("/created_by").textValue();
-            if(!Objects.equals(legacyModCreatedBy, legacyCreatedBy)) {
+            // if record exists skip adding
+            Mono<Category> categoryExists = categoryRepository.findTopByName(category.getName());
+            if(categoryExists.hasElement().block()) {
+                logger.info("duplicate category: {} detected, do not add it again!", category.getName());
+                return;
+            }
+            String createdBy = jsonNode.at("/created_by").textValue();
+            if(!Objects.equals(modCreatedBy, createdBy)) {
                 category.setLegacyId(category.getId());
                 category.setId(null);
-                category.setCreatedBy("system");
-                category.setUpdatedBy("system");
+                category.setCreatedBy(legacyCreatedBy);
                 categoryRepository.save(category).subscribe();
                 logger.info("record saved: {}", category);
             } else {
@@ -61,8 +68,6 @@ public class CategoryConsumer {
                         " and no need to insert it again: {}", category);
             }
             ack.acknowledge();
-        } catch(DataIntegrityViolationException e) {
-            logger.info("duplicate name detected, do not add it again!");
         } catch (Exception e) {
             logger.error(e.getMessage());
         }

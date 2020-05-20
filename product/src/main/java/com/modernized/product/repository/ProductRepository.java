@@ -9,4 +9,5 @@ public interface ProductRepository extends ReactiveCrudRepository<Product, Integ
 
     Flux<Product> findAll();
     Mono<Product> findById(Integer id);
+    Mono<Product> findTopByName(String name);
 }
