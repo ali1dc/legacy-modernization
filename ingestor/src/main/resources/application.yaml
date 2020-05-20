@@ -11,6 +11,9 @@ management:
           - metrics
           - info
           - bindings
+created-by:
+  mod: modernized
+  legacy: legacy
 
 spring.jpa.show-sql: true
 spring.jpa.hibernate.ddl-auto: none

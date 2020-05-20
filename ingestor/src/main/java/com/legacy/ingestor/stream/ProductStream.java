@@ -18,6 +18,7 @@ import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.support.serializer.JsonSerde;
@@ -38,6 +39,11 @@ public class ProductStream {
     @Autowired
     private ProductRepository productRepository;
 
+    @Value(value = "${created-by.legacy}")
+    private String legacyCreatedBy;
+    @Value(value = "${created-by.mod}")
+    private String modCreatedBy;
+
     private final Serde<Category> categorySerde;
     private final Serde<Product> productSerde;
 
@@ -54,6 +60,15 @@ public class ProductStream {
                     try {
                         JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
                         category = jsonMapper.readValue(jsonNode.toString(), Category.class);
+                        // insert category if not exists om legacy db
+                        Optional<Category> legacyCategory = categoryRepository.findTopByName(category.getName());
+                        if(!legacyCategory.isPresent()) {
+                            category.setCreatedBy(modCreatedBy);
+                            categoryRepository.save(category);
+                            logger.info("category id: {} - name: {} was inserted to the legacy db.",
+                                    category.getId(),
+                                    category.getName());
+                        }
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
@@ -95,25 +110,34 @@ public class ProductStream {
                         ReadOnlyKeyValueStore<Long, Product> productStore =
                                 interactiveQueryService.getQueryableStore("product-store", QueryableStoreTypes.keyValueStore());
                         Product product = productStore.get(productId);
+                        // do not add it if the product exists with the same name
+                        Optional<Product> productExists = productRepository.findTopByName(product.getName());
+                        if(productExists.isPresent()) {
+                            logger.info("duplicate product: {} detected, do not insert it again!", product.getName());
+                            return;
+                        }
+//                        // Another way to check if we do not need to insert the record
+//                        if (product.getLegacyId() != null) {
+//                            logger.info("The event is coming from Legacy and no need to insert it again");
+//                            return;
+//                        }
                         ReadOnlyKeyValueStore<Long, Category> categoryStore =
                                 interactiveQueryService.getQueryableStore("category-store", QueryableStoreTypes.keyValueStore());
                         Category category = categoryStore.get(categoryId);
                         // categories are not matched with ids, so we get it by name
-                        Optional<Category> legacy = categoryRepository.findTopByName(category.getName());
-                        if(!legacy.isPresent()) {
-                            category.setCreatedBy("modernized");
-                            legacy = Optional.of(categoryRepository.save(category));
+                        Optional<Category> legacyCategory = categoryRepository.findTopByName(category.getName());
+                        if(!legacyCategory.isPresent()) {
+                            category.setCreatedBy(modCreatedBy);
+                            legacyCategory = Optional.of(categoryRepository.save(category));
                         }
-                        product.setCategory(legacy.get());
+                        product.setCategory(legacyCategory.get());
                         product.setId(null);
-                        product.setCreatedBy("modernized");
+                        product.setCreatedBy(modCreatedBy);
                         productRepository.save(product);
-
                         logger.info("Saved: --> id: {} - product: {} - category: {}",
                                 product.getId(),
                                 product.getName(),
                                 product.getCategory().getName());
-
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
