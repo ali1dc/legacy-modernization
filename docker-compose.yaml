@@ -15,8 +15,6 @@ services:
      - 2181:2181
      - 2888:2888
      - 3888:3888
-    # volumes:
-    #   - /Users/ali/projects/ali1dc/legacy-modernization/data/zk:/zookeeper/data
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -35,22 +33,21 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-    # volumes:
-    #   - /Users/ali/projects/ali1dc/legacy-modernization/data/kafka:/kafka/data
 
   mysql:
     image: debezium/example-mysql:latest
     hostname: mysql
     command: --default-authentication-plugin=mysql_native_password
     volumes:
-      - /Users/ali/projects/ali1dc/legacy-modernization/data/mysql:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
     ports:
      -  3306:3306
     environment:
      - MYSQL_ROOT_PASSWORD=root
      - MYSQL_USER=ali
      - MYSQL_PASSWORD=password
-     - MYSQL_DATABASE=order
+     - MYSQL_DATABASE=legacy_order
+
   adminer:
     image: adminer:latest
     environment:
@@ -67,7 +64,7 @@ services:
      - POSTGRES_USER=postgres
      - POSTGRES_PASSWORD=postgres
     volumes:
-      - /Users/ali/projects/ali1dc/legacy-modernization/data/pg:/var/lib/postgresql/data
+      - pg-data:/var/lib/postgresql/data
 
   connect:
     image: debezium/connect:1.1.1.Final
@@ -83,6 +80,19 @@ services:
      - CONFIG_STORAGE_TOPIC=my_connect_configs
      - OFFSET_STORAGE_TOPIC=my_connect_offsets
      - STATUS_STORAGE_TOPIC=my_connect_statuses
+
+  # schema-registry:
+  #   image: confluentinc/cp-schema-registry:5.1.2
+  #   restart: always
+  #   depends_on:
+  #     - zookeeper
+  #     - kafka
+  #   environment:
+  #     SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper:2181
+  #     SCHEMA_REGISTRY_HOST_NAME: schema-registry
+  #   ports:
+  #     - "8081:8081"
+
   # elastic:
   #   image: docker.elastic.co/elasticsearch/elasticsearch:5.5.2
   #   ports:
@@ -91,4 +101,7 @@ services:
   #    - http.host=0.0.0.0
   #    - transport.host=127.0.0.1
   #    - xpack.security.enabled=false
- 
+
+volumes:
+  pg-data:
+  mysql-data:
