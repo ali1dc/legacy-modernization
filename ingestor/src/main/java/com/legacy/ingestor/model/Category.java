@@ -1,5 +1,6 @@
 package com.legacy.ingestor.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -24,6 +25,7 @@ public class Category {
     String name;
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     @Getter @Setter
+    @JsonIgnore
     Set<Product> products;
     @Getter @Setter
     @JsonProperty("created_by")
