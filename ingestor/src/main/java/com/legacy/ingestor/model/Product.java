@@ -1,5 +1,6 @@
 package com.legacy.ingestor.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -21,6 +22,7 @@ public class Product {
     @JsonProperty("name")
     @Column(name = "product_name")
     String name;
+    @JsonIgnore
     @Getter @Setter
     @ManyToOne
     @JoinColumn(name = "category_id")

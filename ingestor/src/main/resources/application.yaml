@@ -17,7 +17,7 @@ created-by:
 
 spring.jpa.show-sql: true
 spring.jpa.hibernate.ddl-auto: none
-spring.datasource.url: jdbc:mysql://localhost:3306/order
+spring.datasource.url: jdbc:mysql://localhost:3306/legacy_order
 spring.datasource.username: root
 spring.datasource.password: root
 

@@ -1,6 +1,5 @@
 package com.legacy.ingestor.repository;
 
-import com.legacy.ingestor.model.Category;
 import com.legacy.ingestor.model.Product;
 import org.springframework.data.repository.CrudRepository;
 

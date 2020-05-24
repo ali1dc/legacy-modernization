@@ -12,10 +12,13 @@
     "database.tcpKeepAlive": true,
     "table.blacklist": "public.flyway_schema_history",
     "schema.whitelist": "public",
-    "transforms": "unwrap",
-    "transforms.unwrap.type": "io.debezium.transforms.UnwrapFromEnvelope",
-    "transforms.unwrap.drop.tombstones": "false",
     "decimal.handling.mode": "double",
+    "schemas.enable": false,
+    "errors.tolerance": "all",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "internal.key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "internal.value.converter": "org.apache.kafka.connect.json.JsonConverter",
     "slot.name" : "product_slot"
   }
 }
