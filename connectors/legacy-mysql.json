@@ -19,7 +19,6 @@
     "key.converter": "org.apache.kafka.connect.json.JsonConverter",
     "schemas.enable": false,
     "value.converter": "org.apache.kafka.connect.json.JsonConverter",
-    "value.converter.schema.registry.url": "http://schema-registry:8081",
     "internal.key.converter": "org.apache.kafka.connect.json.JsonConverter",
     "internal.value.converter": "org.apache.kafka.connect.json.JsonConverter",
     "slot.name" : "legacy_order_slot"
