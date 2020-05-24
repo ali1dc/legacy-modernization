@@ -54,6 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
         // set proper values
         Category legacyCategory = legacyCategoryOptional.get();
         legacyCategory.setName(event.getAfter().getName());
+        legacyCategory.setCreatedBy(modCreatedBy);
         legacyCategory = categoryRepository.save(legacyCategory);
         return legacyCategory;
     }
