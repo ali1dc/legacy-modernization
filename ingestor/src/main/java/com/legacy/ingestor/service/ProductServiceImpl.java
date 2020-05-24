@@ -40,7 +40,7 @@ public class ProductServiceImpl implements ProductService{
         logger.info("inserting the record");
         // do not insert it if the product exists
         Optional<Product> productExists = productRepository.findTopByName(event.getAfter().getName());
-        if(productExists.isPresent()) {
+        if (productExists.isPresent()) {
             logger.info("duplicate product detected, do not insert it again!");
             return productExists.get();
         }
@@ -57,9 +57,12 @@ public class ProductServiceImpl implements ProductService{
         ReadOnlyKeyValueStore<Long, Product> productStore =
                 interactiveQueryService.getQueryableStore("product-store", QueryableStoreTypes.keyValueStore());
         Product product = productStore.get(productId);
+        if (product == null) {
+            return null;
+        }
         // do not add it if the product exists with the same name
         Optional<Product> productExists = productRepository.findTopByName(product.getName());
-        if(productExists.isPresent()) {
+        if (productExists.isPresent()) {
             logger.info("duplicate product: {} detected, do not insert it again!", product.getName());
             return productExists.get();
         }
@@ -73,7 +76,7 @@ public class ProductServiceImpl implements ProductService{
         Category category = categoryStore.get(categoryId);
         // categories are not matched with ids, so we get it by name
         Optional<Category> legacyCategory = categoryRepository.findTopByName(category.getName());
-        if(!legacyCategory.isPresent()) {
+        if (!legacyCategory.isPresent()) {
             category.setCreatedBy(modCreatedBy);
             legacyCategory = Optional.of(categoryRepository.save(category));
         }
@@ -101,6 +104,7 @@ public class ProductServiceImpl implements ProductService{
         legacyProduct.setDescription(event.getAfter().getDescription());
         legacyProduct.setListPrice(event.getAfter().getListPrice());
         legacyProduct.setQuantity(event.getAfter().getQuantity());
+        legacyProduct.setCreatedBy(modCreatedBy);
         productRepository.save(legacyProduct);
         return legacyProduct;
     }
