@@ -9,8 +9,6 @@ import com.legacy.ingestor.events.CategoryEvent;
 import com.legacy.ingestor.events.ProductEvent;
 import com.legacy.ingestor.model.Category;
 import com.legacy.ingestor.model.Product;
-import com.legacy.ingestor.repository.CategoryRepository;
-import com.legacy.ingestor.repository.ProductRepository;
 import com.legacy.ingestor.service.CategoryService;
 import com.legacy.ingestor.service.ProductService;
 import org.apache.kafka.common.serialization.Serde;
@@ -22,8 +20,6 @@ import org.apache.kafka.streams.kstream.Materialized;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.support.serializer.JsonSerde;
 import org.springframework.stereotype.Component;
@@ -33,24 +29,14 @@ import java.util.function.Function;
 
 @Component
 public class ProductStream {
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private ObjectMapper jsonMapper;
     @Autowired
-    private InteractiveQueryService interactiveQueryService;
-    @Autowired
-    private CategoryRepository categoryRepository;
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
     private CategoryService categoryService;
     @Autowired
     private ProductService productService;
-
-    @Value(value = "${created-by.legacy}")
-    private String legacyCreatedBy;
-    @Value(value = "${created-by.mod}")
-    private String modCreatedBy;
 
     private final Serde<Category> categorySerde;
     private final Serde<Product> productSerde;

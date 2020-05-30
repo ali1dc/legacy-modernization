@@ -64,7 +64,7 @@ public class CategoryConsumer {
                 deleteCategory(categoryEvent);
             }
 
-//            ack.acknowledge();
+            ack.acknowledge();
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
