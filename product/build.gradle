@@ -1,5 +1,5 @@
 plugins {
-	id 'org.springframework.boot' version '2.3.0.BUILD-SNAPSHOT'
+	id 'org.springframework.boot' version '2.3.0.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
 	id 'java'
 	id 'org.flywaydb.flyway' version '6.4.1'
@@ -16,7 +16,7 @@ repositories {
 }
 
 ext {
-	set('springCloudVersion', "Hoxton.BUILD-SNAPSHOT")
+	set('springCloudVersion', "Hoxton.SR4")
 }
 
 dependencies {
@@ -25,9 +25,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.apache.kafka:kafka-streams'
 	implementation 'org.flywaydb:flyway-core'
-	implementation 'org.springframework.cloud:spring-cloud-stream'
-	implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka'
-	implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka-streams'
+	implementation 'org.springframework.cloud:spring-cloud-stream:3.0.4.RELEASE'
+	implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka:3.0.4.RELEASE'
+	implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka-streams:3.0.4.RELEASE'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation 'org.springframework.kafka:spring-kafka'
