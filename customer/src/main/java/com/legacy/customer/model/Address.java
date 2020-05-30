@@ -1,5 +1,6 @@
 package com.legacy.customer.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -37,8 +38,9 @@ public class Address {
     @JsonProperty("zip")
     String zip;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "address")
-    Set<CustomerAddress> customers;
+    Set<CustomerAddress> customerAddresses;
 
     @JsonProperty("created_by")
     @Column(name = "created_by")

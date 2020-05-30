@@ -1,5 +1,6 @@
 package com.legacy.customer.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -28,8 +29,12 @@ public class Customer {
     @Column(name = "last_name")
     String lastName;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "customer")
-    Set<CustomerAddress> addresses;
+    Set<CustomerAddress> customerAddresses;
+
+    @Transient
+    Set<Address> addresses;
 
     @JsonProperty("email")
     String email;
