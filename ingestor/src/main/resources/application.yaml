@@ -23,14 +23,20 @@ spring.datasource.password: root
 
 spring.kafka.bootstrap-servers: localhost:19092
 
+spring.cloud.stream.function.definition: processedCategory;processedProduct;legacy;processCustomer;processAddress;legacyCustomerSync
+
+spring.cloud.stream.kafka.streams.binder.state-store-retry.max-attempts: 10
+spring.cloud.stream.kafka.streams.binder.state-store-retry.backoff-period: 1000
+
+# product microservice
 spring.cloud.stream.bindings.processedCategory-in-0.destination: product.public.categories
 spring.cloud.stream.bindings.processedCategory-out-0.destination: processed-categories
 spring.cloud.stream.bindings.processedProduct-in-0.destination: product.public.products
 spring.cloud.stream.bindings.processedProduct-out-0.destination: processed-products
-
 spring.cloud.stream.bindings.legacy-in-0.destination: product.public.products_categories
-
-spring.cloud.stream.function.definition: processedCategory;processedProduct;legacy
-
-spring.cloud.stream.kafka.streams.binder.state-store-retry.max-attempts: 10
-spring.cloud.stream.kafka.streams.binder.state-store-retry.backoff-period: 1000
+# customer microservice
+spring.cloud.stream.bindings.processCustomer-in-0.destination: customer.public.customers
+spring.cloud.stream.bindings.processCustomer-out-0.destination: processed-customers
+spring.cloud.stream.bindings.processAddress-in-0.destination: customer.public.addresses
+spring.cloud.stream.bindings.processAddress-out-0.destination: processed-addresses
+spring.cloud.stream.bindings.legacyCustomerSync-in-0.destination: customer.public.customer_addresses
