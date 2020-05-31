@@ -1,5 +1,5 @@
 {
-  "name": "product-postgres",
+  "name": "customer-postgres",
   "config": {
     "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
     "tasks.max": "1",
@@ -7,8 +7,8 @@
     "database.port": "5432",
     "database.user": "postgres",
     "database.password": "postgres",
-    "database.dbname": "product",
-    "database.server.name": "product",
+    "database.dbname": "customer",
+    "database.server.name": "customer",
     "database.tcpKeepAlive": true,
     "table.blacklist": "public.flyway_schema_history",
     "schema.whitelist": "public",
@@ -19,6 +19,6 @@
     "value.converter": "org.apache.kafka.connect.json.JsonConverter",
     "internal.key.converter": "org.apache.kafka.connect.json.JsonConverter",
     "internal.value.converter": "org.apache.kafka.connect.json.JsonConverter",
-    "slot.name" : "product_slot"
+    "slot.name" : "customer_slot"
   }
 }
