@@ -1,16 +1,15 @@
 package com.legacy.ingestor.events;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.legacy.ingestor.model.Product;
+import com.legacy.ingestor.dto.CustomerAddress;
 import lombok.*;
 
 import java.sql.Timestamp;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Getter
-public class ProductEvent {
+public class CustomerAddressEvent {
 
     @JsonProperty("op")
     String op;
@@ -19,8 +18,8 @@ public class ProductEvent {
     Timestamp timestamp;
 
     @JsonProperty("before")
-    Product before;
+    CustomerAddress before;
 
     @JsonProperty("after")
-    Product after;
+    CustomerAddress after;
 }

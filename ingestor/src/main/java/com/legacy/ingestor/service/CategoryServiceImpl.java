@@ -28,7 +28,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category insert(CategoryEvent event) {
         logger.info("inserting the record");
-        // insert category if not exists om legacy db
+        // insert category if not exists in legacy db
         Category category = event.getAfter();
         Optional<Category> legacyCategory = categoryRepository.findTopByName(category.getName());
         if(!legacyCategory.isPresent()) {

@@ -1,6 +1,7 @@
 package com.legacy.ingestor.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.legacy.ingestor.config.StateStores;
 import com.legacy.ingestor.events.ProductEvent;
 import com.legacy.ingestor.model.Category;
 import com.legacy.ingestor.model.Product;
@@ -55,7 +56,7 @@ public class ProductServiceImpl implements ProductService{
     public Product insert(Long productId, Long categoryId) {
         logger.info("product id: {} - category id: {}", productId, categoryId);
         ReadOnlyKeyValueStore<Long, Product> productStore =
-                interactiveQueryService.getQueryableStore("product-store", QueryableStoreTypes.keyValueStore());
+                interactiveQueryService.getQueryableStore(StateStores.PRODUCT_STORE, QueryableStoreTypes.keyValueStore());
         Product product = productStore.get(productId);
         if (product == null) {
             return null;
@@ -72,7 +73,7 @@ public class ProductServiceImpl implements ProductService{
 //            return;
 //        }
         ReadOnlyKeyValueStore<Long, Category> categoryStore =
-                interactiveQueryService.getQueryableStore("category-store", QueryableStoreTypes.keyValueStore());
+                interactiveQueryService.getQueryableStore(StateStores.CATEGORY_STORE, QueryableStoreTypes.keyValueStore());
         Category category = categoryStore.get(categoryId);
         // categories are not matched with ids, so we get it by name
         Optional<Category> legacyCategory = categoryRepository.findTopByName(category.getName());
