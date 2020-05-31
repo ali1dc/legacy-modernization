@@ -1,6 +1,8 @@
 package com.legacy.ingestor.config;
 
 public interface StateStores {
-    final String CATEGORY_STORE = "category-store";
-    final String PRODUCT_STORE = "product-store";
+    String CATEGORY_STORE = "category-store";
+    String PRODUCT_STORE = "product-store";
+    String CUSTOMER_STORE = "customer-store";
+    String ADDRESS_STORE = "address-store";
 }

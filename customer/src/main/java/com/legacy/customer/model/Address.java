@@ -44,8 +44,8 @@ public class Address {
 
     @JsonProperty("created_by")
     @Column(name = "created_by")
-
     String createdBy;
+
     @JsonProperty("created_date")
     @Column(name = "created_date")
     Date createdDate;
