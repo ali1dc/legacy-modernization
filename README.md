@@ -90,7 +90,7 @@ The tech stack that I am using for this effort:
 All microservices are independent of each other and maintain it's own datastore; either `PostgreSQL` or `RocksDB` - in-memory `Kafka State Store` and inter communication based on each case, will happen mostly with Kafka or sometimes REST API.
 
 #### 3.1 Product Modernization
-This microservice is responsible for product management. It has 3 tables; categories, products, and products_categories. The data structure is different than legacy and in this app, we can handle multiple category for each product (some simple functionality that is not exist in legacy).
+This microservice is responsible for product management. It has 3 tables; categories, products, and products_categories. The data structure is different than legacy and in this app, we can handle multiple category for each product (a simple functionality that does not exist in legacy).
 
 Also I needed to broadcast modernized data to pur Kafka Cluster. For this purpose, I have 2 ways:
 1. Use Spring Data and Kafka Transaction for manipulating the data and produce it to Kafka. Valid option but requires some custom coding.
@@ -128,6 +128,20 @@ The source code is [here](./product) and you can clone it, then go under `./prod
 $ ./gradlew bootRun
 ```
 
+This diagram shows what we have so far:
+
+![Step-1 Product Microservice Diagram](./images/step-1-product-microservice.png)
+
+#### 3.2 Customer Modernization
+This microservice is responsible for customer management. It has 3 tables; customers, addresses, and customer_addresses. The data structure is different than legacy and we can handle multiple addresses for each customer (a functionality that does not exist in legacy).
+
+I also created this [connector](./connectors/customer-postgres.json) for producing CDC into our Kafka cluster for moving data back to the legacy database. (data needs to be synced)
+
+Now, this is what we have:
+
+![Step-2 Customer Microservice Diagram](./images/step-2-customer-microservice.png)
+
+
 #### Ingestor Microservice
 Let's step back and ask this question; what if a new product is added in the `Product` microservice? How we add that record to the legacy database? The simple old days answer would be create database connection and add record to that database! But the answer is wrong and that is violation of Microservice Paradigm!
 
@@ -137,6 +151,3 @@ With this toolkit, I could transfer the modernized data structure back to the le
 
 Basically, what we have here called streaming app or Stream Processing service! By this streaming ETL, we simply can sync legacy and modernized database with each other without any modification in legacy application or legacy database! This is very important factor and this technology can help us to use Strangler Pattern or Digital Decoupling without breaking existing running app!
 
-This diagram shows what we have so far:
-
-![Step-1 Product Microservice Diagram](/images/step-1-product-microservice.png)
