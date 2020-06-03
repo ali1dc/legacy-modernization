@@ -28,6 +28,11 @@ spring.jpa.show-sql: true
 spring.jpa.hibernate.ddl-auto: none
 
 spring.kafka.bootstrap-servers: localhost:19092
+spring.cloud.stream.function.definition: customers;products;orders;orderItems
+spring.cloud.stream.bindings.customers-in-0.destination: customer.public.customers
+spring.cloud.stream.bindings.products-in-0.destination: product.public.products
+spring.cloud.stream.bindings.orders-in-0.destination: legacy.legacy_order.orders
+spring.cloud.stream.bindings.orderItems-in-0.destination: legacy.legacy_order.order_items
 
 flyway:
   driver-class-name: org.postgresql.Driver
