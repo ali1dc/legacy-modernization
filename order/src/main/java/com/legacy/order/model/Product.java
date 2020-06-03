@@ -15,12 +15,11 @@ import java.util.Date;
 public class Product {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @JsonProperty("id")
-    Integer id;
+    Long id;
 
     @JsonProperty("legacy_id")
-    Integer legacyId;
+    Long legacyId;
 
     @JsonProperty("name")
     String name;

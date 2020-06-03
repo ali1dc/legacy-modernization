@@ -1,5 +1,6 @@
 package com.legacy.order.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -16,20 +17,30 @@ public class OrderItem {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @JsonProperty("id")
+    @JsonProperty("item_id")
     Long id;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name="order_id", nullable=false)
     Order order;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name="product_id", nullable=false)
     Product product;
 
-    @JsonProperty("legacy_id")
+    @Transient
+    @JsonProperty("order_id")
+    Long orderId;
+
+    @Transient
+    @JsonProperty("product_id")
+    Long productId;
+
+    @JsonProperty("quantity")
     @Column(name = "quantity")
-    int quantity;
+    Integer quantity;
 
     @JsonProperty("unit_price")
     @Column(name = "unit_price")

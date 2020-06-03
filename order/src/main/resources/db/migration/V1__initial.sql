@@ -1,6 +1,6 @@
 CREATE TABLE public.customers
 (
-  id SERIAL PRIMARY KEY,
+  id INT PRIMARY KEY,
   first_name VARCHAR(200) NOT NULL,
   last_name VARCHAR(200) NOT NULL,
   email VARCHAR(200) NOT NULL,
@@ -20,7 +20,7 @@ ALTER TABLE public.customers REPLICA IDENTITY FULL;
 
 ----------------------------------------
 CREATE TABLE products(
-  id SERIAL PRIMARY KEY,
+  id INT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   description VARCHAR(255),
   list_price NUMERIC(8, 2) NOT NULL,

@@ -1,5 +1,6 @@
 package com.legacy.order.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -11,14 +12,19 @@ import java.util.Date;
 @Builder
 @Getter @Setter
 @Entity
-@Table(name = "order")
+@Table(name = "orders")
 public class Order {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @JsonProperty("id")
+    @JsonProperty("order_id")
     Long id;
 
+    @Transient
+    @JsonProperty("customer_id")
+    Long customerId;
+
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name="customer_id", nullable=false)
     Customer customer;
@@ -35,7 +41,7 @@ public class Order {
     @Column(name = "created_by")
     String createdBy;
 
-    @JsonProperty("created_date")
+    @JsonProperty("order_date")
     @Column(name = "created_date")
     Date createdDate;
 
