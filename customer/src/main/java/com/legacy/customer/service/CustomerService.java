@@ -1,6 +1,5 @@
 package com.legacy.customer.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.legacy.customer.event.LegacyCustomerEvent;
 import com.legacy.customer.model.Customer;
 
