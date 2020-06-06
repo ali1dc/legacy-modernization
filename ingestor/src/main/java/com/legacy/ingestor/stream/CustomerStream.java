@@ -10,6 +10,7 @@ import com.legacy.ingestor.dto.Customer;
 import com.legacy.ingestor.events.AddressEvent;
 import com.legacy.ingestor.events.CustomerAddressEvent;
 import com.legacy.ingestor.events.CustomerEvent;
+import com.legacy.ingestor.model.LegacyCustomer;
 import com.legacy.ingestor.service.CustomerService;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
@@ -36,17 +37,17 @@ public class CustomerStream {
     @Autowired
     private CustomerService customerService;
 
-    private final Serde<Customer> customerDtoSerde;
-    private final Serde<Address> addressDtoSerde;
+    private final Serde<Customer> customerSerde;
+    private final Serde<Address> addressSerde;
 
 
     public CustomerStream() {
-        this.customerDtoSerde = new JsonSerde<>(Customer.class);
-        this.addressDtoSerde = new JsonSerde<>(Address.class);
+        this.customerSerde = new JsonSerde<>(Customer.class);
+        this.addressSerde = new JsonSerde<>(Address.class);
     }
 
     @Bean
-    public Function<KStream<String, String>, KStream<Long, Customer>> processCustomer() {
+    public Function<KStream<String, String>, KStream<Long, Customer>> processLegacyCustomer() {
 
         return input -> input
 
@@ -61,20 +62,19 @@ public class CustomerStream {
                     return !Objects.equals(event.getOp(), Actions.DELETE);
                 })
                 .map((key, value) -> {
-                   Customer customer = null;
+                    Customer customer = null;
                     try {
                         JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
                         CustomerEvent event = jsonMapper.readValue(jsonNode.toString(), CustomerEvent.class);
                         customer = event.getAfter();
-                        if (Objects.equals(event.getOp(), Actions.UPDATE)) {
-                            customerService.update(event);
-                        }
+                        LegacyCustomer legacyCustomer = customerService.save(event);
+                        customer.setLegacyId(legacyCustomer.getId());
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
                     return KeyValue.pair(customer.getId(), customer);
                 })
-                .groupByKey(Grouped.with(Serdes.Long(), customerDtoSerde))
+                .groupByKey(Grouped.with(Serdes.Long(), customerSerde))
                 .reduce((value1, value2) -> value2, Materialized.as(StateStores.CUSTOMER_STORE))
                 .toStream();
     }
@@ -91,6 +91,7 @@ public class CustomerStream {
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
+                    assert event != null;
                     return !Objects.equals(event.getOp(), Actions.DELETE);
                 })
                 .map((key, value) -> {
@@ -102,9 +103,10 @@ public class CustomerStream {
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
+                    assert address != null;
                     return KeyValue.pair(address.getId(), address);
                 })
-                .groupByKey(Grouped.with(Serdes.Long(), addressDtoSerde))
+                .groupByKey(Grouped.with(Serdes.Long(), addressSerde))
                 .reduce((value1, value2) -> value2, Materialized.as(StateStores.ADDRESS_STORE))
                 .toStream();
     }
@@ -117,12 +119,12 @@ public class CustomerStream {
                     try {
                         JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
                         CustomerAddressEvent event = jsonMapper.readValue(jsonNode.toString(), CustomerAddressEvent.class);
-                        customerService.legacyHandler(event);
-
+                        if (!Objects.equals(event.getOp(), Actions.DELETE)) {
+                            customerService.save(event);
+                        }
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
-
                 });
     }
 }

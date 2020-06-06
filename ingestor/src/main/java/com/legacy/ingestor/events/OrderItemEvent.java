@@ -1,8 +1,11 @@
 package com.legacy.ingestor.events;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.legacy.ingestor.dto.Product;
-import lombok.*;
+import com.legacy.ingestor.dto.OrderItem;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 
@@ -10,7 +13,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Builder
 @Getter
-public class ProductEvent {
+public class OrderItemEvent {
 
     @JsonProperty("op")
     String op;
@@ -19,8 +22,8 @@ public class ProductEvent {
     Timestamp timestamp;
 
     @JsonProperty("before")
-    Product before;
+    OrderItem before;
 
     @JsonProperty("after")
-    Product after;
+    OrderItem after;
 }

@@ -1,6 +1,5 @@
 package com.legacy.ingestor.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.ingestor.events.CategoryEvent;
 import com.legacy.ingestor.model.Category;
 import com.legacy.ingestor.repository.CategoryRepository;
@@ -17,11 +16,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
-    private ObjectMapper jsonMapper;
-    @Autowired
     private CategoryRepository categoryRepository;
-    @Value(value = "${created-by.legacy}")
-    private String legacyCreatedBy;
     @Value(value = "${created-by.mod}")
     private String modCreatedBy;
 

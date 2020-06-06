@@ -30,6 +30,7 @@ spring.jpa.hibernate.ddl-auto: none
 spring.kafka.bootstrap-servers: localhost:19092
 spring.cloud.stream.bindings.processCustomer-in-0.destination: legacy.legacy_order.customers
 spring.cloud.stream.function.definition: processCustomer
+spring.cloud.stream.kafka.stream.binder.application-id: customer-microservice
 
 flyway:
   driver-class-name: org.postgresql.Driver

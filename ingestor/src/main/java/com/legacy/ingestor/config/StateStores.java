@@ -5,4 +5,5 @@ public interface StateStores {
     String PRODUCT_STORE = "product-store";
     String CUSTOMER_STORE = "customer-store";
     String ADDRESS_STORE = "address-store";
+    String ORDER_STORE = "order-store";
 }

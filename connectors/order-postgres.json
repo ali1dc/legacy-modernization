@@ -1,0 +1,24 @@
+{
+  "name": "order-postgres",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "tasks.max": "1",
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "postgres",
+    "database.password": "postgres",
+    "database.dbname": "order",
+    "database.server.name": "order",
+    "database.tcpKeepAlive": true,
+    "table.blacklist": "public.flyway_schema_history",
+    "schema.whitelist": "public",
+    "decimal.handling.mode": "double",
+    "schemas.enable": false,
+    "errors.tolerance": "all",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "internal.key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "internal.value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "slot.name" : "order_slot"
+  }
+}

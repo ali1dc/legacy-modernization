@@ -28,6 +28,7 @@ spring.jpa.show-sql: true
 spring.jpa.hibernate.ddl-auto: none
 
 spring.kafka.bootstrap-servers: localhost:19092
+spring.cloud.stream.kafka.stream.binder.application-id: order-microservice
 spring.cloud.stream.function.definition: customers;products;orders;orderItems
 spring.cloud.stream.bindings.customers-in-0.destination: customer.public.customers
 spring.cloud.stream.bindings.products-in-0.destination: product.public.products

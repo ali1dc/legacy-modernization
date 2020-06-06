@@ -1,7 +1,5 @@
 package com.legacy.ingestor.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.legacy.ingestor.config.Actions;
 import com.legacy.ingestor.config.AddressTypes;
 import com.legacy.ingestor.config.StateStores;
 import com.legacy.ingestor.dto.Address;
@@ -27,25 +25,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
-    private ObjectMapper jsonMapper;
-    @Autowired
     private CustomerRepository customerRepository;
     @Autowired
     private InteractiveQueryService interactiveQueryService;
-    @Value(value = "${created-by.legacy}")
-    private String legacyCreatedBy;
     @Value(value = "${created-by.mod}")
     private String modCreatedBy;
-
-    @Override
-    public void legacyHandler(CustomerAddressEvent event) {
-
-        if (!Objects.equals(event.getOp(), Actions.DELETE)) {
-            save(event);
-        } else {
-            delete(event);
-        }
-    }
 
     @Override
     public LegacyCustomer save(CustomerAddressEvent event) {
@@ -104,20 +88,40 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void update(CustomerEvent event) {
+    public LegacyCustomer save(CustomerEvent event) {
 
-        Optional<LegacyCustomer> customerOptional = customerRepository.findTopByEmail(event.getBefore().getEmail());
-        if (!customerOptional.isPresent()) {
-            logger.info("customer does not exists!");
-            return;
+        Optional<LegacyCustomer> customerOptional = customerRepository.findTopByEmail(event.getAfter().getEmail());
+        LegacyCustomer customer;
+        if (customerOptional.isPresent()) {
+            logger.info("customer update action");
+            customer = customerOptional.get();
+            customer.setFirstName(event.getAfter().getFirstName());
+            customer.setLastName(event.getAfter().getLastName());
+            customer.setPhone(event.getAfter().getPhone());
+            customer.setEmail(event.getAfter().getEmail());
+        } else {
+            logger.info("customer insert action");
+            customer = LegacyCustomer.builder()
+                    .id(null)
+                    .firstName(event.getAfter().getFirstName())
+                    .lastName(event.getAfter().getLastName())
+                    .phone(event.getAfter().getPhone())
+                    .email(event.getAfter().getEmail())
+                    .createdBy(modCreatedBy)
+                    .billingAddress1("")
+                    .billingCity("")
+                    .billingState("")
+                    .billingZip("")
+                    .shippingAddress1("")
+                    .shippingAddress2("")
+                    .shippingCity("")
+                    .shippingState("")
+                    .shippingZip("")
+                    .build();
         }
-        LegacyCustomer customer = customerOptional.get();
-        customer.setFirstName(event.getAfter().getFirstName());
-        customer.setLastName(event.getAfter().getLastName());
-        customer.setPhone(event.getAfter().getPhone());
-        customer.setEmail(event.getAfter().getEmail());
 
         customerRepository.save(customer);
+        return customer;
     }
 
     @Override

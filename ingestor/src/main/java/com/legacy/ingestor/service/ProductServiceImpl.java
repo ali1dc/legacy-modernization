@@ -1,10 +1,10 @@
 package com.legacy.ingestor.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.ingestor.config.StateStores;
+import com.legacy.ingestor.dto.Product;
 import com.legacy.ingestor.events.ProductEvent;
 import com.legacy.ingestor.model.Category;
-import com.legacy.ingestor.model.Product;
+import com.legacy.ingestor.model.LegacyProduct;
 import com.legacy.ingestor.repository.CategoryRepository;
 import com.legacy.ingestor.repository.ProductRepository;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
@@ -23,37 +23,38 @@ public class ProductServiceImpl implements ProductService{
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
-    private ObjectMapper jsonMapper;
-    @Autowired
     private ProductRepository productRepository;
     @Autowired
     private CategoryRepository categoryRepository;
     @Autowired
     private InteractiveQueryService interactiveQueryService;
 
-    @Value(value = "${created-by.legacy}")
-    private String legacyCreatedBy;
     @Value(value = "${created-by.mod}")
     private String modCreatedBy;
 
     @Override
-    public Product insert(ProductEvent event) {
+    public LegacyProduct insert(ProductEvent event) {
         logger.info("inserting the record");
         // do not insert it if the product exists
-        Optional<Product> productExists = productRepository.findTopByName(event.getAfter().getName());
+        Optional<LegacyProduct> productExists = productRepository.findTopByProductName(event.getAfter().getName());
         if (productExists.isPresent()) {
             logger.info("duplicate product detected, do not insert it again!");
             return productExists.get();
         }
-        Product product = event.getAfter();
-        product.setCreatedBy(modCreatedBy);
-        product.setId(null);
+        LegacyProduct product = LegacyProduct.builder()
+                .productName(event.getAfter().getName())
+                .description(event.getAfter().getDescription())
+                .listPrice(event.getAfter().getListPrice())
+                .quantity(event.getAfter().getQuantity())
+                .createdBy(modCreatedBy)
+                .build();
+
         productRepository.save(product);
         return product;
     }
 
     @Override
-    public Product insert(Long productId, Long categoryId) {
+    public LegacyProduct insert(Long productId, Long categoryId) {
         logger.info("product id: {} - category id: {}", productId, categoryId);
         ReadOnlyKeyValueStore<Long, Product> productStore =
                 interactiveQueryService.getQueryableStore(StateStores.PRODUCT_STORE, QueryableStoreTypes.keyValueStore());
@@ -62,7 +63,7 @@ public class ProductServiceImpl implements ProductService{
             return null;
         }
         // do not add it if the product exists with the same name
-        Optional<Product> productExists = productRepository.findTopByName(product.getName());
+        Optional<LegacyProduct> productExists = productRepository.findTopByProductName(product.getName());
         if (productExists.isPresent()) {
             logger.info("duplicate product: {} detected, do not insert it again!", product.getName());
             return productExists.get();
@@ -81,27 +82,32 @@ public class ProductServiceImpl implements ProductService{
             category.setCreatedBy(modCreatedBy);
             legacyCategory = Optional.of(categoryRepository.save(category));
         }
-        product.setCategory(legacyCategory.get());
-        product.setId(null);
-        product.setCreatedBy(modCreatedBy);
-        productRepository.save(product);
+        LegacyProduct legacyProduct = LegacyProduct.builder()
+                .productName(product.getName())
+                .description(product.getDescription())
+                .category(legacyCategory.get())
+                .listPrice(product.getListPrice())
+                .quantity(product.getQuantity())
+                .createdBy(modCreatedBy)
+                .build();
+        productRepository.save(legacyProduct);
         logger.info("Saved: --> id: {} - product: {} - category: {}",
-                product.getId(),
-                product.getName(),
-                product.getCategory().getName());
-        return product;
+                legacyProduct.getProductId(),
+                legacyProduct.getProductName(),
+                legacyProduct.getCategory().getName());
+        return legacyProduct;
     }
 
     @Override
-    public Product update(ProductEvent event) {
+    public LegacyProduct update(ProductEvent event) {
         logger.info("updating the record");
-        Optional<Product> legacyProductOptional = productRepository.findTopByName(event.getBefore().getName());
+        Optional<LegacyProduct> legacyProductOptional = productRepository.findTopByProductName(event.getBefore().getName());
         if (!legacyProductOptional.isPresent()) {
-            legacyProductOptional = productRepository.findTopByName(event.getAfter().getName());
+            legacyProductOptional = productRepository.findTopByProductName(event.getAfter().getName());
             return legacyProductOptional.get();
         }
-        Product legacyProduct = legacyProductOptional.get();
-        legacyProduct.setName(event.getAfter().getName());
+        LegacyProduct legacyProduct = legacyProductOptional.get();
+        legacyProduct.setProductName(event.getAfter().getName());
         legacyProduct.setDescription(event.getAfter().getDescription());
         legacyProduct.setListPrice(event.getAfter().getListPrice());
         legacyProduct.setQuantity(event.getAfter().getQuantity());
