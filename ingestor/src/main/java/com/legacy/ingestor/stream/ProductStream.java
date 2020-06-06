@@ -48,7 +48,7 @@ public class ProductStream {
     }
 
     @Bean
-    public Function<KStream<String, String>, KStream<Long, Category>> processedCategory() {
+    public Function<KStream<String, String>, KStream<Long, Category>> category() {
 
         return input -> input
                 .filter((key, value) -> {
@@ -59,6 +59,7 @@ public class ProductStream {
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
+                    assert event != null;
                     return !Objects.equals(event.getOp(), Actions.DELETE);
                 })
                 .map((key, value) -> {
@@ -88,7 +89,7 @@ public class ProductStream {
     }
 
     @Bean
-    public Function<KStream<String, String>, KStream<Long, Product>> processedProduct() {
+    public Function<KStream<String, String>, KStream<Long, Product>> product() {
         return input -> input
                 .filter((key, value) -> {
                     ProductEvent event = null;
@@ -98,6 +99,7 @@ public class ProductStream {
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
+                    assert event != null;
                     return !Objects.equals(event.getOp(), Actions.DELETE);
                 })
                 .map((key, value) -> {
@@ -122,6 +124,7 @@ public class ProductStream {
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
+                    assert product != null;
                     return KeyValue.pair(product.getId(), product);
                 })
                 .groupByKey(Grouped.with(Serdes.Long(), productSerde))
@@ -130,7 +133,7 @@ public class ProductStream {
     }
 
     @Bean
-    public java.util.function.Consumer<KStream<String, String>> legacy() {
+    public java.util.function.Consumer<KStream<String, String>> productCategory() {
 
         return cs -> cs
                 .foreach(((key, value) -> {
