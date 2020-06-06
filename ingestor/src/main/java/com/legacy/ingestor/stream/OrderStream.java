@@ -48,7 +48,7 @@ public class OrderStream {
     }
 
     @Bean
-    public Function<KStream<String, String>, KStream<Long, Order>> order() {
+    public Function<KStream<String, String>, KStream<Long, Order>> iOrder() {
         return input -> input
                 .filter((key, value) -> {
                     OrderEvent event = null;
@@ -81,7 +81,7 @@ public class OrderStream {
     }
 
     @Bean
-    public java.util.function.Consumer<KStream<String, String>> orderItem() {
+    public java.util.function.Consumer<KStream<String, String>> iOrderItem() {
 
         return cs -> cs.foreach((key, value) -> orderItemService.eventHandler(value));
     }
