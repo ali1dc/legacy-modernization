@@ -1,9 +1,6 @@
 package com.legacy.ingestor.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.legacy.ingestor.config.Actions;
 import com.legacy.ingestor.config.StateStores;
 import com.legacy.ingestor.dto.Customer;
 import com.legacy.ingestor.dto.Order;
@@ -29,8 +26,6 @@ public class OrderServiceImpl implements OrderService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
-    private ObjectMapper jsonMapper;
-    @Autowired
     private OrderRepository orderRepository;
     @Autowired
     private CustomerRepository customerRepository;
@@ -38,29 +33,6 @@ public class OrderServiceImpl implements OrderService {
     private InteractiveQueryService interactiveQueryService;
     @Value(value = "${created-by.mod}")
     private String modCreatedBy;
-
-    @Override
-    public void eventHandler(String data) {
-
-        JsonNode jsonNode;
-        OrderEvent event;
-        try {
-            jsonNode = jsonMapper.readTree(data).at("/payload");
-            event = jsonMapper.readValue(jsonNode.toString(), OrderEvent.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        switch (event.getOp()) {
-            case Actions.CREATE:
-                save(event);
-                break;
-            case Actions.DELETE:
-                delete(event);
-                break;
-        }
-    }
 
     @Override
     public LegacyOrder save(OrderEvent event) {

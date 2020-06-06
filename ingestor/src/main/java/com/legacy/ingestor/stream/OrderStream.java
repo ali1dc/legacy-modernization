@@ -42,19 +42,9 @@ public class OrderStream {
     private OrderItemService orderItemService;
 
     private final Serde<Order> orderSerde;
-    private final Serde<LegacyOrder> legacyOrderSerde;
-    private final Serde<OrderItem> orderItemSerde;
-    private final Serde<EnrichedOrder> enrichedOrderSerde;
-    private final Serde<OrderItemOrder> orderItemOrderSerde;
-    private final Serde<CustomerOrder> customerOrderSerde;
 
     public OrderStream() {
         this.orderSerde = new JsonSerde<>(Order.class);
-        this.legacyOrderSerde = new JsonSerde<>(LegacyOrder.class);
-        this.orderItemSerde = new JsonSerde<>(OrderItem.class);
-        this.enrichedOrderSerde = new JsonSerde<>(EnrichedOrder.class);
-        this.orderItemOrderSerde = new JsonSerde<>(OrderItemOrder.class);
-        this.customerOrderSerde = new JsonSerde<>(CustomerOrder.class);
     }
 
     @Bean
@@ -95,121 +85,4 @@ public class OrderStream {
 
         return cs -> cs.foreach((key, value) -> orderItemService.eventHandler(value));
     }
-
-//    @Bean
-//    public Function<KStream<String, String>, KStream<Long, OrderItem>> processOrderItem() {
-//        return input -> input
-//                .map((key, value) -> {
-//                    OrderItem orderItem = null;
-//                    try {
-//                        JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
-//                        OrderItemEvent event = jsonMapper.readValue(jsonNode.toString(), OrderItemEvent.class);
-//                        orderItem = event.getAfter();
-//                    } catch (JsonProcessingException e) {
-//                        e.printStackTrace();
-//                    }
-//                    return KeyValue.pair(orderItem.getId(), orderItem);
-//                });
-//    }
-
-//    @Bean
-//    public Function<KStream<String, String>, KStream<Long, Customer>> processOrderCustomer() {
-//        return input -> input
-//                .map((key, value) -> {
-//                    Customer customer = null;
-//                    try {
-//                        JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
-//                        CustomerEvent event = jsonMapper.readValue(jsonNode.toString(), CustomerEvent.class);
-//                        LegacyCustomer legacyCustomer = customerService.save(event);
-//                    } catch (JsonProcessingException e) {
-//                        e.printStackTrace();
-//                    }
-//                    return KeyValue.pair(customer.getId(), customer);
-//                });
-//    }
-
-//    @Bean
-//    public Function<KStream<String, String>, KStream<Long, Product>> processOrderProduct() {
-//        return input -> input
-//                .map((key, value) -> {
-//                    Product product = null;
-//                    try {
-//                        JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
-//                        ProductEvent event = jsonMapper.readValue(jsonNode.toString(), ProductEvent.class);
-//                        product = event.getAfter();
-//                    } catch (JsonProcessingException e) {
-//                        e.printStackTrace();
-//                    }
-//                    return KeyValue.pair(product.getId(), product);
-//                });
-//    }
-
-/*
-    @Bean
-    public Function<KStream<Long, OrderItem>,
-            Function<GlobalKTable<Long, Order>,
-                    Function<GlobalKTable<Long, Customer>,
-                            Function<GlobalKTable<Long, Product>, KStream<Long, EnrichedOrder>>>>> enrichOrder() {
-
-        return orderItems -> (
-                orders -> (
-                        customers -> (
-                                products -> (
-                                        orderItems.join(orders,
-                                                (orderItemId, orderItem) -> orderItem.getOrderId(),
-                                                (orderItem, order) -> new OrderItemOrder(order, orderItem))
-                                                //Joined.with(Serdes.Long(), orderItemSerde, orderItemOrderSerde))
-                                                .join(customers,
-                                                        (id, orderItemOrder) -> orderItemOrder.getOrder().getCustomerId(),
-                                                            (orderItemOrder, customer) -> new CustomerOrder(customer, orderItemOrder.getOrder(), orderItemOrder.getOrderItem()))
-                                                        .join(products,
-                                                            (productId, customerOrder) -> customerOrder.getOrderItem().getProductId(),
-                                                            (customerOrder, product) -> {
-                                                                return EnrichedOrder.builder()
-                                                                        .customer(customerOrder.getCustomer())
-                                                                        .order(customerOrder.getOrder())
-                                                                        .product(product)
-                                                                        .orderItem(customerOrder.getOrderItem())
-                                                                        .build();
-
-                                                            })
-                                        )
-                                )
-                        )
-                );
-    }
-*/
-
-//    @Bean
-//    public Function<KStream<String, String>, KStream<Long, Order>> processOrder() {
-//
-//        return input -> input
-//                .filter((key, value) -> {
-//                    OrderEvent event = null;
-//                    try {
-//                        JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
-//                        event = jsonMapper.readValue(jsonNode.toString(), OrderEvent.class);
-//                    } catch (JsonProcessingException e) {
-//                        e.printStackTrace();
-//                    }
-//                    return !Objects.equals(event.getOp(), Actions.DELETE);
-//                })
-//                .map((key, value) -> {
-//                    Order order = null;
-//                    OrderEvent event = null;
-//                    try {
-//                        JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
-//                        event = jsonMapper.readValue(jsonNode.toString(), OrderEvent.class);
-//                        if (Objects.equals(event.getOp(), Actions.CREATE)) {
-//                            order = orderService.save(event);
-//                        }
-//                    } catch (JsonProcessingException e) {
-//                        e.printStackTrace();
-//                    }
-//                    return KeyValue.pair(event.getAfter().getId(), order);
-//                })
-//                .groupByKey(Grouped.with(Serdes.Long(), orderSerde))
-//                .reduce((value1, value2) -> value2, Materialized.as(StateStores.ORDER_STORE))
-//                .toStream();
-//    }
 }

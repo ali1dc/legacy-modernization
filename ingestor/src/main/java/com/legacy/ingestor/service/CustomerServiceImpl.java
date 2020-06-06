@@ -1,6 +1,5 @@
 package com.legacy.ingestor.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.ingestor.config.AddressTypes;
 import com.legacy.ingestor.config.StateStores;
 import com.legacy.ingestor.dto.Address;
@@ -26,13 +25,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
-    private ObjectMapper jsonMapper;
-    @Autowired
     private CustomerRepository customerRepository;
     @Autowired
     private InteractiveQueryService interactiveQueryService;
-    @Value(value = "${created-by.legacy}")
-    private String legacyCreatedBy;
     @Value(value = "${created-by.mod}")
     private String modCreatedBy;
 

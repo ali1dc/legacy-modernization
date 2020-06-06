@@ -1,6 +1,5 @@
 package com.legacy.ingestor.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.ingestor.config.StateStores;
 import com.legacy.ingestor.dto.Product;
 import com.legacy.ingestor.events.ProductEvent;
@@ -24,16 +23,12 @@ public class ProductServiceImpl implements ProductService{
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
-    private ObjectMapper jsonMapper;
-    @Autowired
     private ProductRepository productRepository;
     @Autowired
     private CategoryRepository categoryRepository;
     @Autowired
     private InteractiveQueryService interactiveQueryService;
 
-    @Value(value = "${created-by.legacy}")
-    private String legacyCreatedBy;
     @Value(value = "${created-by.mod}")
     private String modCreatedBy;
 
