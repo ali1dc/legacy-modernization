@@ -22,8 +22,8 @@ spring.datasource.username: root
 spring.datasource.password: root
 
 spring.kafka.bootstrap-servers: localhost:19092
-
-spring.cloud.stream.function.definition: processedCategory;processedProduct;legacy;processCustomer;processAddress;legacyCustomerSync
+spring.cloud.stream.kafka.stream.binder.application-id: ingestor-microservice
+spring.cloud.stream.function.definition: processedCategory;processedProduct;legacy;processLegacyCustomer;processAddress;legacyCustomerSync;processOrder;processOrderItem
 
 spring.cloud.stream.kafka.streams.binder.state-store-retry.max-attempts: 10
 spring.cloud.stream.kafka.streams.binder.state-store-retry.backoff-period: 1000
@@ -35,8 +35,22 @@ spring.cloud.stream.bindings.processedProduct-in-0.destination: product.public.p
 spring.cloud.stream.bindings.processedProduct-out-0.destination: processed-products
 spring.cloud.stream.bindings.legacy-in-0.destination: product.public.products_categories
 # customer microservice
-spring.cloud.stream.bindings.processCustomer-in-0.destination: customer.public.customers
-spring.cloud.stream.bindings.processCustomer-out-0.destination: processed-customers
+spring.cloud.stream.bindings.processLegacyCustomer-in-0.destination: customer.public.customers
+spring.cloud.stream.bindings.processLegacyCustomer-out-0.destination: processed-customers
 spring.cloud.stream.bindings.processAddress-in-0.destination: customer.public.addresses
 spring.cloud.stream.bindings.processAddress-out-0.destination: processed-addresses
 spring.cloud.stream.bindings.legacyCustomerSync-in-0.destination: customer.public.customer_addresses
+# order microservice
+spring.cloud.stream.bindings.processOrder-in-0.destination: order.public.orders
+spring.cloud.stream.bindings.processOrder-out-0.destination: processed-orders
+spring.cloud.stream.bindings.processOrderItem-in-0.destination: order.public.order_items
+#spring.cloud.stream.bindings.processOrderItem-out-0.destination: processed-order-items
+#spring.cloud.stream.bindings.processOrder-in-0.destination: order.public.orders
+#spring.cloud.stream.bindings.processOrder-out-0.destination: processed-orders
+
+#spring.cloud.stream.bindings.enrichOrder-in-0.destination: processed-order-items
+#spring.cloud.stream.bindings.enrichOrder-in-1.destination: processed-orders
+#spring.cloud.stream.bindings.enrichOrder-in-2.destination: processed-order-customer
+#spring.cloud.stream.bindings.enrichOrder-in-3.destination: processed-order-products
+#
+#spring.cloud.stream.bindings.enrichOrder-out-0.destination: enriched-orders
