@@ -69,7 +69,7 @@ public class ProductServiceImpl implements ProductService{
 
         // do not add it if the product exists with the same name
         Optional<LegacyProduct> productExists = productRepository.findById(product.getLegacyId());
-        Optional<Category> categoryExists = categoryRepository.findById(category.getId());
+        Optional<Category> categoryExists = categoryRepository.findTopByName(category.getName());
 
         if (!productExists.isPresent()) {
             logger.error("do something for missing product; mod id: {}, name: {}", product.getId(), product.getName());
@@ -81,7 +81,7 @@ public class ProductServiceImpl implements ProductService{
 
         logger.info("Update category products!");
         LegacyProduct legacyProduct = productExists.get();
-        legacyProduct.setCategory(categoryExists.orElse(category));
+        categoryExists.ifPresent(legacyProduct::setCategory);
         productRepository.save(legacyProduct);
     }
 
@@ -93,9 +93,9 @@ public class ProductServiceImpl implements ProductService{
                 interactiveQueryService.getQueryableStore(StateStores.PRODUCT_STORE, QueryableStoreTypes.keyValueStore());
         Product product = productStore.get(event.getAfter().getId());
         Optional<LegacyProduct> legacyProductOptional = productRepository.findById(product.getLegacyId());
-        if (!legacyProductOptional.isPresent()) {
-            legacyProductOptional = productRepository.findTopByProductName(event.getBefore().getName());
-        }
+//        if (!legacyProductOptional.isPresent()) {
+//            legacyProductOptional = productRepository.findTopByProductName(event.getBefore().getName());
+//        }
         LegacyProduct legacyProduct = legacyProductOptional.get();
         legacyProduct.setProductName(event.getAfter().getName());
         legacyProduct.setDescription(event.getAfter().getDescription());

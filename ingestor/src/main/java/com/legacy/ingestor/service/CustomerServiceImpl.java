@@ -43,7 +43,7 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = customerStore.get(event.getAfter().getCustomerId());
         Address address = addressStore.get(event.getAfter().getAddressId());
         // insert customer if not exists in legacy db
-        Optional<LegacyCustomer> customerOptional = customerRepository.findTopByEmail(customer.getEmail());
+        Optional<LegacyCustomer> customerOptional = customerRepository.findById(customer.getLegacyId());
         LegacyCustomer legacyCustomer;
         if (customerOptional.isPresent()) {
             logger.info("customer exists in legacy, we just update the address!");
@@ -51,7 +51,6 @@ public class CustomerServiceImpl implements CustomerService {
         }
         else {
             legacyCustomer = LegacyCustomer.builder()
-                    .id(null)
                     .firstName(customer.getFirstName())
                     .lastName(customer.getLastName())
                     .phone(customer.getPhone())

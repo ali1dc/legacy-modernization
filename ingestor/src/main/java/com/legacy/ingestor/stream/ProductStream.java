@@ -48,7 +48,7 @@ public class ProductStream {
     }
 
     @Bean
-    public Function<KStream<String, String>, KStream<Long, Category>> category() {
+    public Function<KStream<String, String>, KStream<Long, Category>> iCategory() {
 
         return input -> input
                 .filter((key, value) -> {
@@ -89,7 +89,7 @@ public class ProductStream {
     }
 
     @Bean
-    public Function<KStream<String, String>, KStream<Long, Product>> product() {
+    public Function<KStream<String, String>, KStream<Long, Product>> iProduct() {
         return input -> input
                 .filter((key, value) -> {
                     ProductEvent event = null;
@@ -133,7 +133,7 @@ public class ProductStream {
     }
 
     @Bean
-    public java.util.function.Consumer<KStream<String, String>> productCategory() {
+    public java.util.function.Consumer<KStream<String, String>> iProductCategory() {
 
         return cs -> cs
                 .foreach(((key, value) -> {
