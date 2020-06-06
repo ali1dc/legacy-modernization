@@ -1,7 +1,7 @@
 package com.legacy.ingestor.events;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.legacy.ingestor.model.Product;
+import com.legacy.ingestor.dto.Product;
 import lombok.*;
 
 import java.sql.Timestamp;

@@ -1,11 +1,11 @@
 package com.legacy.ingestor.service;
 
 import com.legacy.ingestor.events.ProductEvent;
-import com.legacy.ingestor.model.Product;
+import com.legacy.ingestor.model.LegacyProduct;
 
 public interface ProductService {
-    Product insert(ProductEvent event);
-    Product insert(Long productId, Long categoryId);
-    Product update(ProductEvent event);
+    LegacyProduct insert(ProductEvent event);
+    LegacyProduct insert(Long productId, Long categoryId);
+    LegacyProduct update(ProductEvent event);
     void delete(ProductEvent event);
 }

@@ -26,7 +26,7 @@ public class Category {
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     @JsonIgnore
-    Set<Product> products;
+    Set<LegacyProduct> legacyProducts;
 
     @JsonProperty("created_by")
     @Column(name = "created_by")

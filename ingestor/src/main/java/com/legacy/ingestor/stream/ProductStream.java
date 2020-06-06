@@ -5,10 +5,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.ingestor.config.Actions;
 import com.legacy.ingestor.config.StateStores;
+import com.legacy.ingestor.dto.Product;
 import com.legacy.ingestor.events.CategoryEvent;
 import com.legacy.ingestor.events.ProductEvent;
 import com.legacy.ingestor.model.Category;
-import com.legacy.ingestor.model.Product;
+import com.legacy.ingestor.model.LegacyProduct;
 import com.legacy.ingestor.service.CategoryService;
 import com.legacy.ingestor.service.ProductService;
 import org.apache.kafka.common.serialization.Serde;
@@ -65,17 +66,20 @@ public class ProductStream {
                     try {
                         JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
                         CategoryEvent event = jsonMapper.readValue(jsonNode.toString(), CategoryEvent.class);
-                        if (Objects.equals(event.getOp(), Actions.CREATE)) {
-                            category = categoryService.insert(event);
-                        } else if (Objects.equals(event.getOp(), Actions.READ)) {
-                            // for snapshots
-                            category = categoryService.insert(event);
-                        } else if (Objects.equals(event.getOp(), Actions.UPDATE)) {
-                            category = categoryService.update(event);
+
+                        switch (event.getOp()) {
+                            case Actions.CREATE:
+                            case Actions.READ:
+                                category = categoryService.insert(event);
+                                break;
+                            case Actions.UPDATE:
+                                category = categoryService.update(event);
+                                break;
                         }
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
+                    assert category != null;
                     return KeyValue.pair(category.getId(), category);
                 })
                 .groupByKey(Grouped.with(Serdes.Long(), categorySerde))
@@ -102,11 +106,19 @@ public class ProductStream {
                         JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
                         ProductEvent event = jsonMapper.readValue(jsonNode.toString(), ProductEvent.class);
                         product = event.getAfter();
-                        if (Objects.equals(event.getOp(), Actions.READ)) {
-                            product = productService.insert(event);
-                        } else if (Objects.equals(event.getOp(), Actions.UPDATE)) {
-                            product = productService.update(event);
+                        LegacyProduct legacyProduct = null;
+
+                        switch (event.getOp()) {
+                            case Actions.CREATE:
+                            case Actions.READ:
+                                legacyProduct = productService.insert(event);
+                                break;
+                            case Actions.UPDATE:
+                                legacyProduct = productService.update(event);
+                                break;
                         }
+                        assert legacyProduct != null;
+                        product.setLegacyId(legacyProduct.getProductId());
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
