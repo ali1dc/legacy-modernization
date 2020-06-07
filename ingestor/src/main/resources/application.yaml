@@ -23,7 +23,7 @@ spring.datasource.password: root
 
 spring.kafka.bootstrap-servers: localhost:19092
 spring.cloud.stream.kafka.stream.binder.application-id: ingestor-microservice
-spring.cloud.stream.function.definition: iCategory;iProduct;iProductCategory;iCustomer;iAddress;iCustomerAddress;iOrder;iOrderItems
+spring.cloud.stream.function.definition: iCategory;iProduct;iProductCategory;iCustomer;iAddress;iCustomerAddress;iOrder;iOrderItem
 
 spring.cloud.stream.kafka.streams.binder.state-store-retry.max-attempts: 100
 spring.cloud.stream.kafka.streams.binder.state-store-retry.backoff-period: 10000
@@ -43,4 +43,4 @@ spring.cloud.stream.bindings.iCustomerAddress-in-0.destination: customer.public.
 # order microservice
 spring.cloud.stream.bindings.iOrder-in-0.destination: order.public.orders
 spring.cloud.stream.bindings.iOrder-out-0.destination: processed-orders
-spring.cloud.stream.bindings.iOrderItems-in-0.destination: order.public.order_items
+spring.cloud.stream.bindings.iOrderItem-in-0.destination: order.public.order_items
