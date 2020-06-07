@@ -5,7 +5,7 @@ import com.legacy.customer.model.Customer;
 
 public interface CustomerService {
     void eventHandler(String data);
-    Customer insert(LegacyCustomerEvent event);
-    Customer update(LegacyCustomerEvent event);
+    void insert(LegacyCustomerEvent event);
+    void update(LegacyCustomerEvent event);
     void delete(LegacyCustomerEvent event);
 }

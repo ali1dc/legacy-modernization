@@ -33,6 +33,8 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository customerRepository;
     @Autowired
     private CustomerAddressRepository customerAddressRepository;
+    @Autowired
+    private CustomerMapper mapper;
 
     @Value(value = "${created-by.legacy}")
     private String legacyCreatedBy;
@@ -52,20 +54,28 @@ public class CustomerServiceImpl implements CustomerService {
             return;
         }
 
-        if (Objects.equals(event.getOp(), Actions.CREATE)) {
-            insert(event);
-        } else if (Objects.equals(event.getOp(), Actions.UPDATE)) {
-            update(event);
-        } else if (Objects.equals(event.getOp(), Actions.DELETE)) {
-            delete(event);
+        switch (event.getOp()) {
+            case Actions.CREATE:
+            case Actions.READ:
+                insert(event);
+                break;
+            case Actions.UPDATE:
+                update(event);
+                break;
+            case Actions.DELETE:
+                delete(event);
+                break;
         }
     }
 
-    @Autowired
-    private CustomerMapper mapper;
-
     @Override
-    public Customer insert(LegacyCustomerEvent event) {
+    public void insert(LegacyCustomerEvent event) {
+
+        // check if message is coming from mod
+        if (Objects.equals(event.getAfter().getCreatedBy(), modCreatedBy)) {
+            logger.info("The message is coming from mod");
+            return;
+        }
 
         Customer customer = mapper.eventToCustomer(event);
         customer.setCreatedBy(legacyCreatedBy);
@@ -99,17 +109,13 @@ public class CustomerServiceImpl implements CustomerService {
                 .isDefault(false)
                 .build();
         customerAddressRepository.save(customerAddress);
-
-        return customer;
     }
 
     @Override
-    public Customer update(LegacyCustomerEvent event) {
+    public void update(LegacyCustomerEvent event) {
 
-        Optional<Customer> existingCustomer = customerRepository.findByLegacyId(event.getBefore().getCustomerId());
-        if (!existingCustomer.isPresent()) {
-            return insert(event);
-        }
+        Optional<Customer> existingCustomer = customerRepository.findTopByEmail(event.getBefore().getEmail());
+        if (!existingCustomer.isPresent()) return;
 
         Customer customer = existingCustomer.get();
         customer.setFirstName(event.getAfter().getFirstName());
@@ -120,8 +126,6 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setUpdatedDate(event.getTimestamp());
         customerRepository.save(customer);
         // then handle address update here!
-
-        return customer;
     }
 
     @Override
