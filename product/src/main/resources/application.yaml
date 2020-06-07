@@ -1,0 +1,47 @@
+server.port: 8091
+management:
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include:
+          - health
+          - metrics
+          - info
+          - bindings
+  endpoint:
+    health.enabled: true
+    health.show-details: always
+
+created-by:
+  mod: modernized
+  legacy: legacy
+
+spring.datasource.driver-class-name: org.postgresql.Driver
+spring.datasource.url: jdbc:postgresql://localhost:5432/product
+spring.datasource.username: postgres
+spring.datasource.password: postgres
+spring.datasource.test-on-borrow: true
+spring.datasource.validation-query: SELECT 1
+spring.datasource.log-validation-errors: true
+spring.jpa.show-sql: true
+spring.jpa.hibernate.ddl-auto: none
+
+spring.kafka.bootstrap-servers: localhost:19092
+spring.cloud.stream.function.definition: categories;products
+spring.cloud.stream.bindings.categories-in-0.destination: legacy.legacy_order.categories
+spring.cloud.stream.bindings.products-in-0.destination: legacy.legacy_order.products
+spring.cloud.stream.kafka.stream.binder.application-id: product-microservice
+spring.cloud.stream.kafka.bindings.products.consumer.max.poll.interval.ms: 10000
+
+flyway:
+  driver-class-name: org.postgresql.Driver
+  url: jdbc:postgresql://localhost:5432/product
+  user: postgres
+  password: postgres
+  enable: true
+  test-on-borrow: true
+  validation-query: SELECT 1
+  log-validation-errors: true
+
+

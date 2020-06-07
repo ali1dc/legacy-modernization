@@ -1,37 +1,60 @@
 package com.modernized.product.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
 
+import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
+import java.util.Set;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table("categories")
+@Getter @Setter
+@Entity
+@Table(name = "categories")
 public class Category {
+
     @Id
     @JsonProperty("category_id")
-    @Getter @Setter
-    Integer id;
-    @Getter @Setter
-    Integer legacyId;
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name = "id")
+    Long id;
+
+    @Column(name = "legacy_id")
+    Long legacyId;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "category")
+    Set<ProductCategory> productCategories;
+
     @JsonProperty("category_name")
-    @Getter @Setter
+    @Column(name = "name")
     String name;
-    @Getter @Setter
+
+    @Column(name = "description")
     String description;
-    @Getter @Setter
+
     @JsonProperty("created_by")
+    @Column(name = "created_by")
     String createdBy;
-    @Getter
+
+    @Column(name = "created_date")
     Date createdDate;
-    @JsonProperty("updated_by")
-    @Getter @Setter
+
+    @Column(name = "updated_by")
     String updatedBy;
-    @Getter
+
+    @Column(name = "updated_date")
     Date updatedDate;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Category category = (Category) o;
+        return Objects.equals(name, category.getName());
+    }
 }

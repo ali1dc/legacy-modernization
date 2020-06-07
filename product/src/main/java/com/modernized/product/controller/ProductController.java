@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/products")
@@ -28,22 +29,29 @@ public class ProductController {
     private ProductCategoryRepository productCategoryRepository;
 
     @GetMapping
-    public Flux<ProductDto> getAllProducts() {
-        return productRepository.findAll()
-                .map(it -> modelMapper.map(it, ProductDto.class));
+    public List<ProductDto> getAllProducts() {
+
+        List<ProductDto> products = new ArrayList<>();
+        productRepository.findAll().forEach(product -> {
+            products.add(modelMapper.map(product, ProductDto.class));
+        });
+        return products;
     }
 
     @GetMapping("/{id}")
-    public Mono<ProductDto> getProductById(@PathVariable Integer id) {
-        Mono<List<String>> categoryNames = productCategoryRepository.findAllCategoryNameByProductId(id).collectList();
-        Mono<ProductDto> productDto = productRepository.findById(id)
-                .map(it -> {
-                    return modelMapper.map(it, ProductDto.class);
+    public ProductDto getProductById(@PathVariable Long id) {
+
+        Optional<ProductDto> productDto = productRepository.findById(id)
+                .map(product -> {
+                    ProductDto dto = modelMapper.map(product, ProductDto.class);
+                    List<String> categoryNames = new ArrayList<>();
+                    productCategoryRepository.findByProductId(id).ifPresent(list -> {
+                        list.forEach(cat -> categoryNames.add(cat.getCategory().getName()));
+                    });
+                    dto.setCategories(categoryNames);
+                    return dto;
                 });
-        return Mono.zip(productDto, categoryNames)
-                .map(tuple -> {
-                    tuple.getT1().setCategories(tuple.getT2());
-                    return tuple.getT1();
-                });
+
+        return productDto.orElse(new ProductDto());
     }
 }
