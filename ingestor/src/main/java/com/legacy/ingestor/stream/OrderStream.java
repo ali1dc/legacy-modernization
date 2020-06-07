@@ -83,6 +83,8 @@ public class OrderStream {
     @Bean
     public java.util.function.Consumer<KStream<String, String>> iOrderItem() {
 
-        return cs -> cs.foreach((key, value) -> orderItemService.eventHandler(value));
+        return cs -> cs.foreach((key, value) -> {
+            orderItemService.eventHandler(value);
+        });
     }
 }

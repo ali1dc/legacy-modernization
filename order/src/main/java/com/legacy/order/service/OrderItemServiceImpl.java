@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -32,8 +33,11 @@ public class OrderItemServiceImpl implements OrderItemService {
     private ProductRepository productRepository;
     @Autowired
     private OrderRepository orderRepository;
+
     @Value(value = "${created-by.legacy}")
     private String legacyCreatedBy;
+    @Value(value = "${created-by.mod}")
+    private String modCreatedBy;
 
     @Override
     public void eventHandler(String data) {
@@ -62,14 +66,16 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
     @Override
-    public OrderItem insert(OrderItemEvent event) {
+    public void insert(OrderItemEvent event) {
 
         OrderItem orderItem = event.getAfter();
+        if (Objects.equals(orderItem.getCreatedBy(), modCreatedBy)) return;
         Optional<OrderItem> optionalOrderItem = orderItemRepository.findTopByLegacyId(orderItem.getId());
         if (optionalOrderItem.isPresent()) {
             logger.info("duplicate order item, no need to insert the item!");
-            return optionalOrderItem.get();
+            return;
         }
+
         orderItem.setLegacyId(orderItem.getId());
         orderItem.setCreatedBy(legacyCreatedBy);
         orderItem.setCreatedDate(new Date());
@@ -80,16 +86,14 @@ public class OrderItemServiceImpl implements OrderItemService {
         orderItem.setOrder(order);
         orderItem.setProduct(product);
         orderItemRepository.save(orderItem);
-
-        return orderItem;
     }
 
     @Override
-    public OrderItem update(OrderItemEvent event) {
+    public void update(OrderItemEvent event) {
 
         Optional<OrderItem> optionalOrderItem =
                 orderItemRepository.findTopByLegacyId(event.getAfter().getId());
-        if (!optionalOrderItem.isPresent()) return insert(event);
+        if (!optionalOrderItem.isPresent()) return;
 
         OrderItem orderItem = optionalOrderItem.get();
         orderItem.setQuantity(event.getAfter().getQuantity());
@@ -97,8 +101,6 @@ public class OrderItemServiceImpl implements OrderItemService {
         orderItem.setUpdatedBy(legacyCreatedBy);
         orderItem.setUpdatedDate(new Date());
         orderItemRepository.save(orderItem);
-
-        return orderItem;
     }
 
     @Override

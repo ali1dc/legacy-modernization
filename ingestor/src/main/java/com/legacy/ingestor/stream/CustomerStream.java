@@ -47,7 +47,7 @@ public class CustomerStream {
     }
 
     @Bean
-    public Function<KStream<String, String>, KStream<Long, Customer>> customer() {
+    public Function<KStream<String, String>, KStream<Long, Customer>> iCustomer() {
 
         return input -> input
 
@@ -80,7 +80,7 @@ public class CustomerStream {
     }
 
     @Bean
-    public Function<KStream<String, String>, KStream<Long, Address>> address() {
+    public Function<KStream<String, String>, KStream<Long, Address>> iAddress() {
 
         return input -> input
                 .filter((key, value) -> {
@@ -112,7 +112,7 @@ public class CustomerStream {
     }
 
     @Bean
-    public java.util.function.Consumer<KStream<String, String>> customerAddress() {
+    public java.util.function.Consumer<KStream<String, String>> iCustomerAddress() {
 
         return ca -> ca
                 .foreach((key, value) -> {

@@ -7,7 +7,7 @@ public interface OrderService {
 
     void eventHandler(String data);
 
-    Order insert(OrderEvent event);
-    Order update(OrderEvent event);
+    void insert(OrderEvent event);
+    void update(OrderEvent event);
     void delete(OrderEvent event);
 }

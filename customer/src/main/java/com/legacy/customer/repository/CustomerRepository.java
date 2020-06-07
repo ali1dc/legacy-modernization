@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface CustomerRepository extends CrudRepository <Customer, Long> {
     Optional<Customer> findById(Long id);
     Optional<Customer> findByLegacyId(Long legacyId);
-    Optional<Customer> findByEmail(String email);
+    Optional<Customer> findTopByEmail(String email);
 }

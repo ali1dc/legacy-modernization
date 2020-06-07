@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -31,6 +32,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Value(value = "${created-by.legacy}")
     private String legacyCreatedBy;
+    @Value(value = "${created-by.mod}")
+    private String modCreatedBy;
 
     @Override
     public void eventHandler(String data) {
@@ -59,13 +62,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order insert(OrderEvent event) {
+    public void insert(OrderEvent event) {
 
         Order order = event.getAfter();
+        if (Objects.equals(order.getCreatedBy(), modCreatedBy)) return;
         Optional<Order> optionalOrder = orderRepository.findTopByLegacyId(order.getId());
         if (optionalOrder.isPresent()) {
             logger.info("duplicate order, no need to insert the order!");
-            return optionalOrder.get();
+            return;
         }
         order.setLegacyId(order.getId());
         order.setId(null);
@@ -76,15 +80,13 @@ public class OrderServiceImpl implements OrderService {
         order.setCustomer(customer);
 
         orderRepository.save(order);
-
-        return order;
     }
 
     @Override
-    public Order update(OrderEvent event) {
+    public void update(OrderEvent event) {
 
         Optional<Order> optionalOrder = orderRepository.findTopByLegacyId(event.getAfter().getId());
-        if (!optionalOrder.isPresent()) return insert(event);
+        if (!optionalOrder.isPresent()) return;
 
         Order order = optionalOrder.get();
         order.setStatus(event.getAfter().getStatus());
@@ -97,8 +99,6 @@ public class OrderServiceImpl implements OrderService {
         order.setCustomer(customer);
 
         orderRepository.save(order);
-
-        return order;
     }
 
     @Override
