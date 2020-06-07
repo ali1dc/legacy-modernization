@@ -8,21 +8,16 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter @Setter
 public class CategoryDto {
-    @Getter @Setter
-    Integer id;
-    @Getter @Setter
+
+    Long id;
     String name;
-    @Getter @Setter
     String description;
-    @Getter @Setter
     String createdBy;
-    @Getter @Setter
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     Date createdDate;
-    @Getter @Setter
     String updatedBy;
-    @Getter @Setter
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     Date updatedDate;
 }

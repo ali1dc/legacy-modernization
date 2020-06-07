@@ -1,16 +1,14 @@
 package com.modernized.product.repository;
 
 import com.modernized.product.model.Category;
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import org.springframework.data.repository.CrudRepository;
 
-public interface CategoryRepository extends ReactiveCrudRepository<Category, Integer> {
+import java.util.Optional;
 
-    Flux<Category> findAll();
-    Mono<Category> findById(Integer id);
-    Mono<Category> findTopByName(String name);
-    @Query("SELECT * FROM categories WHERE legacy_id = :legacyId")
-    Mono<Category> findByLegacyId(Integer legacyId);
+public interface CategoryRepository extends CrudRepository<Category, Long> {
+
+    Iterable<Category> findAll();
+    Optional<Category> findById(Long id);
+    Optional<Category> findTopByName(String name);
+    Optional<Category> findTopByLegacyId(Long legacyId);
 }

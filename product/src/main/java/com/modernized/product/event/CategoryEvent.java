@@ -9,17 +9,18 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
 public class CategoryEvent {
-    @Getter @Setter
+
     @JsonProperty("op")
     String op;
-    @Getter @Setter
+
     @JsonProperty("ts_ms")
     Timestamp timestamp;
-    @Getter @Setter
+
     @JsonProperty("before")
     Category before;
-    @Getter @Setter
+
     @JsonProperty("after")
     Category after;
 }

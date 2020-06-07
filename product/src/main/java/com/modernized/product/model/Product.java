@@ -1,46 +1,64 @@
 package com.modernized.product.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.relational.core.mapping.Table;
 
+import javax.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table("products")
+@Getter @Setter
+@Entity
+@Table(name = "products")
 public class Product {
+
     @Id
     @JsonProperty("product_id")
-    @Getter @Setter
-    Integer id;
-    @Getter @Setter
-    Integer legacyId;
-    @Getter @Setter
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name = "id")
+    Long id;
+
+    @Column(name = "legacy_id")
+    Long legacyId;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "product")
+    Set<ProductCategory> productCategories;
+
     @JsonProperty("category_id")
     @Transient
-    Integer categoryId;
+    Long categoryId;
+
     @JsonProperty("product_name")
-    @Getter @Setter
+    @Column(name = "name")
     String name;
-    @Getter @Setter
+
+    @JsonProperty("description")
+    @Column(name = "description")
     String description;
-    @Getter @Setter
+
     @JsonProperty("list_price")
+    @Column(name = "list_price")
     Float listPrice;
-    @Getter @Setter
+
+    @JsonProperty("quantity")
+    @Column(name = "quantity")
     Integer quantity;
-    @Getter @Setter
+
     @JsonProperty("created_by")
+    @Column(name = "created_by")
     String createdBy;
-    @Getter @Setter
+
+    @Column(name = "created_date")
     Date createdDate;
-    @Getter @Setter
+
+    @Column(name = "updated_by")
     String updatedBy;
-    @Getter @Setter
+
+    @Column(name = "updated_date")
     Date updatedDate;
 }

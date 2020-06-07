@@ -1,13 +1,14 @@
 package com.modernized.product.repository;
 
 import com.modernized.product.model.Product;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import org.springframework.data.repository.CrudRepository;
 
-public interface ProductRepository extends ReactiveCrudRepository<Product, Integer> {
+import java.util.Optional;
 
-    Flux<Product> findAll();
-    Mono<Product> findById(Integer id);
-    Mono<Product> findTopByName(String name);
+
+public interface ProductRepository extends CrudRepository<Product, Long> {
+
+    Iterable<Product> findAll();
+    Optional<Product> findById(Integer id);
+    Optional<Product> findTopByName(String name);
 }
