@@ -10,6 +10,7 @@ import com.legacy.order.repository.CustomerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -23,6 +24,11 @@ public class CustomerServiceImpl implements CustomerService {
     private ObjectMapper jsonMapper;
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Value(value = "${created-by.legacy}")
+    private String legacyCreatedBy;
+    @Value(value = "${created-by.mod}")
+    private String modCreatedBy;
 
     @Override
     public void eventHandler(String data) {
@@ -61,7 +67,7 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setLegacyId(event.getAfter().getLegacyId());
             customer.setPhone(event.getAfter().getPhone());
             customer.setEmail(event.getAfter().getEmail());
-            customer.setUpdatedBy("modernized");
+            customer.setUpdatedBy(modCreatedBy);
             customer.setUpdatedDate(new Date());
         } else {
             customer = event.getAfter();
