@@ -80,6 +80,11 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = mapper.eventToCustomer(event);
         customer.setCreatedBy(legacyCreatedBy);
         customer.setCreatedDate(event.getTimestamp());
+        Optional<Customer> existingCustomer = customerRepository.findTopByEmail(customer.getEmail());
+        if (existingCustomer.isPresent()) {
+            logger.info("Customer: {} exists, do not insert it again!", customer.getEmail());
+            return;
+        }
         customerRepository.save(customer);
 
         Address billingAddress = mapper.eventToAddress(event,true);
