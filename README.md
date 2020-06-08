@@ -142,12 +142,22 @@ Now, this is what we have:
 ![Step-2 Customer Microservice Diagram](./images/step-2-customer-microservice.png)
 
 
+#### 3.2 Order Modernization
+This microservice is responsible for order management. It has 4 tables; customers, products, orders, and order_items. The point with this microservice is that we replicate data as we need. For example `customers` and `products` tables are replicated from customer and product microservice by Kafka and acts as look-up tables (read-only).
+
+This [connector](./connectors/order-postgres.json) the connector for producing CDC into our Kafka cluster for moving data back to the legacy database. (data needs to be synced)
+
+Now, this is what we have:
+
+![Step-2 Customer Microservice Diagram](./images/step-3-order-microservice.png)
+
+
+
 #### Ingestor Microservice
-Let's step back and ask this question; what if a new product is added in the `Product` microservice? How we add that record to the legacy database? The simple old days answer would be create database connection and add record to that database! But the answer is wrong and that is violation of Microservice Paradigm!
+Let's step back and ask this question; what if a new product is added in the `Product` microservice? How we add that record to the legacy database? The simple old days answer would be create database connection and add record to that database! But the answer is wrong and that is a huge violation of Microservice Paradigm!
 
 I implemented this service with Spring Framework, Spring Cloud Stream and Spring Kafka Stream! Fancy.
 
-With this toolkit, I could transfer the modernized data structure back to the legacy (reverse engineering) and same the records into the legacy database from `Ingestor` microservice.
+With this toolkit, I could transfer the modernized data structure back to the legacy (reverse engineering) and save the records into the legacy database from `Ingestor` microservice.
 
 Basically, what we have here called streaming app or Stream Processing service! By this streaming ETL, we simply can sync legacy and modernized database with each other without any modification in legacy application or legacy database! This is very important factor and this technology can help us to use Strangler Pattern or Digital Decoupling without breaking existing running app!
-
