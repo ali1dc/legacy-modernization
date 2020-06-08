@@ -81,11 +81,13 @@ public class OrderItemServiceImpl implements OrderItemService {
         orderItem.setCreatedDate(new Date());
         orderItem.setId(null);
         // handle order-id product-id
-        Product product = productRepository.findTopByLegacyId(orderItem.getProductId()).get();
-        Order order = orderRepository.findTopByLegacyId(orderItem.getOrderId()).get();
-        orderItem.setOrder(order);
-        orderItem.setProduct(product);
-        orderItemRepository.save(orderItem);
+        Optional<Product> optionalProduct = productRepository.findTopByLegacyId(orderItem.getProductId());
+        Optional<Order> optionalOrder = orderRepository.findTopByLegacyId(orderItem.getOrderId());
+        if (optionalOrder.isPresent() && optionalProduct.isPresent()) {
+            orderItem.setOrder(optionalOrder.get());
+            orderItem.setProduct(optionalProduct.get());
+            orderItemRepository.save(orderItem);
+        }
     }
 
     @Override

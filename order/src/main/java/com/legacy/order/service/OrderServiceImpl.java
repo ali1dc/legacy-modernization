@@ -75,11 +75,11 @@ public class OrderServiceImpl implements OrderService {
         order.setId(null);
         order.setCreatedBy(legacyCreatedBy);
 
-        // handle customer
-        Customer customer = customerRepository.findTopByLegacyId(event.getAfter().getCustomerId()).get();
-        order.setCustomer(customer);
-
-        orderRepository.save(order);
+        // insert if customer exists
+        customerRepository.findTopByLegacyId(order.getCustomerId()).ifPresent(customer -> {
+            order.setCustomer(customer);
+            orderRepository.save(order);
+        });
     }
 
     @Override
@@ -93,12 +93,11 @@ public class OrderServiceImpl implements OrderService {
         order.setUpdatedBy(legacyCreatedBy);
         order.setUpdatedDate(new Date());
         // handle customer id
-        Customer customer = customerRepository.findTopByLegacyId(event.getAfter().getCustomerId()).get();
-
-        order.setCustomerId(customer.getId());
-        order.setCustomer(customer);
-
-        orderRepository.save(order);
+        customerRepository.findTopByLegacyId(event.getAfter().getCustomerId()).ifPresent(customer -> {
+            order.setCustomerId(customer.getId());
+            order.setCustomer(customer);
+            orderRepository.save(order);
+        });
     }
 
     @Override
