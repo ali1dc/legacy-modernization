@@ -32,7 +32,7 @@ public class CustomerServiceImpl implements CustomerService {
     private String modCreatedBy;
 
     @Override
-    public LegacyCustomer save(CustomerAddressEvent event) {
+    public void save(CustomerAddressEvent event) {
 
         logger.info("inserting the customer record");
         ReadOnlyKeyValueStore<Long, Customer> customerStore =
@@ -42,8 +42,11 @@ public class CustomerServiceImpl implements CustomerService {
 
         Customer customer = customerStore.get(event.getAfter().getCustomerId());
         Address address = addressStore.get(event.getAfter().getAddressId());
+        if (customer == null || address == null) return;
+
         // insert customer if not exists in legacy db
-        Optional<LegacyCustomer> customerOptional = customerRepository.findById(customer.getLegacyId());
+        Optional<LegacyCustomer> customerOptional = customerRepository.findById(customer.getLegacyId());;
+
         LegacyCustomer legacyCustomer;
         if (customerOptional.isPresent()) {
             logger.info("customer exists in legacy, we just update the address!");
@@ -82,8 +85,6 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         customerRepository.save(legacyCustomer);
-
-        return legacyCustomer;
     }
 
     @Override

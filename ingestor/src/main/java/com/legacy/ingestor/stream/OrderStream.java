@@ -59,7 +59,11 @@ public class OrderStream {
                         e.printStackTrace();
                     }
                     assert event != null;
-                    return !Objects.equals(event.getOp(), Actions.DELETE);
+                    boolean isDeleted = Objects.equals(event.getOp(), Actions.DELETE);
+                    boolean isCreated = (Objects.equals(event.getOp(), Actions.CREATE) || Objects.equals(event.getOp(), Actions.READ));
+                    boolean hasLegacyId = event.getAfter().getLegacyId() != null;
+
+                    return !(isDeleted || (isCreated && hasLegacyId));
                 })
                 .map((key, value) -> {
                     Order order = null;

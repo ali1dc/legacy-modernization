@@ -50,7 +50,6 @@ public class CustomerStream {
     public Function<KStream<String, String>, KStream<Long, Customer>> iCustomer() {
 
         return input -> input
-
                 .filter((key, value) -> {
                     CustomerEvent event = null;
                     try {
@@ -59,7 +58,11 @@ public class CustomerStream {
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
-                    return !Objects.equals(event.getOp(), Actions.DELETE);
+                    boolean isDeleted = Objects.equals(event.getOp(), Actions.DELETE);
+                    boolean isCreated = (Objects.equals(event.getOp(), Actions.CREATE) || Objects.equals(event.getOp(), Actions.READ));
+                    boolean hasLegacyId = event.getAfter().getLegacyId() != null;
+
+                    return !(isDeleted || (isCreated && hasLegacyId));
                 })
                 .map((key, value) -> {
                     Customer customer = null;

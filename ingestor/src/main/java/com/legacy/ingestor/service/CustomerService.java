@@ -6,7 +6,7 @@ import com.legacy.ingestor.model.LegacyCustomer;
 
 public interface CustomerService {
 
-    LegacyCustomer save(CustomerAddressEvent event);
+    void save(CustomerAddressEvent event);
     LegacyCustomer save(CustomerEvent event);
     void delete(CustomerAddressEvent event);
 }
