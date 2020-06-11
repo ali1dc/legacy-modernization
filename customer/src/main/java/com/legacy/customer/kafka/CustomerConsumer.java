@@ -1,4 +1,4 @@
-package com.legacy.customer.consumer;
+package com.legacy.customer.kafka;
 
 import com.legacy.customer.service.CustomerService;
 import org.apache.kafka.streams.kstream.KStream;
