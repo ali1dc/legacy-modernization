@@ -29,6 +29,8 @@ spring.jpa.hibernate.ddl-auto: none
 
 spring.kafka.bootstrap-servers: localhost:19092
 
+spring.cloud.stream.function.definition: pCustomers
+spring.cloud.stream.bindings.pCustomers-in-0.destination: enriched-customers
 
 flyway:
   driver-class-name: org.postgresql.Driver
