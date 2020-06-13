@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.payment.config.AddressTypes;
-import com.legacy.payment.dto.Customer;
 import com.legacy.payment.dto.CustomerAddress;
 import com.legacy.payment.dto.EnrichedCustomer;
 import com.legacy.payment.service.CustomerService;
@@ -38,6 +37,7 @@ public class CustomerConsumer {
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
+                    assert customerAddress != null;
                     return Objects.equals(customerAddress.getAddressType(), AddressTypes.BILLING);
                 })
                 .foreach((key, value) -> {
@@ -48,6 +48,7 @@ public class CustomerConsumer {
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
+                    assert customer != null;
                     logger.info("consumed --> key: {}, customer id: {}, address id: {}, address type: {}",
                             key,
                             customer.getCustomer().getId(),
