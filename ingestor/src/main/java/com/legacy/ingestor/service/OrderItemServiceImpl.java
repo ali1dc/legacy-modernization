@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.ingestor.config.Actions;
+import com.legacy.ingestor.config.LegacyIdTopics;
 import com.legacy.ingestor.config.StateStores;
 import com.legacy.ingestor.dto.*;
 import com.legacy.ingestor.events.OrderItemEvent;
@@ -20,7 +21,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 @Service
 public class OrderItemServiceImpl implements OrderItemService {
@@ -36,7 +40,8 @@ public class OrderItemServiceImpl implements OrderItemService {
     private ProductRepository productRepository;
     @Autowired
     private InteractiveQueryService interactiveQueryService;
-
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
     @Value(value = "${created-by.mod}")
     private String modCreatedBy;
 
@@ -91,7 +96,11 @@ public class OrderItemServiceImpl implements OrderItemService {
                 .createdBy(modCreatedBy)
                 .build();
         orderItemRepository.save(legacyOrderItem);
-
+        if (Objects.equals(event.getOp(), Actions.CREATE) || Objects.equals(event.getOp(), Actions.READ)) {
+            kafkaTemplate.send(LegacyIdTopics.ORDER_ITEM,
+                    event.getAfter().getId().toString(),
+                    legacyOrderItem.getItemId().toString());
+        }
         return legacyOrderItem;
     }
 

@@ -1,5 +1,6 @@
 package com.legacy.ingestor.service;
 
+import com.legacy.ingestor.config.LegacyIdTopics;
 import com.legacy.ingestor.config.StateStores;
 import com.legacy.ingestor.dto.Product;
 import com.legacy.ingestor.events.ProductEvent;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -28,7 +30,8 @@ public class ProductServiceImpl implements ProductService{
     private CategoryRepository categoryRepository;
     @Autowired
     private InteractiveQueryService interactiveQueryService;
-
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
     @Value(value = "${created-by.mod}")
     private String modCreatedBy;
 
@@ -40,7 +43,11 @@ public class ProductServiceImpl implements ProductService{
         Optional<LegacyProduct> productExists = productRepository.findTopByProductName(event.getAfter().getName());
         if (productExists.isPresent()) {
             logger.info("duplicate product detected, do not insert it again!");
-            return productExists.get();
+            LegacyProduct product = productExists.get();
+            kafkaTemplate.send(LegacyIdTopics.PRODUCT,
+                    event.getAfter().getId().toString(),
+                    product.getProductId().toString());
+            return product;
         }
         LegacyProduct product = LegacyProduct.builder()
                 .productName(event.getAfter().getName())
@@ -51,6 +58,9 @@ public class ProductServiceImpl implements ProductService{
                 .build();
 
         productRepository.save(product);
+        kafkaTemplate.send(LegacyIdTopics.PRODUCT,
+                event.getAfter().getId().toString(),
+                product.getProductId().toString());
         return product;
     }
 
