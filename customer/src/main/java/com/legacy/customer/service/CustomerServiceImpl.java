@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.customer.config.Actions;
+import com.legacy.customer.config.AddressTypes;
 import com.legacy.customer.config.CustomerMapper;
 import com.legacy.customer.event.LegacyCustomerEvent;
 import com.legacy.customer.model.Address;
@@ -47,7 +48,7 @@ public class CustomerServiceImpl implements CustomerService {
         JsonNode jsonNode = null;
         LegacyCustomerEvent event = null;
         try {
-            jsonNode = jsonMapper.readTree(data).at("/payload");
+            jsonNode = jsonMapper.readTree(data).at("/");
             event = jsonMapper.readValue(jsonNode.toString(), LegacyCustomerEvent.class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -103,7 +104,7 @@ public class CustomerServiceImpl implements CustomerService {
         CustomerAddress customerAddress = CustomerAddress.builder()
                 .customer(customer)
                 .address(billingAddress)
-                .addressType("billing")
+                .addressType(AddressTypes.BILLING)
                 .isDefault(true)
                 .build();
         customerAddressRepository.save(customerAddress);

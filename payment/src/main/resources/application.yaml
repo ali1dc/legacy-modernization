@@ -1,0 +1,50 @@
+server.port: 8095
+management:
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include:
+          - health
+          - metrics
+          - info
+          - bindings
+  endpoint:
+    health.enabled: true
+    health.show-details: always
+
+created-by:
+  mod: modernized
+  legacy: legacy
+
+spring.datasource.driver-class-name: org.postgresql.Driver
+spring.datasource.url: jdbc:postgresql://localhost:5432/payment
+spring.datasource.username: postgres
+spring.datasource.password: postgres
+spring.datasource.test-on-borrow: true
+spring.datasource.validation-query: SELECT 1
+spring.datasource.log-validation-errors: true
+spring.jpa.show-sql: true
+spring.jpa.hibernate.ddl-auto: none
+
+spring.kafka.bootstrap-servers: localhost:19092
+spring.cloud.stream.kafka.stream.binder.application-id: payment-microservice
+spring.cloud.stream.function.definition: pCustomers;pOrderTotal;pOrders
+spring.cloud.stream.bindings.pCustomers-in-0.destination: enriched-customers
+spring.cloud.stream.bindings.pOrderTotal-in-0.destination: order.public.order_items
+spring.cloud.stream.bindings.pOrderTotal-out-0.destination: order-total
+spring.cloud.stream.bindings.pOrders-in-0.destination: order.public.orders
+
+
+spring.cloud.stream.kafka.streams.binder.state-store-retry.max-attempts: 100
+spring.cloud.stream.kafka.streams.binder.state-store-retry.backoff-period: 10000
+
+flyway:
+  driver-class-name: org.postgresql.Driver
+  url: jdbc:postgresql://localhost:5432/payment
+  user: postgres
+  password: postgres
+  enable: true
+  test-on-borrow: true
+  validation-query: SELECT 1
+  log-validation-errors: true

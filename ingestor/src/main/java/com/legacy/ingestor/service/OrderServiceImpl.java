@@ -1,6 +1,7 @@
 package com.legacy.ingestor.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.legacy.ingestor.config.Actions;
+import com.legacy.ingestor.config.LegacyIdTopics;
 import com.legacy.ingestor.config.StateStores;
 import com.legacy.ingestor.dto.Customer;
 import com.legacy.ingestor.dto.Order;
@@ -16,8 +17,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -31,6 +34,8 @@ public class OrderServiceImpl implements OrderService {
     private CustomerRepository customerRepository;
     @Autowired
     private InteractiveQueryService interactiveQueryService;
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
     @Value(value = "${created-by.mod}")
     private String modCreatedBy;
 
@@ -58,7 +63,11 @@ public class OrderServiceImpl implements OrderService {
                 .customer(legacyCustomer)
                 .build();
         orderRepository.save(legacyOrder);
-
+        if (Objects.equals(event.getOp(), Actions.CREATE) || Objects.equals(event.getOp(), Actions.READ)) {
+            kafkaTemplate.send(LegacyIdTopics.ORDER,
+                    event.getAfter().getId().toString(),
+                    legacyOrder.getOrderId().toString());
+        }
         return legacyOrder;
     }
 

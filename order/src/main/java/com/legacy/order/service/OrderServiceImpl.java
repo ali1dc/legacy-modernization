@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.order.config.Actions;
 import com.legacy.order.event.OrderEvent;
-import com.legacy.order.model.Customer;
 import com.legacy.order.model.Order;
 import com.legacy.order.repository.CustomerRepository;
 import com.legacy.order.repository.OrderRepository;

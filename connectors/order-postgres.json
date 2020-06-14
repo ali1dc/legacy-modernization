@@ -10,7 +10,7 @@
     "database.dbname": "order",
     "database.server.name": "order",
     "database.tcpKeepAlive": true,
-    "table.blacklist": "public.flyway_schema_history",
+    "table.blacklist": "public.flyway_schema_history,public.customers,public.products,public.orders",
     "schema.whitelist": "public",
     "decimal.handling.mode": "double",
     "schemas.enable": false,
@@ -19,6 +19,12 @@
     "value.converter": "org.apache.kafka.connect.json.JsonConverter",
     "internal.key.converter": "org.apache.kafka.connect.json.JsonConverter",
     "internal.value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "transforms": "ExtractField",
+    "transforms.ExtractField.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
+    "transforms.ExtractField.field": "id",
+    "key.converter.schemas.enable": false,
+    "value.converter.schemas.enable": false,
+    "key.ignore" : false,
     "slot.name" : "order_slot"
   }
 }

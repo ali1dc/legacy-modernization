@@ -16,33 +16,32 @@ configurations {
 
 repositories {
 	mavenCentral()
-	maven { url 'https://repo.spring.io/milestone' }
-	maven { url 'https://repo.spring.io/snapshot' }
 }
 
 ext {
-	set('springCloudVersion', "Hoxton.SR4")
+	set('springCloudVersion', "Hoxton.SR5")
 }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.kafka:spring-kafka'
 	implementation 'org.apache.kafka:kafka-streams'
+	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.springframework.cloud:spring-cloud-stream:3.0.4.RELEASE'
 	implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka:3.0.4.RELEASE'
 	implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka-core:3.0.4.RELEASE'
 	implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka-streams:3.0.4.RELEASE'
-	implementation 'mysql:mysql-connector-java'
+
 	compileOnly 'org.projectlombok:lombok'
+	compile group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
+	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
 	testImplementation 'org.springframework.cloud:spring-cloud-stream-test-support'
-	testImplementation 'org.springframework.kafka:spring-kafka-test'
 }
 
 dependencyManagement {
