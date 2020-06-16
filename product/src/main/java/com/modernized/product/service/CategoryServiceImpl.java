@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -85,6 +86,20 @@ public class CategoryServiceImpl implements CategoryService {
                 category.setUpdatedBy(legacyCreatedBy);
                 category.setUpdatedDate(event.getTimestamp());
                 categoryRepository.save(category);
+            }
+        });
+    }
+
+    @Override
+    public void update(Long id, Long legacyId) {
+
+        Optional<Category> optionalCategory = categoryRepository.findById(id);
+        optionalCategory.ifPresent(cat -> {
+            if (cat.getLegacyId() == null) {
+                cat.setLegacyId(legacyId);
+                cat.setUpdatedBy(legacyCreatedBy);
+                cat.setUpdatedDate(new Date());
+                categoryRepository.save(cat);
             }
         });
     }

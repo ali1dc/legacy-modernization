@@ -6,6 +6,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -61,4 +62,15 @@ public class Product {
 
     @Column(name = "updated_date")
     Date updatedDate;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return Objects.equals(name, product.name) &&
+                Objects.equals(description, product.description) &&
+                quantity.equals(product.quantity) &&
+                listPrice.equals(product.listPrice);
+    }
 }

@@ -20,7 +20,6 @@ public class Category {
     @Id
     @JsonProperty("category_id")
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name = "id")
     Long id;
 
     @Column(name = "legacy_id")

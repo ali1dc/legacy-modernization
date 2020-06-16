@@ -3,12 +3,12 @@ package com.modernized.product.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.modernized.product.config.Actions;
 import com.modernized.product.event.ProductEvent;
 import com.modernized.product.model.Category;
 import com.modernized.product.model.Product;
 import com.modernized.product.model.ProductCategory;
-import com.modernized.product.model.ProductCategoryKey;
 import com.modernized.product.repository.CategoryRepository;
 import com.modernized.product.repository.ProductCategoryRepository;
 import com.modernized.product.repository.ProductRepository;
@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -57,6 +58,8 @@ public class ProductServiceImpl implements ProductService {
                     delete(event);
                     break;
             }
+        } catch (MismatchedInputException me) {
+            logger.warn(me.getMessage());
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -81,10 +84,6 @@ public class ProductServiceImpl implements ProductService {
             // now get category id and set products_category entity
             Optional<Category> category = categoryRepository.findTopByLegacyId(product.getCategoryId());
             category.ifPresent(cat -> productCategoryRepository.save(ProductCategory.builder()
-                    .id(ProductCategoryKey.builder()
-                            .productId(product.getId())
-                            .categoryId(cat.getId())
-                            .build())
                     .product(product)
                     .category(cat)
                     .build()));
@@ -99,22 +98,34 @@ public class ProductServiceImpl implements ProductService {
         Optional<Product> existingProduct = productRepository.findTopByName(event.getBefore().getName());
 
         existingProduct.ifPresent(product -> {
-            product.setName(event.getAfter().getName());
-            product.setDescription(event.getAfter().getDescription());
-            product.setQuantity(event.getAfter().getQuantity());
-            product.setListPrice(event.getAfter().getListPrice());
-            product.setUpdatedBy(legacyCreatedBy);
-            product.setUpdatedDate(event.getTimestamp());
-            productRepository.save(product);
-            Optional<Category> optionalCategory = categoryRepository.findTopByLegacyId(event.getBefore().getCategoryId());
-            optionalCategory.ifPresent(cat -> productCategoryRepository.save(ProductCategory.builder()
-                    .id(ProductCategoryKey.builder()
-                            .productId(product.getId())
-                            .categoryId(cat.getId())
-                            .build())
-                    .product(product)
-                    .category(cat)
-                    .build()));
+            if (!event.getAfter().equals(product)) {
+                product.setName(event.getAfter().getName());
+                product.setDescription(event.getAfter().getDescription());
+                product.setQuantity(event.getAfter().getQuantity());
+                product.setListPrice(event.getAfter().getListPrice());
+                product.setUpdatedBy(legacyCreatedBy);
+                product.setUpdatedDate(event.getTimestamp());
+                productRepository.save(product);
+                Optional<Category> optionalCategory = categoryRepository.findTopByLegacyId(event.getBefore().getCategoryId());
+                optionalCategory.ifPresent(cat -> productCategoryRepository.save(ProductCategory.builder()
+                        .product(product)
+                        .category(cat)
+                        .build()));
+            }
+        });
+    }
+
+    @Override
+    public void update(Long id, Long legacyId) {
+
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        optionalProduct.ifPresent(product -> {
+            if (product.getLegacyId() == null) {
+                product.setLegacyId(legacyId);
+                product.setUpdatedBy(legacyCreatedBy);
+                product.setUpdatedDate(new Date());
+                productRepository.save(product);
+            }
         });
     }
 

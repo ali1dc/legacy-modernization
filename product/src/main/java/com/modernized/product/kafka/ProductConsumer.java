@@ -42,7 +42,9 @@ public class ProductConsumer {
 
         return input -> input
                 .foreach((key, value) -> {
-                    productService.productHandler(value);
+                    Long id = Long.parseLong(key);
+                    Long legacyId = Long.parseLong(value);
+                    categoryService.update(id, legacyId);
                 });
     }
 
@@ -51,7 +53,9 @@ public class ProductConsumer {
 
         return input -> input
                 .foreach((key, value) -> {
-                    productService.productHandler(value);
+                    Long id = Long.parseLong(key);
+                    Long legacyId = Long.parseLong(value);
+                    productService.update(id, legacyId);
                 });
     }
 
