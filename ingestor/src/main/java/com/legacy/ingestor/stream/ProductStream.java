@@ -1,7 +1,6 @@
 package com.legacy.ingestor.stream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.ingestor.config.Actions;
 import com.legacy.ingestor.config.StateStores;
@@ -9,7 +8,6 @@ import com.legacy.ingestor.dto.Product;
 import com.legacy.ingestor.events.CategoryEvent;
 import com.legacy.ingestor.events.ProductEvent;
 import com.legacy.ingestor.model.Category;
-import com.legacy.ingestor.model.LegacyProduct;
 import com.legacy.ingestor.service.CategoryService;
 import com.legacy.ingestor.service.ProductService;
 import org.apache.kafka.common.serialization.Serde;
@@ -48,14 +46,64 @@ public class ProductStream {
     }
 
     @Bean
+    public java.util.function.Consumer<KStream<String, String>> iProducts() {
+
+        return products -> products
+
+                .map((key, value) -> {
+                    Product product = null;
+                    try {
+                        product = jsonMapper.readValue(
+                                jsonMapper.readTree(value).toString(), Product.class);
+
+                        productService.save(product);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                    assert product != null;
+                    return KeyValue.pair(key, product);
+                })
+                .groupByKey(Grouped.with(Serdes.String(), productSerde))
+                .reduce((value1, value2) -> value2, Materialized.as(StateStores.PRODUCT_STORE));
+    }
+
+    @Bean
+    public java.util.function.Consumer<KStream<String, String>> iProductUpdate() {
+
+        return products -> products
+                .filter((key, value) -> {
+                    ProductEvent event = null;
+                    try {
+                        event = jsonMapper.readValue(
+                                jsonMapper.readTree(value).toString(), ProductEvent.class);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                    assert event != null;
+                    return Objects.equals(event.getOp(), Actions.UPDATE);
+                })
+                .foreach((key, value) -> {
+                    ProductEvent event = null;
+                    try {
+                        event = jsonMapper.readValue(
+                                jsonMapper.readTree(value).toString(), ProductEvent.class);
+
+                        productService.update(event);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                });
+    }
+
+   @Bean
     public Function<KStream<String, String>, KStream<Long, Category>> iCategory() {
 
         return input -> input
                 .filter((key, value) -> {
                     CategoryEvent event = null;
                     try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
-                        event = jsonMapper.readValue(jsonNode.toString(), CategoryEvent.class);
+                        event = jsonMapper.readValue(
+                                jsonMapper.readTree(value).toString(), CategoryEvent.class);
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
@@ -65,8 +113,8 @@ public class ProductStream {
                 .map((key, value) -> {
                     Category category = null;
                     try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
-                        CategoryEvent event = jsonMapper.readValue(jsonNode.toString(), CategoryEvent.class);
+                        CategoryEvent event = jsonMapper.readValue(
+                                jsonMapper.readTree(value).toString(), CategoryEvent.class);
 
                         switch (event.getOp()) {
                             case Actions.CREATE:
@@ -88,7 +136,10 @@ public class ProductStream {
                 .toStream();
     }
 
-    @Bean
+
+    /**
+
+     @Bean
     public Function<KStream<String, String>, KStream<Long, Product>> iProduct() {
         return input -> input
                 .filter((key, value) -> {
@@ -105,8 +156,8 @@ public class ProductStream {
                 .map((key, value) -> {
                     Product product = null;
                     try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
-                        ProductEvent event = jsonMapper.readValue(jsonNode.toString(), ProductEvent.class);
+                        ProductEvent event = jsonMapper.readValue(
+                                jsonMapper.readTree(value).toString(), ProductEvent.class);
                         product = event.getAfter();
                         LegacyProduct legacyProduct = null;
 
@@ -132,19 +183,5 @@ public class ProductStream {
                 .toStream();
     }
 
-    @Bean
-    public java.util.function.Consumer<KStream<String, String>> iProductCategory() {
-
-        return cs -> cs
-                .foreach(((key, value) -> {
-                    try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/payload/after");
-                        Long productId = jsonNode.at("/product_id").asLong();
-                        Long categoryId = jsonNode.at("/category_id").asLong();
-                        productService.insert(productId, categoryId);
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                }));
-    }
+    */
 }

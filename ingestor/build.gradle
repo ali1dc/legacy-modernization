@@ -35,6 +35,7 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka-core:3.0.4.RELEASE'
 	implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka-streams:3.0.4.RELEASE'
 	implementation 'mysql:mysql-connector-java'
+	implementation 'org.modelmapper:modelmapper:2.3.7'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'
