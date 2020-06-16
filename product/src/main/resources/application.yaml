@@ -28,10 +28,27 @@ spring.jpa.show-sql: true
 spring.jpa.hibernate.ddl-auto: none
 
 spring.kafka.bootstrap-servers: localhost:19092
-spring.cloud.stream.function.definition: categories;products
+spring.cloud.stream.function.definition: categories;products;pCategories;pProducts;pProductCategories;enrichedProducts;categoryLegacyIds;productLegacyIds
 spring.cloud.stream.bindings.categories-in-0.destination: legacy.legacy_order.categories
 spring.cloud.stream.bindings.products-in-0.destination: legacy.legacy_order.products
 spring.cloud.stream.kafka.stream.binder.application-id: product-microservice
+spring.cloud.stream.bindings.categoryLegacyIds-in-0.destination: category-legacy-ids
+spring.cloud.stream.bindings.productLegacyIds-in-0.destination: product-legacy-ids
+
+spring.cloud.stream.bindings.pCategories-in-0.destination: product.public.categories
+spring.cloud.stream.bindings.pCategories-out-0.destination: clean-categories
+spring.cloud.stream.bindings.pProducts-in-0.destination: product.public.products
+spring.cloud.stream.bindings.pProducts-out-0.destination: clean-products
+spring.cloud.stream.bindings.pProductCategories-in-0.destination: product.public.products_categories
+spring.cloud.stream.bindings.pProductCategories-out-0.destination: clean-product-categories
+
+spring.cloud.stream.bindings.enrichedProducts-in-0.destination: clean-product-categories
+spring.cloud.stream.bindings.enrichedProducts-in-1.destination: clean-products
+spring.cloud.stream.bindings.enrichedProducts-in-2.destination: clean-categories
+spring.cloud.stream.bindings.enrichedProducts-out-0.destination: enriched-products
+
+spring.cloud.stream.kafka.streams.binder.state-store-retry.max-attempts: 100
+spring.cloud.stream.kafka.streams.binder.state-store-retry.backoff-period: 10000
 spring.cloud.stream.kafka.bindings.products.consumer.max.poll.interval.ms: 10000
 
 flyway:

@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.*;
 
+import java.util.List;
+import java.util.Objects;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -19,6 +22,9 @@ public class Product {
     @JsonProperty("description")
     String description;
 
+    @JsonProperty("categories")
+    List<String> categories;
+
     @JsonProperty("list_price")
     Float listPrice;
 
@@ -30,4 +36,17 @@ public class Product {
 
     @JsonProperty("legacy_id")
     Long legacyId;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return id.equals(product.id) &&
+                Objects.equals(name, product.getName()) &&
+                Objects.equals(description, product.description) &&
+                listPrice.equals(product.getListPrice()) &&
+                quantity.equals(product.quantity) &&
+                legacyId.equals(product.getLegacyId());
+    }
 }

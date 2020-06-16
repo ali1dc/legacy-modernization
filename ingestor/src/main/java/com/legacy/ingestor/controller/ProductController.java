@@ -1,7 +1,8 @@
 package com.legacy.ingestor.controller;
 
+import com.legacy.ingestor.config.StateStores;
+import com.legacy.ingestor.dto.Product;
 import com.legacy.ingestor.model.Category;
-import com.legacy.ingestor.model.LegacyProduct;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
@@ -47,22 +48,22 @@ public class ProductController {
     }
 
     @GetMapping("/products")
-    public List<LegacyProduct> products() {
-        List<LegacyProduct> legacyProducts = new ArrayList<>();
-        ReadOnlyKeyValueStore<Long, LegacyProduct> store =
-                interactiveQueryService.getQueryableStore("product-store", QueryableStoreTypes.keyValueStore());
-        KeyValueIterator<Long, LegacyProduct> all = store.all();
+    public List<Product> products() {
+        List<Product> products = new ArrayList<>();
+        ReadOnlyKeyValueStore<String, Product> store =
+                interactiveQueryService.getQueryableStore(StateStores.PRODUCT_STORE, QueryableStoreTypes.keyValueStore());
+        KeyValueIterator<String, Product> all = store.all();
         while (all.hasNext()) {
-            KeyValue<Long, LegacyProduct> value = all.next();
-            legacyProducts.add(value.value);
+            KeyValue<String, Product> value = all.next();
+            products.add(value.value);
         }
-        return legacyProducts;
+        return products;
     }
 
     @GetMapping("/products/{id}")
-    public LegacyProduct productById(@PathVariable Long id) {
-        ReadOnlyKeyValueStore<Long, LegacyProduct> store =
-                interactiveQueryService.getQueryableStore("product-store", QueryableStoreTypes.keyValueStore());
-        return store.get(id);
+    public Product productById(@PathVariable Long id) {
+        ReadOnlyKeyValueStore<String, Product> store =
+                interactiveQueryService.getQueryableStore(StateStores.PRODUCT_STORE, QueryableStoreTypes.keyValueStore());
+        return store.get(id.toString());
     }
 }

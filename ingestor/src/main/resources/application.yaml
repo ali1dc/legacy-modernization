@@ -23,7 +23,7 @@ spring.datasource.password: root
 
 spring.kafka.bootstrap-servers: localhost:19092
 spring.cloud.stream.kafka.stream.binder.application-id: ingestor-microservice
-spring.cloud.stream.function.definition: iCategory;iProduct;iProductCategory;iCustomer;iAddress;iCustomerAddress;iOrder;iOrderItem
+spring.cloud.stream.function.definition: iProducts;iCategory;iProductUpdate;iCustomer;iAddress;iCustomerAddress;iOrder;iOrderItem
 
 spring.cloud.stream.kafka.streams.binder.state-store-retry.max-attempts: 100
 spring.cloud.stream.kafka.streams.binder.state-store-retry.backoff-period: 10000
@@ -31,9 +31,11 @@ spring.cloud.stream.kafka.streams.binder.state-store-retry.backoff-period: 10000
 # product microservice
 spring.cloud.stream.bindings.iCategory-in-0.destination: product.public.categories
 spring.cloud.stream.bindings.iCategory-out-0.destination: processed-categories
-spring.cloud.stream.bindings.iProduct-in-0.destination: product.public.products
-spring.cloud.stream.bindings.iProduct-out-0.destination: processed-products
-spring.cloud.stream.bindings.iProductCategory-in-0.destination: product.public.products_categories
+spring.cloud.stream.bindings.iProducts-in-0.destination: enriched-products
+spring.cloud.stream.bindings.iProductUpdate-in-0.destination: product.public.products
+#spring.cloud.stream.bindings.iProduct-out-0.destination: processed-products
+#spring.cloud.stream.bindings.iProductCategory-in-0.destination: product.public.products_categories
+#spring.cloud.stream.bindings.iProducts-out-0.destination: processed-products
 # customer microservice
 spring.cloud.stream.bindings.iCustomer-in-0.destination: customer.public.customers
 spring.cloud.stream.bindings.iCustomer-out-0.destination: processed-customers
