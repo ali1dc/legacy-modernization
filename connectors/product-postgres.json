@@ -19,6 +19,12 @@
     "value.converter": "org.apache.kafka.connect.json.JsonConverter",
     "internal.key.converter": "org.apache.kafka.connect.json.JsonConverter",
     "internal.value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "transforms": "ExtractField",
+    "transforms.ExtractField.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
+    "transforms.ExtractField.field": "id",
+    "key.converter.schemas.enable": false,
+    "value.converter.schemas.enable": false,
+    "key.ignore" : false,
     "slot.name" : "product_slot"
   }
 }

@@ -1,4 +1,4 @@
-package com.modernized.product.consumer;
+package com.modernized.product.kafka;
 
 import com.modernized.product.service.CategoryService;
 import com.modernized.product.service.ProductService;
@@ -36,4 +36,23 @@ public class ProductConsumer {
                     productService.productHandler(value);
                 });
     }
+
+    @Bean
+    public java.util.function.Consumer<KStream<String, String>> categoryLegacyIds() {
+
+        return input -> input
+                .foreach((key, value) -> {
+                    productService.productHandler(value);
+                });
+    }
+
+    @Bean
+    public java.util.function.Consumer<KStream<String, String>> productLegacyIds() {
+
+        return input -> input
+                .foreach((key, value) -> {
+                    productService.productHandler(value);
+                });
+    }
+
 }

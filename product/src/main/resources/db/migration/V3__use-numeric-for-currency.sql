@@ -1,2 +1,0 @@
-ALTER TABLE products
-ALTER COLUMN list_price TYPE NUMERIC(8, 2);
