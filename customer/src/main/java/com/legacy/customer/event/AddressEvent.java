@@ -1,7 +1,7 @@
 package com.legacy.customer.event;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.legacy.customer.model.Address;
+import com.legacy.customer.dto.AddressDto;
 import lombok.*;
 
 import java.sql.Timestamp;
@@ -18,8 +18,8 @@ public class AddressEvent {
     Timestamp timestamp;
 
     @JsonProperty("before")
-    Address before;
+    AddressDto before;
 
     @JsonProperty("after")
-    Address after;
+    AddressDto after;
 }

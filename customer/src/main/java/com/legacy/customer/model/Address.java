@@ -42,6 +42,10 @@ public class Address {
     @OneToMany(mappedBy = "address")
     Set<CustomerAddress> customerAddresses;
 
+    @JsonProperty("legacy_id")
+    @Column(name = "legacy_id")
+    Long legacyId;
+
     @JsonProperty("created_by")
     @Column(name = "created_by")
     String createdBy;

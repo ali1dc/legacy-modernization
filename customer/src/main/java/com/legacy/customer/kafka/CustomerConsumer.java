@@ -16,12 +16,23 @@ public class CustomerConsumer {
     private CustomerService customerService;
 
     @Bean
-    public java.util.function.Consumer<KStream<Object, String>> processCustomer() {
+    public java.util.function.Consumer<KStream<Object, String>> legacyCustomers() {
 
         return input -> input
                 .foreach((key, value) -> {
                     logger.info("start processing legacy messages");
                     customerService.eventHandler(value);
+                });
+    }
+
+    @Bean
+    public java.util.function.Consumer<KStream<String, String>> legacyCustomerIds() {
+
+        return input -> input
+                .foreach((key, value) -> {
+                    Long id = Long.parseLong(key);
+                    Long legacyId = Long.parseLong(value);
+                    customerService.update(id, legacyId);
                 });
     }
 }
