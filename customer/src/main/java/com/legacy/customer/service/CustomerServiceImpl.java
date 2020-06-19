@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -48,7 +50,7 @@ public class CustomerServiceImpl implements CustomerService {
         JsonNode jsonNode = null;
         LegacyCustomerEvent event = null;
         try {
-            jsonNode = jsonMapper.readTree(data).at("/");
+            jsonNode = jsonMapper.readTree(data).at("/payload");
             event = jsonMapper.readValue(jsonNode.toString(), LegacyCustomerEvent.class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -91,11 +93,13 @@ public class CustomerServiceImpl implements CustomerService {
         Address billingAddress = mapper.eventToAddress(event,true);
         billingAddress.setCreatedDate(event.getTimestamp());
         billingAddress.setCreatedBy(legacyCreatedBy);
+        billingAddress.setLegacyId(customer.getLegacyId());
         addressRepository.save(billingAddress);
 
         Address shippingAddress = mapper.eventToAddress(event,false);
         shippingAddress.setCreatedDate(event.getTimestamp());
         shippingAddress.setCreatedBy(legacyCreatedBy);
+        shippingAddress.setLegacyId(customer.getLegacyId());
         if(billingAddress.equals(shippingAddress)) {
             shippingAddress = billingAddress;
         }
@@ -111,7 +115,7 @@ public class CustomerServiceImpl implements CustomerService {
         customerAddress = CustomerAddress.builder()
                 .customer(customer)
                 .address(shippingAddress)
-                .addressType("shipping")
+                .addressType(AddressTypes.SHIPPING)
                 .isDefault(false)
                 .build();
         customerAddressRepository.save(customerAddress);
@@ -132,6 +136,30 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setUpdatedDate(event.getTimestamp());
         customerRepository.save(customer);
         // then handle address update here!
+    }
+
+    @Override
+    public void update(Long id, Long legacyId) {
+
+        Optional<Customer> optionalCustomer = customerRepository.findById(id);
+        optionalCustomer.ifPresent(customer -> {
+            if (customer.getLegacyId() == null) {
+                customer.setLegacyId(legacyId);
+                customer.setUpdatedBy(legacyCreatedBy);
+                customer.setUpdatedDate(new Date());
+                customerRepository.save(customer);
+            }
+        });
+        Optional<List<CustomerAddress>> customerAddresses = customerAddressRepository.findByCustomerId(id);
+        customerAddresses.ifPresent(list -> {
+            list.forEach(ca -> {
+                Address address = ca.getAddress();
+                if (address.getLegacyId() == null) {
+                    address.setLegacyId(legacyId);
+                    addressRepository.save(address);
+                }
+            });
+        });
     }
 
     @Override

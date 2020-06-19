@@ -117,27 +117,6 @@ public class ProductServiceImpl implements ProductService{
         });
     }
 
-//    @Override
-//    public LegacyProduct update(ProductEvent event) {
-//
-//        logger.info("updating the record");
-//        ReadOnlyKeyValueStore<Long, Product> productStore =
-//                interactiveQueryService.getQueryableStore(StateStores.PRODUCT_STORE, QueryableStoreTypes.keyValueStore());
-//        Product product = productStore.get(event.getAfter().getId());
-//        Optional<LegacyProduct> legacyProductOptional = productRepository.findById(product.getLegacyId());
-//        if (!legacyProductOptional.isPresent()) {
-//            legacyProductOptional = productRepository.findTopByName(event.getBefore().getName());
-//        }
-//        LegacyProduct legacyProduct = legacyProductOptional.get();
-//        legacyProduct.setName(event.getAfter().getName());
-//        legacyProduct.setDescription(event.getAfter().getDescription());
-//        legacyProduct.setListPrice(event.getAfter().getListPrice());
-//        legacyProduct.setQuantity(event.getAfter().getQuantity());
-//        legacyProduct.setCreatedBy(modCreatedBy);
-//        productRepository.save(legacyProduct);
-//        return legacyProduct;
-//    }
-
     @Override
     public void delete(ProductEvent event) {
         logger.info("deleting records; not implemented yet!");

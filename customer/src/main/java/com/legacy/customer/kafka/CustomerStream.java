@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.customer.dto.*;
+import com.legacy.customer.event.AddressEvent;
+import com.legacy.customer.event.CustomerAddressEvent;
+import com.legacy.customer.event.CustomerEvent;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.GlobalKTable;
 import org.apache.kafka.streams.kstream.KStream;
@@ -23,56 +26,52 @@ public class CustomerStream {
     private ObjectMapper jsonMapper;
 
     @Bean
-    public Function<KStream<String, String>, KStream<String, CustomerDto>> pCustomer() {
+    public Function<KStream<String, CustomerEvent>, KStream<String, CustomerDto>> pCustomer() {
         return input -> input
-                .map((key, value) -> {
-                    CustomerDto customer = null;
-                    try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/after");
-                        customer = jsonMapper.readValue(jsonNode.toString(), CustomerDto.class);
-                        logger.info("Key: {}, Value: {}", key, customer.getId());
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                    return KeyValue.pair(key, customer);
-                });
+                .map((key, event) -> KeyValue.pair(key, event.getAfter()));
     }
 
     @Bean
-    public Function<KStream<String, String>, KStream<String, AddressDto>> pAddress() {
+    public Function<KStream<String, AddressEvent>, KStream<String, AddressDto>> pAddress() {
         return input -> input
-                .map((key, value) -> {
-                    AddressDto address = null;
-                    try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/after");
-                        address = jsonMapper.readValue(jsonNode.toString(), AddressDto.class);
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                    return KeyValue.pair(key, address);
-                });
+                .map((key, event) -> KeyValue.pair(key, event.getAfter()));
     }
 
     @Bean
-    public Function<KStream<String, String>, KStream<String, CustomerAddressDto>> pBillingCustomerAddress() {
+    public Function<KStream<String, CustomerAddressEvent>, KStream<String, CustomerAddressDto>> pCustomerAddress() {
         return input -> input
-                .map((key, value) -> {
-                    CustomerAddressDto customerAddress = null;
-                    try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/after");
-                        customerAddress = jsonMapper.readValue(jsonNode.toString(), CustomerAddressDto.class);
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                    return KeyValue.pair(key, customerAddress);
-                });
+                .map((key, event) -> KeyValue.pair(key, event.getAfter()));
     }
+
+/**    @Bean
+    public Function<KStream<String, CustomerAddressEvent>,
+            Function<GlobalKTable<String, CustomerEvent>,
+                    Function<GlobalKTable<String, AddressEvent>,
+                            KStream<String, EnrichedCustomer>>>> coolCustomers() {
+        return customerAddresses -> (
+                customers -> (
+                        addresses -> (
+                                customerAddresses.leftJoin(customers,
+                                        (customerAddressId, customerAddress) -> customerAddress.getAfter().getCustomerId().toString(),
+                                        CustomerAddressCustomer::new)
+                                        .leftJoin(addresses,
+                                                (id, customerAddressCustomer) -> customerAddressCustomer.getCustomerAddressEvent().getAfter().getAddressId().toString(),
+                                                (customerAddressCustomer, address) -> EnrichedCustomer.builder()
+                                                        .customer(customerAddressCustomer.getCustomerEvent().getAfter())
+                                                        .customerAddress(customerAddressCustomer.getCustomerAddressEvent().getAfter())
+                                                        .address(address.getAfter())
+                                                        .build())
+                        )
+                )
+        );
+    }
+**/
 
     @Bean
     public Function<KStream<String, CustomerAddressDto>,
             Function<GlobalKTable<String, CustomerDto>,
                     Function<GlobalKTable<String, AddressDto>,
-                            KStream<String, EnrichedCustomer>>>> enrichedCustomer() {
+                            KStream<String, EnrichedCustomer>>>> enrichedCustomers() {
         return customerAddresses -> (
                 customers -> (
                         addresses -> (

@@ -28,21 +28,27 @@ spring.jpa.show-sql: true
 spring.jpa.hibernate.ddl-auto: none
 
 spring.kafka.bootstrap-servers: localhost:19092
-spring.cloud.stream.bindings.processCustomer-in-0.destination: legacy.legacy_order.customers
-spring.cloud.stream.function.definition: pCustomer;pAddress;pBillingCustomerAddress;enrichedCustomer;processCustomer
 spring.cloud.stream.kafka.stream.binder.application-id: customer-microservice
+spring.cloud.stream.function.definition: pCustomer;pAddress;pCustomerAddress;enrichedCustomers;legacyCustomers;legacyCustomerIds
 
+spring.cloud.stream.bindings.legacyCustomers-in-0.destination: legacy.legacy_order.customers
 spring.cloud.stream.bindings.pCustomer-in-0.destination: customer.public.customers
 spring.cloud.stream.bindings.pCustomer-out-0.destination: clean-customers
 spring.cloud.stream.bindings.pAddress-in-0.destination: customer.public.addresses
 spring.cloud.stream.bindings.pAddress-out-0.destination: clean-addresses
-spring.cloud.stream.bindings.pBillingCustomerAddress-in-0.destination: customer.public.customer_addresses
-spring.cloud.stream.bindings.pBillingCustomerAddress-out-0.destination: clean-billing-customer-addresses
+spring.cloud.stream.bindings.pCustomerAddress-in-0.destination: customer.public.customer_addresses
+spring.cloud.stream.bindings.pCustomerAddress-out-0.destination: clean-customer-addresses
 
-spring.cloud.stream.bindings.enrichedCustomer-in-0.destination: clean-billing-customer-addresses
-spring.cloud.stream.bindings.enrichedCustomer-in-1.destination: clean-customers
-spring.cloud.stream.bindings.enrichedCustomer-in-2.destination: clean-addresses
-spring.cloud.stream.bindings.enrichedCustomer-out-0.destination: enriched-customers
+spring.cloud.stream.bindings.enrichedCustomers-in-0.destination: clean-customer-addresses
+spring.cloud.stream.bindings.enrichedCustomers-in-1.destination: clean-customers
+spring.cloud.stream.bindings.enrichedCustomers-in-2.destination: clean-addresses
+spring.cloud.stream.bindings.enrichedCustomers-out-0.destination: enriched-customers
+
+spring.cloud.stream.bindings.legacyCustomerIds-in-0.destination: customer-legacy-ids
+
+spring.cloud.stream.kafka.streams.binder.state-store-retry.max-attempts: 100
+spring.cloud.stream.kafka.streams.binder.state-store-retry.backoff-period: 10000
+spring.cloud.stream.kafka.bindings.products.consumer.max.poll.interval.ms: 10000
 
 flyway:
   driver-class-name: org.postgresql.Driver
