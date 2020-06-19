@@ -1,12 +1,10 @@
 package com.legacy.ingestor.stream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.ingestor.config.Actions;
 import com.legacy.ingestor.config.StateStores;
-import com.legacy.ingestor.dto.Address;
-import com.legacy.ingestor.dto.Customer;
+import com.legacy.ingestor.dto.*;
 import com.legacy.ingestor.events.AddressEvent;
 import com.legacy.ingestor.events.CustomerAddressEvent;
 import com.legacy.ingestor.events.CustomerEvent;
@@ -15,9 +13,7 @@ import com.legacy.ingestor.service.CustomerService;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
-import org.apache.kafka.streams.kstream.Grouped;
-import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.Materialized;
+import org.apache.kafka.streams.kstream.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +21,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.support.serializer.JsonSerde;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 @Component
@@ -46,35 +44,23 @@ public class CustomerStream {
         this.addressSerde = new JsonSerde<>(Address.class);
     }
 
+    /**
     @Bean
-    public Function<KStream<String, String>, KStream<Long, Customer>> iCustomer() {
+    public Function<KStream<String, CustomerEvent>, KStream<Long, Customer>> iCustomer() {
 
         return input -> input
-                .filter((key, value) -> {
-                    CustomerEvent event = null;
-                    try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
-                        event = jsonMapper.readValue(jsonNode.toString(), CustomerEvent.class);
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
+                .filter((key, event) -> {
                     boolean isDeleted = Objects.equals(event.getOp(), Actions.DELETE);
                     boolean isCreated = (Objects.equals(event.getOp(), Actions.CREATE) || Objects.equals(event.getOp(), Actions.READ));
                     boolean hasLegacyId = event.getAfter().getLegacyId() != null;
 
                     return !(isDeleted || (isCreated && hasLegacyId));
                 })
-                .map((key, value) -> {
-                    Customer customer = null;
-                    try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
-                        CustomerEvent event = jsonMapper.readValue(jsonNode.toString(), CustomerEvent.class);
-                        customer = event.getAfter();
-                        LegacyCustomer legacyCustomer = customerService.save(event);
-                        customer.setLegacyId(legacyCustomer.getId());
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
+                .map((key, event) -> {
+                    Customer customer = event.getAfter();
+                    LegacyCustomer legacyCustomer = customerService.save(event);
+                    customer.setLegacyId(legacyCustomer.getId());
+
                     return KeyValue.pair(customer.getId(), customer);
                 })
                 .groupByKey(Grouped.with(Serdes.Long(), customerSerde))
@@ -83,51 +69,49 @@ public class CustomerStream {
     }
 
     @Bean
-    public Function<KStream<String, String>, KStream<Long, Address>> iAddress() {
+    public Function<KStream<String, AddressEvent>, KStream<Long, Address>> iAddress() {
 
         return input -> input
-                .filter((key, value) -> {
-                    AddressEvent event = null;
-                    try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
-                        event = jsonMapper.readValue(jsonNode.toString(), AddressEvent.class);
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                    assert event != null;
-                    return !Objects.equals(event.getOp(), Actions.DELETE);
-                })
-                .map((key, value) -> {
-                    Address address = null;
-                    try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
-                        AddressEvent event = jsonMapper.readValue(jsonNode.toString(), AddressEvent.class);
-                        address = event.getAfter();
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                    assert address != null;
-                    return KeyValue.pair(address.getId(), address);
-                })
+                .filter((key, event) -> !Objects.equals(event.getOp(), Actions.DELETE))
+                .map((key, event) -> KeyValue.pair(event.getAfter().getId(), event.getAfter()))
                 .groupByKey(Grouped.with(Serdes.Long(), addressSerde))
                 .reduce((value1, value2) -> value2, Materialized.as(StateStores.ADDRESS_STORE))
                 .toStream();
     }
 
     @Bean
-    public java.util.function.Consumer<KStream<String, String>> iCustomerAddress() {
+    public java.util.function.Consumer<KStream<String, CustomerAddressEvent>> iCustomerAddress() {
 
         return ca -> ca
+                .filter((key, event) -> !Objects.equals(event.getOp(), Actions.DELETE))
+                .foreach((key, event) -> customerService.save(event));
+    }
+    **/
+    @Bean
+    public java.util.function.Consumer<KStream<String, String>> iCustomerInsert() {
+
+        return customers -> customers
                 .foreach((key, value) -> {
+                    EnrichedCustomer customer;
                     try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
-                        CustomerAddressEvent event = jsonMapper.readValue(jsonNode.toString(), CustomerAddressEvent.class);
-                        if (!Objects.equals(event.getOp(), Actions.DELETE)) {
-                            customerService.save(event);
-                        }
+                        customer = jsonMapper.readValue(
+                                jsonMapper.readTree(value).toString(), EnrichedCustomer.class);
+
+                        customerService.insert(customer);
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
+                });
+    }
+
+    @Bean
+    public java.util.function.Consumer<KStream<String, CustomerEvent>> iCustomerUpdate() {
+
+        return customers -> customers
+                .filter((key, event) -> Objects.equals(event.getOp(), Actions.UPDATE))
+                .foreach((key, event) -> {
+//                    customerService.insert(customer);
+                    customerService.update(event);
                 });
     }
 }

@@ -6,6 +6,7 @@ import com.legacy.ingestor.config.LegacyIdTopics;
 import com.legacy.ingestor.config.StateStores;
 import com.legacy.ingestor.dto.Address;
 import com.legacy.ingestor.dto.Customer;
+import com.legacy.ingestor.dto.EnrichedCustomer;
 import com.legacy.ingestor.events.CustomerAddressEvent;
 import com.legacy.ingestor.events.CustomerEvent;
 import com.legacy.ingestor.model.LegacyCustomer;
@@ -37,6 +38,67 @@ public class CustomerServiceImpl implements CustomerService {
     private String modCreatedBy;
 
     @Override
+    public void insert(EnrichedCustomer customer) {
+
+        String addressType = customer.getCustomerAddress().getAddressType();
+        Optional<LegacyCustomer> optionalLegacyCustomer = customerRepository.findTopByEmail(customer.getCustomer().getEmail());
+        LegacyCustomer legacyCustomer;
+        legacyCustomer = optionalLegacyCustomer.orElseGet(() -> LegacyCustomer.builder()
+                .firstName(customer.getCustomer().getFirstName())
+                .lastName(customer.getCustomer().getLastName())
+                .email(customer.getCustomer().getEmail())
+                .phone(customer.getCustomer().getPhone())
+                .createdBy(modCreatedBy)
+                .billingAddress1("")
+                .billingCity("")
+                .billingState("")
+                .billingZip("")
+                .shippingAddress1("")
+                .shippingAddress2("")
+                .shippingCity("")
+                .shippingState("")
+                .shippingZip("")
+                .build());
+        if (Objects.equals(addressType, AddressTypes.BILLING)) {
+            legacyCustomer.setBillingAddress1(customer.getAddress().getAddress1());
+            legacyCustomer.setBillingAddress2(customer.getAddress().getAddress2());
+            legacyCustomer.setBillingCity(customer.getAddress().getCity());
+            legacyCustomer.setBillingState(customer.getAddress().getState());
+            legacyCustomer.setBillingZip(customer.getAddress().getZip());
+        } else {
+            legacyCustomer.setShippingAddress1(customer.getAddress().getAddress1());
+            legacyCustomer.setShippingAddress2(customer.getAddress().getAddress2());
+            legacyCustomer.setShippingCity(customer.getAddress().getCity());
+            legacyCustomer.setShippingState(customer.getAddress().getState());
+            legacyCustomer.setShippingZip(customer.getAddress().getZip());
+        }
+
+        customerRepository.save(legacyCustomer);
+
+        // if it is a new record, send legacy id back to mod
+        if (!optionalLegacyCustomer.isPresent()) {
+            kafkaTemplate.send(LegacyIdTopics.CUSTOMER,
+                    customer.getCustomer().getId().toString(),
+                    legacyCustomer.getId().toString());
+        }
+    }
+
+    @Override
+    public void update(CustomerEvent event) {
+
+        if (event.getAfter().getLegacyId() == null) return;
+        Optional<LegacyCustomer> optionalCustomer = customerRepository.findById(event.getAfter().getLegacyId());
+        optionalCustomer.ifPresent(customer -> {
+            customer.setFirstName(event.getAfter().getFirstName());
+            customer.setLastName(event.getAfter().getLastName());
+            customer.setEmail(event.getAfter().getEmail());
+            customer.setPhone(event.getAfter().getPhone());
+
+            customerRepository.save(customer);
+        });
+    }
+
+    @Override
     public void save(CustomerAddressEvent event) {
 
         logger.info("inserting the customer record");
@@ -53,28 +115,22 @@ public class CustomerServiceImpl implements CustomerService {
         Optional<LegacyCustomer> customerOptional = customerRepository.findById(customer.getLegacyId());;
 
         LegacyCustomer legacyCustomer;
-        if (customerOptional.isPresent()) {
-            logger.info("customer exists in legacy, we just update the address!");
-            legacyCustomer = customerOptional.get();
-        }
-        else {
-            legacyCustomer = LegacyCustomer.builder()
-                    .firstName(customer.getFirstName())
-                    .lastName(customer.getLastName())
-                    .phone(customer.getPhone())
-                    .email(customer.getEmail())
-                    .createdBy(modCreatedBy)
-                    .billingAddress1("")
-                    .billingCity("")
-                    .billingState("")
-                    .billingZip("")
-                    .shippingAddress1("")
-                    .shippingAddress2("")
-                    .shippingCity("")
-                    .shippingState("")
-                    .shippingZip("")
-                    .build();
-        }
+        legacyCustomer = customerOptional.orElseGet(() -> LegacyCustomer.builder()
+                .firstName(customer.getFirstName())
+                .lastName(customer.getLastName())
+                .phone(customer.getPhone())
+                .email(customer.getEmail())
+                .createdBy(modCreatedBy)
+                .billingAddress1("")
+                .billingCity("")
+                .billingState("")
+                .billingZip("")
+                .shippingAddress1("")
+                .shippingAddress2("")
+                .shippingCity("")
+                .shippingState("")
+                .shippingZip("")
+                .build());
         if (Objects.equals(event.getAfter().getAddressType(), AddressTypes.BILLING)) {
             legacyCustomer.setBillingAddress1(address.getAddress1());
             legacyCustomer.setBillingAddress2(address.getAddress2());
