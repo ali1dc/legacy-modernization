@@ -73,4 +73,15 @@ public class OrderConsumer {
                     orderService.update(id, legacyId);
                 });
     }
+
+    @Bean
+    public java.util.function.Consumer<KStream<String, String>> legacyOrderItemIds() {
+
+        return input -> input
+                .foreach((key, value) -> {
+                    Long id = Long.parseLong(key);
+                    Long legacyId = Long.parseLong(value);
+                    orderItemService.update(id, legacyId);
+                });
+    }
 }
