@@ -1,5 +1,7 @@
 package com.legacy.order.consumer;
 
+import com.legacy.order.event.CustomerEvent;
+import com.legacy.order.event.ProductEvent;
 import com.legacy.order.service.CustomerService;
 import com.legacy.order.service.OrderItemService;
 import com.legacy.order.service.OrderService;
@@ -26,20 +28,20 @@ public class OrderConsumer {
     private OrderItemService orderItemService;
 
     @Bean
-    public java.util.function.Consumer<KStream<String, String>> customers() {
+    public java.util.function.Consumer<KStream<String, CustomerEvent>> oCustomers() {
 
         return input -> input
-                .foreach((key, value) -> {
-                    customerService.eventHandler(value);
+                .foreach((key, event) -> {
+                    customerService.eventHandler(event);
                 });
     }
 
     @Bean
-    public java.util.function.Consumer<KStream<String, String>> products() {
+    public java.util.function.Consumer<KStream<String, ProductEvent>> oProducts() {
 
         return input -> input
-                .foreach((key, value) -> {
-                    productService.eventHandler(value);
+                .foreach((key, event) -> {
+                    productService.eventHandler(event);
                 });
     }
 
@@ -58,6 +60,17 @@ public class OrderConsumer {
         return input -> input
                 .foreach((key, value) -> {
                     orderItemService.eventHandler(value);
+                });
+    }
+
+    @Bean
+    public java.util.function.Consumer<KStream<String, String>> legacyOrderIds() {
+
+        return input -> input
+                .foreach((key, value) -> {
+                    Long id = Long.parseLong(key);
+                    Long legacyId = Long.parseLong(value);
+                    orderService.update(id, legacyId);
                 });
     }
 }

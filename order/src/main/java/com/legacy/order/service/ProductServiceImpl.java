@@ -1,7 +1,5 @@
 package com.legacy.order.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.order.config.Actions;
 import com.legacy.order.event.ProductEvent;
@@ -10,6 +8,7 @@ import com.legacy.order.repository.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -24,18 +23,11 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    @Override
-    public void eventHandler(String data) {
+    @Value(value = "${created-by.mod}")
+    private String modCreatedBy;
 
-        JsonNode jsonNode;
-        ProductEvent event;
-        try {
-            jsonNode = jsonMapper.readTree(data).at("/payload");
-            event = jsonMapper.readValue(jsonNode.toString(), ProductEvent.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return;
-        }
+    @Override
+    public void eventHandler(ProductEvent event) {
 
         switch (event.getOp()) {
             case Actions.CREATE:
@@ -60,7 +52,8 @@ public class ProductServiceImpl implements ProductService {
             product.setDescription(event.getAfter().getDescription());
             product.setListPrice(event.getAfter().getListPrice());
             product.setQuantity(event.getAfter().getQuantity());
-            product.setUpdatedBy("me");
+            product.setLegacyId(event.getAfter().getLegacyId());
+            product.setUpdatedBy(modCreatedBy);
             product.setUpdatedDate(new Date());
         } else {
             product = event.getAfter();

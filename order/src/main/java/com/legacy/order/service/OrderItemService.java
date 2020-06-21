@@ -8,5 +8,6 @@ public interface OrderItemService {
 
     void insert(OrderItemEvent event);
     void update(OrderItemEvent event);
+    void update(Long id, Long legacyId);
     void delete(OrderItemEvent event);
 }

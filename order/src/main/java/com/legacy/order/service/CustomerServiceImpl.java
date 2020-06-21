@@ -1,7 +1,5 @@
 package com.legacy.order.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.order.config.Actions;
 import com.legacy.order.event.CustomerEvent;
@@ -25,23 +23,11 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
 
-    @Value(value = "${created-by.legacy}")
-    private String legacyCreatedBy;
     @Value(value = "${created-by.mod}")
     private String modCreatedBy;
 
     @Override
-    public void eventHandler(String data) {
-
-        JsonNode jsonNode;
-        CustomerEvent event;
-        try {
-            jsonNode = jsonMapper.readTree(data).at("/payload");
-            event = jsonMapper.readValue(jsonNode.toString(), CustomerEvent.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return;
-        }
+    public void eventHandler(CustomerEvent event) {
 
         switch (event.getOp()) {
             case Actions.CREATE:

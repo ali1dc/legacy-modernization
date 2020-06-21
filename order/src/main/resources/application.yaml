@@ -29,11 +29,14 @@ spring.jpa.hibernate.ddl-auto: none
 
 spring.kafka.bootstrap-servers: localhost:19092
 spring.cloud.stream.kafka.stream.binder.application-id: order-microservice
-spring.cloud.stream.function.definition: customers;products;orders;orderItems
-spring.cloud.stream.bindings.customers-in-0.destination: customer.public.customers
-spring.cloud.stream.bindings.products-in-0.destination: product.public.products
+spring.cloud.stream.function.definition: oCustomers;oProducts;orders;orderItems;legacyOrderIds;legacyOrderItemIds
+spring.cloud.stream.bindings.oCustomers-in-0.destination: customer.public.customers
+spring.cloud.stream.bindings.oProducts-in-0.destination: product.public.products
 spring.cloud.stream.bindings.orders-in-0.destination: legacy.legacy_order.orders
 spring.cloud.stream.bindings.orderItems-in-0.destination: legacy.legacy_order.order_items
+spring.cloud.stream.bindings.legacyOrderIds-in-0.destination: order-legacy-ids
+spring.cloud.stream.bindings.legacyOrderItemIds-in-0.destination: order-item-legacy-ids
+
 
 flyway:
   driver-class-name: org.postgresql.Driver

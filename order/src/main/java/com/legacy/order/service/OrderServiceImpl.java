@@ -100,6 +100,20 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public void update(Long id, Long legacyId) {
+
+        Optional<Order> optionalOrder = orderRepository.findById(id);
+        optionalOrder.ifPresent(order -> {
+            if (order.getLegacyId() == null) {
+                order.setLegacyId(legacyId);
+                order.setUpdatedBy(legacyCreatedBy);
+                order.setUpdatedDate(new Date());
+                orderRepository.save(order);
+            }
+        });
+    }
+
+    @Override
     public void delete(OrderEvent event) {
 
         logger.info("deleting records; not implemented yet!");
