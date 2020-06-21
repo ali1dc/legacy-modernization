@@ -72,6 +72,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public void update(OrderEvent event) {
+        logger.info("updating order status when changed");
+    }
+
+    @Override
     public void delete(OrderEvent event) {
 
         logger.info("deleting records; not implemented yet!");

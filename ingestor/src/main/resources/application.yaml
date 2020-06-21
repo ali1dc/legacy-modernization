@@ -23,7 +23,7 @@ spring.datasource.password: root
 
 spring.kafka.bootstrap-servers: localhost:19092
 spring.cloud.stream.kafka.stream.binder.application-id: ingestor-microservice
-spring.cloud.stream.function.definition: iProducts;iCategory;iProductUpdate;iOrder;iOrderItem;iCustomerInsert;iCustomerUpdate
+spring.cloud.stream.function.definition: iOrderCustomer;iCustomerStateStore;iProducts;iCategory;iProductUpdate;iOrders;iOrderItems;iCustomerInsert;iCustomerUpdate
 
 spring.cloud.stream.kafka.streams.binder.state-store-retry.max-attempts: 100
 spring.cloud.stream.kafka.streams.binder.state-store-retry.backoff-period: 10000
@@ -44,9 +44,14 @@ spring.cloud.stream.bindings.iCustomerUpdate-in-0.destination: customer.public.c
 #spring.cloud.stream.bindings.iAddressUpdate-in-1.destination: clean-customer-addresses
 #spring.cloud.stream.bindings.iAddressUpdate-out-0.destination: test-addresses
 
-
-
 # order microservice
-spring.cloud.stream.bindings.iOrder-in-0.destination: order.public.orders
-spring.cloud.stream.bindings.iOrder-out-0.destination: processed-orders
-spring.cloud.stream.bindings.iOrderItem-in-0.destination: order.public.order_items
+spring.cloud.stream.bindings.iOrders-in-0.destination: order.public.orders
+#spring.cloud.stream.bindings.iOrders-out-0.destination: processed-orders
+spring.cloud.stream.bindings.iOrderItems-in-0.destination: order.public.order_items
+spring.cloud.stream.bindings.iOrderCustomer-in-0.destination: order.public.orders
+spring.cloud.stream.bindings.iOrderCustomer-in-1.destination: customer.public.customers
+spring.cloud.stream.bindings.iCustomerStateStore-in-0.destination: customer.public.customers
+
+#spring.cloud.stream.bindings.iOrderCustomer-out-0.destination: clean-customer-orders
+
+

@@ -78,15 +78,20 @@ public class CustomerStream {
                 .reduce((value1, value2) -> value2, Materialized.as(StateStores.ADDRESS_STORE))
                 .toStream();
     }
+     **/
 
     @Bean
-    public java.util.function.Consumer<KStream<String, CustomerAddressEvent>> iCustomerAddress() {
+    public java.util.function.Consumer<KStream<String, CustomerEvent>> iCustomerStateStore() {
 
-        return ca -> ca
-                .filter((key, event) -> !Objects.equals(event.getOp(), Actions.DELETE))
-                .foreach((key, event) -> customerService.save(event));
+            return input -> input
+                    .map((key, event) -> {
+                        Customer customer = event.getAfter();
+                        return KeyValue.pair(customer.getId(), customer);
+                    })
+                    .groupByKey(Grouped.with(Serdes.Long(), customerSerde))
+                    .reduce((value1, value2) -> value2, Materialized.as(StateStores.CUSTOMER_STORE));
     }
-    **/
+
     @Bean
     public java.util.function.Consumer<KStream<String, String>> iCustomerInsert() {
 
@@ -114,4 +119,6 @@ public class CustomerStream {
                     customerService.update(event);
                 });
     }
+
+
 }
