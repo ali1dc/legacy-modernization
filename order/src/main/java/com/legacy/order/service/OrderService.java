@@ -1,7 +1,6 @@
 package com.legacy.order.service;
 
 import com.legacy.order.event.OrderEvent;
-import com.legacy.order.model.Order;
 
 public interface OrderService {
 
@@ -9,5 +8,6 @@ public interface OrderService {
 
     void insert(OrderEvent event);
     void update(OrderEvent event);
+    void update(Long id, Long legacyId);
     void delete(OrderEvent event);
 }

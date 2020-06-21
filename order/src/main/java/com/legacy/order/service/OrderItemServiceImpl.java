@@ -42,6 +42,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     @Override
     public void eventHandler(String data) {
 
+
         JsonNode jsonNode;
         OrderItemEvent event;
         try {
@@ -62,8 +63,7 @@ public class OrderItemServiceImpl implements OrderItemService {
             case Actions.DELETE:
                 delete(event);
                 break;
-        }
-    }
+        }    }
 
     @Override
     public void insert(OrderItemEvent event) {
@@ -103,6 +103,20 @@ public class OrderItemServiceImpl implements OrderItemService {
         orderItem.setUpdatedBy(legacyCreatedBy);
         orderItem.setUpdatedDate(new Date());
         orderItemRepository.save(orderItem);
+    }
+
+    @Override
+    public void update(Long id, Long legacyId) {
+
+        Optional<OrderItem> optionalOrderItem = orderItemRepository.findById(id);
+        optionalOrderItem.ifPresent(item -> {
+            if (item.getLegacyId() == null) {
+                item.setLegacyId(legacyId);
+                item.setUpdatedBy(legacyCreatedBy);
+                item.setUpdatedDate(new Date());
+                orderItemRepository.save(item);
+            }
+        });
     }
 
     @Override

@@ -4,7 +4,7 @@ import com.legacy.order.event.ProductEvent;
 
 public interface ProductService {
 
-    void eventHandler(String data);
+    void eventHandler(ProductEvent event);
 
     void save(ProductEvent event);
     void delete(ProductEvent event);

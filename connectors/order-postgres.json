@@ -10,7 +10,7 @@
     "database.dbname": "order",
     "database.server.name": "order",
     "database.tcpKeepAlive": true,
-    "table.blacklist": "public.flyway_schema_history,public.customers,public.products,public.orders",
+    "table.blacklist": "public.flyway_schema_history,public.customers,public.products",
     "schema.whitelist": "public",
     "decimal.handling.mode": "double",
     "schemas.enable": false,

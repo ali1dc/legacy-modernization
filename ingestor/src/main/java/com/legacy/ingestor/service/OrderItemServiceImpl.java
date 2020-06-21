@@ -1,7 +1,5 @@
 package com.legacy.ingestor.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.ingestor.config.Actions;
 import com.legacy.ingestor.config.LegacyIdTopics;
@@ -46,17 +44,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     private String modCreatedBy;
 
     @Override
-    public void eventHandler(String data) {
-
-        JsonNode jsonNode;
-        OrderItemEvent event;
-        try {
-            jsonNode = jsonMapper.readTree(data).at("/payload");
-            event = jsonMapper.readValue(jsonNode.toString(), OrderItemEvent.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return;
-        }
+    public void eventHandler(OrderItemEvent event) {
 
         switch (event.getOp()) {
             case Actions.CREATE:
@@ -75,8 +63,6 @@ public class OrderItemServiceImpl implements OrderItemService {
         OrderItem orderItem = event.getAfter();
         if (orderItem.getLegacyId() != null) return orderItemRepository.findById(orderItem.getLegacyId()).get();
 
-        ReadOnlyKeyValueStore<Long, Customer> customerStore =
-                interactiveQueryService.getQueryableStore(StateStores.CUSTOMER_STORE, QueryableStoreTypes.keyValueStore());
         ReadOnlyKeyValueStore<Long, Product> productStore =
                 interactiveQueryService.getQueryableStore(StateStores.PRODUCT_STORE, QueryableStoreTypes.keyValueStore());
         ReadOnlyKeyValueStore<Long, Order> orderStore =
@@ -84,7 +70,6 @@ public class OrderItemServiceImpl implements OrderItemService {
 
         Order order = orderStore.get(orderItem.getOrderId());
         Product product = productStore.get(orderItem.getProductId());
-        Customer customer = customerStore.get(order.getCustomerId());
         LegacyOrder legacyOrder = orderRepository.findById(order.getLegacyId()).get();
         LegacyProduct legacyProduct = productRepository.findById(product.getLegacyId()).get();
 

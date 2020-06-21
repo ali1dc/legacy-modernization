@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 import java.util.Optional;
 
-
 @Service
 public class OrderServiceImpl implements OrderService {
 
@@ -69,6 +68,11 @@ public class OrderServiceImpl implements OrderService {
                     legacyOrder.getOrderId().toString());
         }
         return legacyOrder;
+    }
+
+    @Override
+    public void update(OrderEvent event) {
+        logger.info("updating order status when changed");
     }
 
     @Override

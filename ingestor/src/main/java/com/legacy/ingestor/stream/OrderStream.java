@@ -1,7 +1,5 @@
 package com.legacy.ingestor.stream;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.ingestor.config.Actions;
 import com.legacy.ingestor.config.StateStores;
@@ -24,7 +22,6 @@ import org.springframework.kafka.support.serializer.JsonSerde;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 @Component
 public class OrderStream {
@@ -42,22 +39,35 @@ public class OrderStream {
     private OrderItemService orderItemService;
 
     private final Serde<Order> orderSerde;
-
+    private final Serde<Customer> customerSerde;
     public OrderStream() {
         this.orderSerde = new JsonSerde<>(Order.class);
+        this.customerSerde = new JsonSerde<>(Customer.class);
     }
 
+    /**
     @Bean
-    public Function<KStream<String, String>, KStream<Long, Order>> iOrder() {
+    public BiConsumer<KStream<String, OrderEvent>, GlobalKTable<String, CustomerEvent>> iOrderCustomer() {
+
+        return (orderStream, customerTable) -> {
+            orderStream.leftJoin(customerTable, (left, right) -> right.getAfter().getCustomerId().toString(),
+                    (orderEvent, customerEvent) -> {
+                        OrderCustomer oc = OrderCustomer.builder().id(orderEvent.getAfter().getId()).order(orderEvent.getAfter()).customer(customerEvent.getAfter()).build();
+                        return oc;
+                    })
+                    .foreach((key, value) -> {
+                        logger.info("key: {}, order id: {}, customer email: {}", key, value.getOrder().getId(), value.getCustomer().getEmail());
+
+                    });
+        };
+    }
+    **/
+
+    @Bean
+    public java.util.function.Consumer<KStream<String, OrderEvent>> iOrders() {
+
         return input -> input
-                .filter((key, value) -> {
-                    OrderEvent event = null;
-                    try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
-                        event = jsonMapper.readValue(jsonNode.toString(), OrderEvent.class);
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
+                .filter((key, event) -> {
                     assert event != null;
                     boolean isDeleted = Objects.equals(event.getOp(), Actions.DELETE);
                     boolean isCreated = (Objects.equals(event.getOp(), Actions.CREATE) || Objects.equals(event.getOp(), Actions.READ));
@@ -65,30 +75,21 @@ public class OrderStream {
 
                     return !(isDeleted || (isCreated && hasLegacyId));
                 })
-                .map((key, value) -> {
-                    Order order = null;
-                    try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
-                        OrderEvent event = jsonMapper.readValue(jsonNode.toString(), OrderEvent.class);
-                        LegacyOrder legacyOrder = orderService.save(event);
-                        order = event.getAfter();
-                        order.setLegacyId(legacyOrder.getOrderId());
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                    assert order != null;
+                .map((key, event) -> {
+                    LegacyOrder legacyOrder = orderService.save(event);
+                    Order order = event.getAfter();
+                    order.setLegacyId(legacyOrder.getOrderId());
                     return KeyValue.pair(order.getId(), order);
                 })
                 .groupByKey(Grouped.with(Serdes.Long(), orderSerde))
-                .reduce((value1, value2) -> value2, Materialized.as(StateStores.ORDER_STORE))
-                .toStream();
+                .reduce((value1, value2) -> value2, Materialized.as(StateStores.ORDER_STORE));
     }
 
     @Bean
-    public java.util.function.Consumer<KStream<String, String>> iOrderItem() {
+    public java.util.function.Consumer<KStream<String, OrderItemEvent>> iOrderItems() {
 
-        return cs -> cs.foreach((key, value) -> {
-            orderItemService.eventHandler(value);
+        return cs -> cs.foreach((key, event) -> {
+            orderItemService.eventHandler(event);
         });
     }
 }
