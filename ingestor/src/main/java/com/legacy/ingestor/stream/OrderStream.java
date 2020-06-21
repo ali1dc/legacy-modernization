@@ -45,21 +45,23 @@ public class OrderStream {
         this.customerSerde = new JsonSerde<>(Customer.class);
     }
 
-//    @Bean
-//    public BiConsumer<KStream<String, OrderEvent>, GlobalKTable<String, CustomerEvent>> iOrderCustomer() {
-//
-//        return (orderStream, customerTable) -> {
-//            orderStream.leftJoin(customerTable, (left, right) -> right.getAfter().getCustomerId().toString(),
-//                    (orderEvent, customerEvent) -> {
-//                        OrderCustomer oc = OrderCustomer.builder().id(orderEvent.getAfter().getId()).order(orderEvent.getAfter()).customer(customerEvent.getAfter()).build();
-//                        return oc;
-//                    })
-//                    .foreach((key, value) -> {
-//                        logger.info("key: {}, order id: {}, customer email: {}", key, value.getOrder().getId(), value.getCustomer().getEmail());
-//
-//                    });
-//        };
-//    }
+    /**
+    @Bean
+    public BiConsumer<KStream<String, OrderEvent>, GlobalKTable<String, CustomerEvent>> iOrderCustomer() {
+
+        return (orderStream, customerTable) -> {
+            orderStream.leftJoin(customerTable, (left, right) -> right.getAfter().getCustomerId().toString(),
+                    (orderEvent, customerEvent) -> {
+                        OrderCustomer oc = OrderCustomer.builder().id(orderEvent.getAfter().getId()).order(orderEvent.getAfter()).customer(customerEvent.getAfter()).build();
+                        return oc;
+                    })
+                    .foreach((key, value) -> {
+                        logger.info("key: {}, order id: {}, customer email: {}", key, value.getOrder().getId(), value.getCustomer().getEmail());
+
+                    });
+        };
+    }
+    **/
 
     @Bean
     public java.util.function.Consumer<KStream<String, OrderEvent>> iOrders() {
@@ -84,10 +86,10 @@ public class OrderStream {
     }
 
     @Bean
-    public java.util.function.Consumer<KStream<String, String>> iOrderItems() {
+    public java.util.function.Consumer<KStream<String, OrderItemEvent>> iOrderItems() {
 
-        return cs -> cs.foreach((key, value) -> {
-            orderItemService.eventHandler(value);
+        return cs -> cs.foreach((key, event) -> {
+            orderItemService.eventHandler(event);
         });
     }
 }

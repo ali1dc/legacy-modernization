@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.ingestor.config.Actions;
 import com.legacy.ingestor.config.StateStores;
 import com.legacy.ingestor.dto.*;
-import com.legacy.ingestor.events.AddressEvent;
-import com.legacy.ingestor.events.CustomerAddressEvent;
 import com.legacy.ingestor.events.CustomerEvent;
-import com.legacy.ingestor.model.LegacyCustomer;
 import com.legacy.ingestor.service.CustomerService;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
@@ -21,10 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.support.serializer.JsonSerde;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 @Component
 public class CustomerStream {
@@ -115,10 +109,7 @@ public class CustomerStream {
         return customers -> customers
                 .filter((key, event) -> Objects.equals(event.getOp(), Actions.UPDATE))
                 .foreach((key, event) -> {
-//                    customerService.insert(customer);
                     customerService.update(event);
                 });
     }
-
-
 }

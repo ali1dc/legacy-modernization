@@ -61,9 +61,9 @@ public class ProductStream {
                         e.printStackTrace();
                     }
                     assert product != null;
-                    return KeyValue.pair(key, product);
+                    return KeyValue.pair(product.getId(), product);
                 })
-                .groupByKey(Grouped.with(Serdes.String(), productSerde))
+                .groupByKey(Grouped.with(Serdes.Long(), productSerde))
                 .reduce((value1, value2) -> value2, Materialized.as(StateStores.PRODUCT_STORE));
     }
 
@@ -135,53 +135,4 @@ public class ProductStream {
                 .reduce((value1, value2) -> value2, Materialized.as(StateStores.CATEGORY_STORE))
                 .toStream();
     }
-
-
-    /**
-
-     @Bean
-    public Function<KStream<String, String>, KStream<Long, Product>> iProduct() {
-        return input -> input
-                .filter((key, value) -> {
-                    ProductEvent event = null;
-                    try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/payload");
-                        event = jsonMapper.readValue(jsonNode.toString(), ProductEvent.class);
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                    assert event != null;
-                    return !Objects.equals(event.getOp(), Actions.DELETE);
-                })
-                .map((key, value) -> {
-                    Product product = null;
-                    try {
-                        ProductEvent event = jsonMapper.readValue(
-                                jsonMapper.readTree(value).toString(), ProductEvent.class);
-                        product = event.getAfter();
-                        LegacyProduct legacyProduct = null;
-
-                        switch (event.getOp()) {
-                            case Actions.CREATE:
-                            case Actions.READ:
-                                legacyProduct = productService.insert(event);
-                                break;
-                            case Actions.UPDATE:
-                                legacyProduct = productService.update(event);
-                                break;
-                        }
-                        assert legacyProduct != null;
-                        product.setLegacyId(legacyProduct.getProductId());
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                    assert product != null;
-                    return KeyValue.pair(product.getId(), product);
-                })
-                .groupByKey(Grouped.with(Serdes.Long(), productSerde))
-                .reduce((value1, value2) -> value2, Materialized.as(StateStores.PRODUCT_STORE))
-                .toStream();
-    }
-
-    */
 }

@@ -23,7 +23,7 @@ spring.datasource.password: root
 
 spring.kafka.bootstrap-servers: localhost:19092
 spring.cloud.stream.kafka.stream.binder.application-id: ingestor-microservice
-spring.cloud.stream.function.definition: iOrderCustomer;iCustomerStateStore;iProducts;iCategory;iProductUpdate;iOrders;iOrderItems;iCustomerInsert;iCustomerUpdate
+spring.cloud.stream.function.definition: iCustomerStateStore;iProducts;iCategory;iProductUpdate;iOrders;iOrderItems;iCustomerInsert;iCustomerUpdate
 
 spring.cloud.stream.kafka.streams.binder.state-store-retry.max-attempts: 100
 spring.cloud.stream.kafka.streams.binder.state-store-retry.backoff-period: 10000
@@ -33,25 +33,9 @@ spring.cloud.stream.bindings.iCategory-out-0.destination: processed-categories
 spring.cloud.stream.bindings.iProducts-in-0.destination: enriched-products
 spring.cloud.stream.bindings.iProductUpdate-in-0.destination: product.public.products
 # customer microservice
-#spring.cloud.stream.bindings.iCustomer-in-0.destination: customer.public.customers
-#spring.cloud.stream.bindings.iCustomer-out-0.destination: processed-customers
-#spring.cloud.stream.bindings.iAddress-in-0.destination: customer.public.addresses
-#spring.cloud.stream.bindings.iAddress-out-0.destination: processed-addresses
-#spring.cloud.stream.bindings.iCustomerAddress-in-0.destination: customer.public.customer_addresses
 spring.cloud.stream.bindings.iCustomerInsert-in-0.destination: enriched-customers
 spring.cloud.stream.bindings.iCustomerUpdate-in-0.destination: customer.public.customers
-#spring.cloud.stream.bindings.iAddressUpdate-in-0.destination: clean-addresses
-#spring.cloud.stream.bindings.iAddressUpdate-in-1.destination: clean-customer-addresses
-#spring.cloud.stream.bindings.iAddressUpdate-out-0.destination: test-addresses
-
+spring.cloud.stream.bindings.iCustomerStateStore-in-0.destination: customer.public.customers
 # order microservice
 spring.cloud.stream.bindings.iOrders-in-0.destination: order.public.orders
-#spring.cloud.stream.bindings.iOrders-out-0.destination: processed-orders
 spring.cloud.stream.bindings.iOrderItems-in-0.destination: order.public.order_items
-spring.cloud.stream.bindings.iOrderCustomer-in-0.destination: order.public.orders
-spring.cloud.stream.bindings.iOrderCustomer-in-1.destination: customer.public.customers
-spring.cloud.stream.bindings.iCustomerStateStore-in-0.destination: customer.public.customers
-
-#spring.cloud.stream.bindings.iOrderCustomer-out-0.destination: clean-customer-orders
-
-
