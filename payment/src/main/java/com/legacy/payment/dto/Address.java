@@ -29,6 +29,9 @@ public class Address {
     @JsonProperty("zip")
     String zip;
 
+    @JsonProperty("legacy_id")
+    Long legacyId;
+
     @JsonProperty("created_by")
     String createdBy;
 

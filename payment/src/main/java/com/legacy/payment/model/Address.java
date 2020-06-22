@@ -37,6 +37,9 @@ public class Address {
     @JsonProperty("zip")
     String zip;
 
+    @JsonProperty("legacy_id")
+    Long legacyId;
+
     @JsonIgnore
     @OneToOne(mappedBy = "address")
     Customer customer;
