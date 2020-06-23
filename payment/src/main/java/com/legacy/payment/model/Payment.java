@@ -36,9 +36,9 @@ public class Payment {
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name="order_id", nullable=false)
-    Customer order;
+    Order order;
 
-    @JsonProperty("amount")
+    @JsonProperty("charged_amount")
     @Column(name = "amount")
     Float amount;
 
@@ -49,6 +49,10 @@ public class Payment {
     @JsonProperty("legacy_id")
     @Column(name = "legacy_id")
     Long legacyId;
+
+    @JsonProperty("legacy_order_id")
+    @Column(name = "legacy_order_id")
+    Long legacyOrderId;
 
     @JsonProperty("created_by")
     @Column(name = "created_by")
