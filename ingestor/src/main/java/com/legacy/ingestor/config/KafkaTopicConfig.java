@@ -57,7 +57,4 @@ public class KafkaTopicConfig {
     public NewTopic shipment() {
         return new NewTopic(LegacyIdTopics.SHIPPING, 1, (short) 1);
     }
-
-
-
 }

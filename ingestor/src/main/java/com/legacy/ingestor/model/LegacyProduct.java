@@ -1,6 +1,5 @@
 package com.legacy.ingestor.model;
 
-import com.legacy.ingestor.dto.Product;
 import lombok.*;
 
 import javax.persistence.*;
