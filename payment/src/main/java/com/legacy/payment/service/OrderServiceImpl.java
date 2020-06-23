@@ -21,7 +21,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void save(OrderEvent event) {
 
-        Optional<Customer> optionalCustomer = customerRepository.findById(event.getAfter().getId());
+        Optional<Customer> optionalCustomer = customerRepository.findById(event.getAfter().getCustomerId());
         optionalCustomer.ifPresent(customer -> {
             Order order = event.getAfter();
             order.setCustomer(customer);

@@ -1,10 +1,8 @@
 package com.legacy.payment.kafka;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.payment.config.Actions;
 import com.legacy.payment.event.OrderEvent;
-import com.legacy.payment.repository.OrderRepository;
 import com.legacy.payment.service.OrderService;
 import org.apache.kafka.streams.kstream.KStream;
 import org.slf4j.Logger;
@@ -25,27 +23,15 @@ public class OrderConsumer {
     private OrderService orderService;
 
     @Bean
-    public java.util.function.Consumer<KStream<String, String>> pOrders() {
+    public java.util.function.Consumer<KStream<String, OrderEvent>> pOrders1() {
 
         return input -> input
-                .filter((key, value) -> {
-                    OrderEvent event = getOrderEvent(value);
+                .filter((key, event) -> {
                     assert event != null;
                     return !Objects.equals(event.getOp(), Actions.DELETE);
                 })
-                .foreach((key, value) -> {
-                    OrderEvent event = getOrderEvent(value);
+                .foreach((key, event) -> {
                     orderService.save(event);
                 });
-    }
-
-    private OrderEvent getOrderEvent(String data) {
-        OrderEvent event = null;
-        try {
-            event = jsonMapper.readValue(jsonMapper.readTree(data).toString(), OrderEvent.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return event;
     }
 }

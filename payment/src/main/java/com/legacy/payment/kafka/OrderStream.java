@@ -1,10 +1,9 @@
 package com.legacy.payment.kafka;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.payment.config.StateStores;
 import com.legacy.payment.dto.*;
+import com.legacy.payment.event.OrderItemEvent;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.*;
@@ -24,17 +23,10 @@ public class OrderStream {
     private ObjectMapper jsonMapper;
 
     @Bean
-    public Function<KStream<String, String>, KStream<Long, Float>> pOrderTotal() {
+    public Function<KStream<String, OrderItemEvent>, KStream<Long, Float>> pOrderTotal() {
         return input -> input
-                .map((key, value) -> {
-                    OrderItem item = null;
-                    try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/after");
-                        item = jsonMapper.readValue(jsonNode.toString(), OrderItem.class);
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                    assert item != null;
+                .map((key, event) -> {
+                    OrderItem item = event.getAfter();
                     Float lineTotal = item.getQuantity() * item.getUnitPrice();
                     return KeyValue.pair(item.getOrderId(), lineTotal);
                 })

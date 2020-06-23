@@ -1,4 +1,4 @@
-package com.legacy.payment.dto;
+package com.legacy.ingestor.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -9,28 +9,28 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @Getter @Setter
-public class Address {
+public class Payment {
 
     @JsonProperty("id")
     Long id;
 
-    @JsonProperty("address_1")
-    String address1;
+    @JsonProperty("customer_id")
+    Long customerId;
 
-    @JsonProperty("address_2")
-    String address2;
+    @JsonProperty("order_id")
+    Long orderId;
 
-    @JsonProperty("city")
-    String city;
+    @JsonProperty("amount")
+    Float amount;
 
-    @JsonProperty("state")
-    String state;
-
-    @JsonProperty("zip")
-    String zip;
+    @JsonProperty("successful")
+    Boolean successful;
 
     @JsonProperty("legacy_id")
     Long legacyId;
+
+    @JsonProperty("legacy_order_id")
+    Long legacyOrderId;
 
     @JsonProperty("created_by")
     String createdBy;

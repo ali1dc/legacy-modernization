@@ -29,12 +29,13 @@ spring.jpa.hibernate.ddl-auto: none
 
 spring.kafka.bootstrap-servers: localhost:19092
 spring.cloud.stream.kafka.stream.binder.application-id: payment-microservice
-spring.cloud.stream.function.definition: pCustomers;pOrderTotal;pOrders
+spring.cloud.stream.function.definition: pCustomers;pOrderTotal;pOrders1;payments;legacyPaymentIds
 spring.cloud.stream.bindings.pCustomers-in-0.destination: enriched-customers
 spring.cloud.stream.bindings.pOrderTotal-in-0.destination: order.public.order_items
 spring.cloud.stream.bindings.pOrderTotal-out-0.destination: order-total
-spring.cloud.stream.bindings.pOrders-in-0.destination: order.public.orders
-
+spring.cloud.stream.bindings.pOrders1-in-0.destination: order.public.orders
+spring.cloud.stream.bindings.payments-in-0.destination: legacy.legacy_order.payments
+spring.cloud.stream.bindings.legacyPaymentIds-in-0.destination: payment-legacy-ids
 
 spring.cloud.stream.kafka.streams.binder.state-store-retry.max-attempts: 100
 spring.cloud.stream.kafka.streams.binder.state-store-retry.backoff-period: 10000

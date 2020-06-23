@@ -6,6 +6,7 @@ CREATE TABLE public.addresses
   city VARCHAR(100) NOT NULL,
   state VARCHAR(2) NOT NULL,
   zip VARCHAR(10) NOT NULL,
+  legacy_id INT,
   created_by VARCHAR(50) NOT NULL,
   created_date TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_by VARCHAR(50),
@@ -32,7 +33,7 @@ CREATE TABLE public.customers
   updated_by VARCHAR(50),
   updated_date TIMESTAMP WITHOUT TIME ZONE,
   legacy_id INT,
-  FOREIGN KEY (address_id) REFERENCES addresses(id)
+  FOREIGN KEY (address_id) REFERENCES public.addresses(id)
 )
 WITH (
   OIDS = FALSE
@@ -45,11 +46,13 @@ ALTER TABLE public.customers REPLICA IDENTITY FULL;
 CREATE TABLE orders(
   id INT PRIMARY KEY,
   status VARCHAR(50) NOT NULL,
+  customer_id INT,
   created_by VARCHAR(50) NOT NULL,
   created_date TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_by VARCHAR(50),
   updated_date TIMESTAMP WITHOUT TIME ZONE,
-  legacy_id INT
+  legacy_id INT,
+  FOREIGN KEY (customer_id) REFERENCES public.customers(id)
 )
 WITH (
   OIDS = FALSE
@@ -70,8 +73,8 @@ CREATE TABLE payments(
   updated_by VARCHAR(50),
   updated_date TIMESTAMP WITHOUT TIME ZONE,
   legacy_id INT,
-  FOREIGN KEY (customer_id) REFERENCES customers(id),
-  FOREIGN KEY (order_id) REFERENCES customers(id)
+  FOREIGN KEY (customer_id) REFERENCES public.customers(id),
+  FOREIGN KEY (order_id) REFERENCES public.orders(id)
 )
 WITH (
   OIDS = FALSE
