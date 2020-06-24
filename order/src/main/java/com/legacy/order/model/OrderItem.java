@@ -50,6 +50,14 @@ public class OrderItem {
     @Column(name = "legacy_id")
     Long legacyId;
 
+    @JsonProperty("legacy_order_id")
+    @Column(name = "legacy_order_id")
+    Long legacyOrderId;
+
+    @JsonProperty("legacy_product_id")
+    @Column(name = "legacy_product_id")
+    Long legacyProductId;
+
     @JsonProperty("created_by")
     @Column(name = "created_by")
     String createdBy;

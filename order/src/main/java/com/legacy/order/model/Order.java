@@ -37,6 +37,10 @@ public class Order {
     @Column(name = "legacy_id")
     Long legacyId;
 
+    @JsonProperty("legacy_customer_id")
+    @Column(name = "legacy_customer_id")
+    Long legacyCustomerId;
+
     @JsonProperty("created_by")
     @Column(name = "created_by")
     String createdBy;
