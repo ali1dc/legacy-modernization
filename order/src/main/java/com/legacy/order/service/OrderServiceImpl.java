@@ -73,6 +73,7 @@ public class OrderServiceImpl implements OrderService {
         order.setLegacyId(order.getId());
         order.setId(null);
         order.setCreatedBy(legacyCreatedBy);
+        order.setLegacyCustomerId(event.getAfter().getCustomerId());
 
         // insert if customer exists
         customerRepository.findTopByLegacyId(order.getCustomerId()).ifPresent(customer -> {

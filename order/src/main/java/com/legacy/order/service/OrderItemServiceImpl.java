@@ -77,6 +77,8 @@ public class OrderItemServiceImpl implements OrderItemService {
         }
 
         orderItem.setLegacyId(orderItem.getId());
+        orderItem.setLegacyOrderId(orderItem.getOrderId());
+        orderItem.setLegacyProductId(orderItem.getProductId());
         orderItem.setCreatedBy(legacyCreatedBy);
         orderItem.setCreatedDate(new Date());
         orderItem.setId(null);
