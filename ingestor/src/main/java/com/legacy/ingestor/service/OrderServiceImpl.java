@@ -39,35 +39,27 @@ public class OrderServiceImpl implements OrderService {
     private String modCreatedBy;
 
     @Override
-    public LegacyOrder save(OrderEvent event) {
+    public void insert(OrderEvent event) {
 
         logger.info("inserting/updating the order record");
-
         Order order = event.getAfter();
-        ReadOnlyKeyValueStore<Long, Customer> customerStore =
-                interactiveQueryService.getQueryableStore(StateStores.CUSTOMER_STORE, QueryableStoreTypes.keyValueStore());
+        if (order.getLegacyId() != null) return;
 
-        Customer customer = customerStore.get(order.getCustomerId());
-        LegacyCustomer legacyCustomer = customerRepository.findById(customer.getLegacyId()).get();
-
-        if (order.getLegacyId() != null) {
-            Optional<LegacyOrder> optionalLegacyOrder = orderRepository.findById(order.getLegacyId());
-            return optionalLegacyOrder.get();
-        }
-
-        LegacyOrder legacyOrder = LegacyOrder.builder()
-                .status(order.getStatus())
-                .createdBy(modCreatedBy)
-                .orderDate(event.getTimestamp())
-                .customer(legacyCustomer)
-                .build();
-        orderRepository.save(legacyOrder);
-        if (Objects.equals(event.getOp(), Actions.CREATE) || Objects.equals(event.getOp(), Actions.READ)) {
-            kafkaTemplate.send(LegacyIdTopics.ORDER,
-                    event.getAfter().getId().toString(),
-                    legacyOrder.getOrderId().toString());
-        }
-        return legacyOrder;
+        Optional<LegacyCustomer> optionalLegacyCustomer = customerRepository.findById(order.getLegacyCustomerId());
+        optionalLegacyCustomer.ifPresent(customer -> {
+            LegacyOrder legacyOrder = LegacyOrder.builder()
+                    .status(order.getStatus())
+                    .createdBy(modCreatedBy)
+                    .orderDate(event.getTimestamp())
+                    .customer(customer)
+                    .build();
+            orderRepository.save(legacyOrder);
+            if (Objects.equals(event.getOp(), Actions.CREATE) || Objects.equals(event.getOp(), Actions.READ)) {
+                kafkaTemplate.send(LegacyIdTopics.ORDER,
+                        event.getAfter().getId().toString(),
+                        legacyOrder.getOrderId().toString());
+            }
+        });
     }
 
     @Override

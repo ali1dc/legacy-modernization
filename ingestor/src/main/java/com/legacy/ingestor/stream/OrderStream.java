@@ -75,14 +75,20 @@ public class OrderStream {
 
                     return !(isDeleted || (isCreated && hasLegacyId));
                 })
-                .map((key, event) -> {
-                    LegacyOrder legacyOrder = orderService.save(event);
-                    Order order = event.getAfter();
-                    order.setLegacyId(legacyOrder.getOrderId());
-                    return KeyValue.pair(order.getId(), order);
-                })
-                .groupByKey(Grouped.with(Serdes.Long(), orderSerde))
-                .reduce((value1, value2) -> value2, Materialized.as(StateStores.ORDER_STORE));
+                .foreach((key, event) -> {
+                    switch (event.getOp()) {
+                        case Actions.CREATE:
+                        case Actions.READ:
+                            orderService.insert(event);
+                            break;
+                        case Actions.UPDATE:
+                            orderService.update(event);
+                            break;
+                        case Actions.DELETE:
+                            orderService.delete(event);
+                            break;
+                    }
+                });
     }
 
     @Bean

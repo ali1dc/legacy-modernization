@@ -6,6 +6,6 @@ import com.legacy.ingestor.model.LegacyOrderItem;
 public interface OrderItemService {
 
     void eventHandler(OrderItemEvent data);
-    LegacyOrderItem save(OrderItemEvent event);
+    void save(OrderItemEvent event);
     void delete(OrderItemEvent event);
 }

@@ -23,6 +23,9 @@ public class Order {
     @JsonProperty("legacy_id")
     Long legacyId;
 
+    @JsonProperty("legacy_customer_id")
+    Long legacyCustomerId;
+
     @JsonProperty("created_by")
     String createdBy;
 

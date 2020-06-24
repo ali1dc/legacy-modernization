@@ -23,6 +23,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class OrderItemServiceImpl implements OrderItemService {
@@ -58,35 +59,35 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
     @Override
-    public LegacyOrderItem save(OrderItemEvent event) {
+    public void save(OrderItemEvent event) {
 
         OrderItem orderItem = event.getAfter();
-        if (orderItem.getLegacyId() != null) return orderItemRepository.findById(orderItem.getLegacyId()).get();
+        if (orderItem.getLegacyId() != null) return;
 
-        ReadOnlyKeyValueStore<Long, Product> productStore =
-                interactiveQueryService.getQueryableStore(StateStores.PRODUCT_STORE, QueryableStoreTypes.keyValueStore());
-        ReadOnlyKeyValueStore<Long, Order> orderStore =
-                interactiveQueryService.getQueryableStore(StateStores.ORDER_STORE, QueryableStoreTypes.keyValueStore());
+//        ReadOnlyKeyValueStore<Long, Product> productStore =
+//                interactiveQueryService.getQueryableStore(StateStores.PRODUCT_STORE, QueryableStoreTypes.keyValueStore());
+//        ReadOnlyKeyValueStore<Long, Order> orderStore =
+//                interactiveQueryService.getQueryableStore(StateStores.ORDER_STORE, QueryableStoreTypes.keyValueStore());
 
-        Order order = orderStore.get(orderItem.getOrderId());
-        Product product = productStore.get(orderItem.getProductId());
-        LegacyOrder legacyOrder = orderRepository.findById(order.getLegacyId()).get();
-        LegacyProduct legacyProduct = productRepository.findById(product.getLegacyId()).get();
+//        Product product = productStore.get(orderItem.getProductId());
+        Optional<LegacyOrder> optionalLegacyOrder = orderRepository.findById(orderItem.getLegacyOrderId());
+        Optional<LegacyProduct> optionalLegacyProduct = productRepository.findById(orderItem.getLegacyProductId());
 
-        LegacyOrderItem legacyOrderItem = LegacyOrderItem.builder()
-                .order(legacyOrder)
-                .product(legacyProduct)
-                .quantity(orderItem.getQuantity())
-                .unitPrice(orderItem.getUnitPrice())
-                .createdBy(modCreatedBy)
-                .build();
-        orderItemRepository.save(legacyOrderItem);
-        if (Objects.equals(event.getOp(), Actions.CREATE) || Objects.equals(event.getOp(), Actions.READ)) {
-            kafkaTemplate.send(LegacyIdTopics.ORDER_ITEM,
-                    event.getAfter().getId().toString(),
-                    legacyOrderItem.getItemId().toString());
+        if (optionalLegacyOrder.isPresent() && optionalLegacyProduct.isPresent()) {
+            LegacyOrderItem legacyOrderItem = LegacyOrderItem.builder()
+                    .order(optionalLegacyOrder.get())
+                    .product(optionalLegacyProduct.get())
+                    .quantity(orderItem.getQuantity())
+                    .unitPrice(orderItem.getUnitPrice())
+                    .createdBy(modCreatedBy)
+                    .build();
+            orderItemRepository.save(legacyOrderItem);
+            if (Objects.equals(event.getOp(), Actions.CREATE) || Objects.equals(event.getOp(), Actions.READ)) {
+                kafkaTemplate.send(LegacyIdTopics.ORDER_ITEM,
+                        event.getAfter().getId().toString(),
+                        legacyOrderItem.getItemId().toString());
+            }
         }
-        return legacyOrderItem;
     }
 
     @Override

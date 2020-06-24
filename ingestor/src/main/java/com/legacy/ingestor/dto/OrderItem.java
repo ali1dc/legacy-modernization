@@ -30,6 +30,12 @@ public class OrderItem {
     @JsonProperty("legacy_id")
     Long legacyId;
 
+    @JsonProperty("legacy_order_id")
+    Long legacyOrderId;
+
+    @JsonProperty("legacy_product_id")
+    Long legacyProductId;
+
     @JsonProperty("created_by")
     String createdBy;
 
