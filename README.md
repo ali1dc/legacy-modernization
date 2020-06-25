@@ -142,16 +142,23 @@ Now, this is what we have:
 ![Step-2 Customer Microservice Diagram](./images/step-2-customer-microservice.png)
 
 
-#### 3.2 Order Modernization
+#### 3.3 Order Modernization
 This microservice is responsible for order management. It has 4 tables; customers, products, orders, and order_items. The point with this microservice is that we replicate data as we need. For example `customers` and `products` tables are replicated from customer and product microservice by Kafka and acts as look-up tables (read-only).
 
-This [connector](./connectors/order-postgres.json) the connector for producing CDC into our Kafka cluster for moving data back to the legacy database. (data needs to be synced)
+[This](./connectors/order-postgres.json) is the connector for producing CDC into our Kafka cluster for moving data back to the legacy database. (data needs to be synced)
 
 Now, this is what we have:
 
-![Step-2 Customer Microservice Diagram](./images/step-3-order-microservice.png)
+![Step-3 Order Microservice Diagram](./images/step-3-order-microservice.png)
 
+#### 3.4 Payment Modernization
+This microservice is responsible for handling client's payment. It has 4 tables; `customers`, `addresses` (only billing addresses), `orders`, and `payments`. In this microservice, we leverage our Kafka Cluster for replicating data needed for processing payment. in order to handle this requirement, we need customer information and order information, therefore, we are replicating `customers`, `addresses`, and `orders` (as read only tables). Note that with payment, we just need billing address for each customer and we are just replicating that (we do not care about shipping address, so we do not replicate that).
 
+[This](./connectors/payment-postgres.json) is the connector for producing CDC into our Kafka cluster for moving data back to the legacy database. (data needs to be synced)
+
+Now, this is what we have:
+
+![Step-4 Payment Microservice Diagram](./images/step-4-payment-microservice.png)
 
 #### Ingestor Microservice
 Let's step back and ask this question; what if a new product is added in the `Product` microservice? How we add that record to the legacy database? The simple old days answer would be create database connection and add record to that database! But the answer is wrong and that is a huge violation of Microservice Paradigm!
