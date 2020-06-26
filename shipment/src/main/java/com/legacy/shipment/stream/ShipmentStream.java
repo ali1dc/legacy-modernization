@@ -25,7 +25,7 @@ public class ShipmentStream {
     private ShipmentService shipmentService;
 
     @Bean
-    public java.util.function.Consumer<KStream<String, String>> shipments1() {
+    public java.util.function.Consumer<KStream<String, String>> shipments() {
 
         return input -> input
                 .filter((key, value) -> {

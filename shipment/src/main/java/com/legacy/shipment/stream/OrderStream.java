@@ -23,7 +23,7 @@ public class OrderStream {
     private OrderService orderService;
 
     @Bean
-    public java.util.function.Consumer<KStream<String, OrderEvent>> shOrders1() {
+    public java.util.function.Consumer<KStream<String, OrderEvent>> shOrders() {
 
         return input -> input
                 .filter((key, event) -> {

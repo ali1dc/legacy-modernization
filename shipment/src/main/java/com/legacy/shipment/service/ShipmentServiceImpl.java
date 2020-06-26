@@ -8,7 +8,6 @@ import com.legacy.shipment.model.Shipment;
 import com.legacy.shipment.repository.CustomerRepository;
 import com.legacy.shipment.repository.OrderRepository;
 import com.legacy.shipment.repository.ShipmentRepository;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

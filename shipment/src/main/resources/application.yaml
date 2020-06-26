@@ -32,11 +32,11 @@ spring.cloud.stream.kafka.stream.binder.application-id: shipment-microservice
 spring.cloud.stream.kafka.streams.binder.state-store-retry.max-attempts: 100
 spring.cloud.stream.kafka.streams.binder.state-store-retry.backoff-period: 10000
 
-spring.cloud.stream.function.definition: shCustomers;shOrders1;shipments1;legacyShipmentIds
+spring.cloud.stream.function.definition: shCustomers;shOrders;shipments;legacyShipmentIds
 
 spring.cloud.stream.bindings.shCustomers-in-0.destination: enriched-customers
-spring.cloud.stream.bindings.shOrders1-in-0.destination: order.public.orders
-spring.cloud.stream.bindings.shipments1-in-0.destination: legacy.legacy_order.shipping
+spring.cloud.stream.bindings.shOrders-in-0.destination: order.public.orders
+spring.cloud.stream.bindings.shipments-in-0.destination: legacy.legacy_order.shipping
 spring.cloud.stream.bindings.legacyShipmentIds-in-0.destination: shipping-legacy-ids
 
 flyway:
