@@ -2,8 +2,6 @@ package com.legacy.ingestor.stream;
 
 import com.legacy.ingestor.config.Actions;
 import com.legacy.ingestor.events.PaymentEvent;
-import com.legacy.ingestor.service.CustomerService;
-import com.legacy.ingestor.service.OrderService;
 import com.legacy.ingestor.service.PaymentService;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.KStream;
@@ -20,14 +18,10 @@ public class PaymentStream {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
-    private OrderService orderService;
-    @Autowired
-    private CustomerService customerService;
-    @Autowired
     private PaymentService paymentService;
 
     @Bean
-    public java.util.function.Consumer<KStream<String, PaymentEvent>> iPayments_1() {
+    public java.util.function.Consumer<KStream<String, PaymentEvent>> iPayments() {
 
         return input -> input
                 .filter((key, event) -> {

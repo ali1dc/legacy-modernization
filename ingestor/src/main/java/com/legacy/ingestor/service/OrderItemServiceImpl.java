@@ -3,7 +3,6 @@ package com.legacy.ingestor.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.ingestor.config.Actions;
 import com.legacy.ingestor.config.LegacyIdTopics;
-import com.legacy.ingestor.config.StateStores;
 import com.legacy.ingestor.dto.*;
 import com.legacy.ingestor.events.OrderItemEvent;
 import com.legacy.ingestor.model.LegacyOrder;
@@ -12,13 +11,10 @@ import com.legacy.ingestor.model.LegacyProduct;
 import com.legacy.ingestor.repository.OrderItemRepository;
 import com.legacy.ingestor.repository.OrderRepository;
 import com.legacy.ingestor.repository.ProductRepository;
-import org.apache.kafka.streams.state.QueryableStoreTypes;
-import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -37,8 +33,6 @@ public class OrderItemServiceImpl implements OrderItemService {
     private OrderRepository orderRepository;
     @Autowired
     private ProductRepository productRepository;
-    @Autowired
-    private InteractiveQueryService interactiveQueryService;
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
     @Value(value = "${created-by.mod}")
@@ -64,12 +58,6 @@ public class OrderItemServiceImpl implements OrderItemService {
         OrderItem orderItem = event.getAfter();
         if (orderItem.getLegacyId() != null) return;
 
-//        ReadOnlyKeyValueStore<Long, Product> productStore =
-//                interactiveQueryService.getQueryableStore(StateStores.PRODUCT_STORE, QueryableStoreTypes.keyValueStore());
-//        ReadOnlyKeyValueStore<Long, Order> orderStore =
-//                interactiveQueryService.getQueryableStore(StateStores.ORDER_STORE, QueryableStoreTypes.keyValueStore());
-
-//        Product product = productStore.get(orderItem.getProductId());
         Optional<LegacyOrder> optionalLegacyOrder = orderRepository.findById(orderItem.getLegacyOrderId());
         Optional<LegacyProduct> optionalLegacyProduct = productRepository.findById(orderItem.getLegacyProductId());
 

@@ -30,49 +30,10 @@ public class CustomerStream {
     private CustomerService customerService;
 
     private final Serde<Customer> customerSerde;
-    private final Serde<Address> addressSerde;
-
 
     public CustomerStream() {
         this.customerSerde = new JsonSerde<>(Customer.class);
-        this.addressSerde = new JsonSerde<>(Address.class);
     }
-
-    /**
-    @Bean
-    public Function<KStream<String, CustomerEvent>, KStream<Long, Customer>> iCustomer() {
-
-        return input -> input
-                .filter((key, event) -> {
-                    boolean isDeleted = Objects.equals(event.getOp(), Actions.DELETE);
-                    boolean isCreated = (Objects.equals(event.getOp(), Actions.CREATE) || Objects.equals(event.getOp(), Actions.READ));
-                    boolean hasLegacyId = event.getAfter().getLegacyId() != null;
-
-                    return !(isDeleted || (isCreated && hasLegacyId));
-                })
-                .map((key, event) -> {
-                    Customer customer = event.getAfter();
-                    LegacyCustomer legacyCustomer = customerService.save(event);
-                    customer.setLegacyId(legacyCustomer.getId());
-
-                    return KeyValue.pair(customer.getId(), customer);
-                })
-                .groupByKey(Grouped.with(Serdes.Long(), customerSerde))
-                .reduce((value1, value2) -> value2, Materialized.as(StateStores.CUSTOMER_STORE))
-                .toStream();
-    }
-
-    @Bean
-    public Function<KStream<String, AddressEvent>, KStream<Long, Address>> iAddress() {
-
-        return input -> input
-                .filter((key, event) -> !Objects.equals(event.getOp(), Actions.DELETE))
-                .map((key, event) -> KeyValue.pair(event.getAfter().getId(), event.getAfter()))
-                .groupByKey(Grouped.with(Serdes.Long(), addressSerde))
-                .reduce((value1, value2) -> value2, Materialized.as(StateStores.ADDRESS_STORE))
-                .toStream();
-    }
-     **/
 
     @Bean
     public java.util.function.Consumer<KStream<String, CustomerEvent>> iCustomerStateStore() {
