@@ -1,4 +1,4 @@
-package com.legacy.payment.model;
+package com.legacy.shipment.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
