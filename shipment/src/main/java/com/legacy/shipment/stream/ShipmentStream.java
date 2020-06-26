@@ -1,11 +1,11 @@
-package com.legacy.payment.kafka;
+package com.legacy.shipment.stream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.legacy.payment.config.Actions;
-import com.legacy.payment.event.PaymentEvent;
-import com.legacy.payment.service.PaymentService;
+import com.legacy.shipment.config.Actions;
+import com.legacy.shipment.event.ShipmentEvent;
+import com.legacy.shipment.service.ShipmentService;
 import org.apache.kafka.streams.kstream.KStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,48 +16,48 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 @Component
-public class PaymentStream {
+public class ShipmentStream {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private ObjectMapper jsonMapper;
     @Autowired
-    private PaymentService paymentService;
+    private ShipmentService shipmentService;
 
     @Bean
-    public java.util.function.Consumer<KStream<String, String>> payments() {
+    public java.util.function.Consumer<KStream<String, String>> shipments1() {
 
         return input -> input
                 .filter((key, value) -> {
-                    PaymentEvent event = getPaymentEvent(value);
+                    ShipmentEvent event = getShipmentEvent(value);
                     return !Objects.equals(event.getOp(), Actions.DELETE);
                 })
                 .foreach((key, value) -> {
-                    PaymentEvent event = getPaymentEvent(value);
-                    paymentService.eventHandler(event);
+                    ShipmentEvent event = getShipmentEvent(value);
+                    shipmentService.eventHandler(event);
                 });
     }
 
     @Bean
-    public java.util.function.Consumer<KStream<String, String>> legacyPaymentIds() {
+    public java.util.function.Consumer<KStream<String, String>> legacyShipmentIds() {
 
         return input -> input
                 .foreach((key, value) -> {
                     Long id = Long.parseLong(key);
                     Long legacyId = Long.parseLong(value);
-                    paymentService.update(id, legacyId);
+                    shipmentService.update(id, legacyId);
                 });
     }
 
-    private PaymentEvent getPaymentEvent(String data) {
+    private ShipmentEvent getShipmentEvent(String data) {
 
         JsonNode jsonNode;
-        PaymentEvent event = null;
+        ShipmentEvent event = null;
         try {
             jsonNode = jsonMapper.readTree(data).at("/payload");
-            Integer isSuccessful = jsonNode.at("/after/successful").asInt();
-            event = jsonMapper.readValue(jsonNode.toString(), PaymentEvent.class);
-            event.getAfter().setSuccessful(isSuccessful == 1);
+            Integer isDelivered = jsonNode.at("/after/delivered").asInt();
+            event = jsonMapper.readValue(jsonNode.toString(), ShipmentEvent.class);
+            event.getAfter().setDelivered(isDelivered == 1);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

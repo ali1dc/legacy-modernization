@@ -78,7 +78,6 @@ create table payments(
 
 create table shipping(
   shipping_id INT AUTO_INCREMENT PRIMARY KEY,
-  customer_id int NOT NULL,
   order_id int NOT NULL,
   shipping_date datetime DEFAULT now(),
   delivered boolean,
