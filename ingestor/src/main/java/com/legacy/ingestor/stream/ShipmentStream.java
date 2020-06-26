@@ -1,8 +1,8 @@
 package com.legacy.ingestor.stream;
 
 import com.legacy.ingestor.config.Actions;
-import com.legacy.ingestor.events.PaymentEvent;
-import com.legacy.ingestor.service.PaymentService;
+import com.legacy.ingestor.events.ShipmentEvent;
+import com.legacy.ingestor.service.ShipmentService;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.KStream;
 import org.slf4j.Logger;
@@ -14,14 +14,14 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 @Component
-public class PaymentStream {
+public class ShipmentStream {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
-    private PaymentService paymentService;
+    private ShipmentService shipmentService;
 
     @Bean
-    public java.util.function.Consumer<KStream<String, PaymentEvent>> iPayments() {
+    public java.util.function.Consumer<KStream<String, ShipmentEvent>> iShipments() {
 
         return input -> input
                 .filter((key, event) -> {
@@ -32,7 +32,7 @@ public class PaymentStream {
                     return  !(isDeleted || (isCreated && hasLegacyId));
                 })
                 .map((key, event) -> {
-                    paymentService.save(event);
+                    shipmentService.save(event);
                     return KeyValue.pair(key, event);
                 });
     }
