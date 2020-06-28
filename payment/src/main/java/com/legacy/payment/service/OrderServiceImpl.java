@@ -1,22 +1,32 @@
 package com.legacy.payment.service;
 
+import com.legacy.payment.dto.OrderStatus;
 import com.legacy.payment.event.OrderEvent;
 import com.legacy.payment.model.Customer;
 import com.legacy.payment.model.Order;
 import com.legacy.payment.repository.CustomerRepository;
 import com.legacy.payment.repository.OrderRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class OrderServiceImpl implements OrderService {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private CustomerRepository customerRepository;
     @Autowired
     private OrderRepository orderRepository;
+
+    @Value(value = "${created-by.mod}")
+    private String modCreatedBy;
 
     @Override
     public void save(OrderEvent event) {
@@ -26,6 +36,21 @@ public class OrderServiceImpl implements OrderService {
             Order order = event.getAfter();
             order.setCustomer(customer);
             orderRepository.save(order);
+        });
+    }
+
+    @Override
+    public void update(OrderStatus status) {
+
+        logger.info("updating order status!");
+        Optional<Order> optionalOrder = orderRepository.findById(status.getOrderId());
+        optionalOrder.ifPresent(order -> {
+            if (!Objects.equals(order.getStatus(), status.getStatus())) {
+                order.setStatus(status.getStatus());
+                order.setUpdatedBy(modCreatedBy);
+                order.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
+                orderRepository.save(order);
+            }
         });
     }
 }

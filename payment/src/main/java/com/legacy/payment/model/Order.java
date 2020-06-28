@@ -40,7 +40,7 @@ public class Order {
     @Column(name = "created_by")
     String createdBy;
 
-    @JsonProperty("order_date")
+    @JsonProperty("created_date")
     @Column(name = "created_date")
     Date createdDate;
 

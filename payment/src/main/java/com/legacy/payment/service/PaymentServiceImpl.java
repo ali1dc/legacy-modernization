@@ -1,7 +1,11 @@
 package com.legacy.payment.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.payment.config.Actions;
+import com.legacy.payment.config.KafkaTopics;
+import com.legacy.payment.config.OrderStatuses;
+import com.legacy.payment.dto.OrderStatus;
 import com.legacy.payment.event.PaymentEvent;
 import com.legacy.payment.model.Customer;
 import com.legacy.payment.model.Order;
@@ -14,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -34,6 +39,8 @@ public class PaymentServiceImpl implements PaymentService {
     private ObjectMapper jsonMapper;
     @Autowired(required = false )
     private ModelMapper mapper;
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     @Value(value = "${created-by.legacy}")
     private String legacyCreatedBy;
@@ -75,6 +82,8 @@ public class PaymentServiceImpl implements PaymentService {
             payment.setCustomer(optionalCustomer.get());
             payment.setOrder(optionalOrder.get());
             paymentRepository.save(payment);
+            // produce event for changing order status
+            sendStatus(payment);
         }
     }
 
@@ -90,5 +99,21 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentRepository.save(payment);
             }
         });
+    }
+
+    private void sendStatus(Payment payment) {
+
+        OrderStatus status = OrderStatus.builder()
+                .orderId(payment.getOrder().getId())
+                .Status(OrderStatuses.CHARGED)
+                .legacyOrderId(payment.getLegacyOrderId())
+                .build();
+        try {
+            kafkaTemplate.send(KafkaTopics.ORDER_STATUS_TOPIC,
+                    status.getOrderId().toString(),
+                    jsonMapper.writeValueAsString(status));
+        } catch (JsonProcessingException e) {
+            logger.error(e.getMessage());
+        }
     }
 }
