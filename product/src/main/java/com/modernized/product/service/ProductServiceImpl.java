@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -123,7 +123,7 @@ public class ProductServiceImpl implements ProductService {
             if (product.getLegacyId() == null) {
                 product.setLegacyId(legacyId);
                 product.setUpdatedBy(legacyCreatedBy);
-                product.setUpdatedDate(new Date());
+                product.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
                 productRepository.save(product);
             }
         });

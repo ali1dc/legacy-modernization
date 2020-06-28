@@ -2,6 +2,7 @@ package com.legacy.payment.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.payment.config.Actions;
+import com.legacy.payment.dto.OrderStatus;
 import com.legacy.payment.event.OrderEvent;
 import com.legacy.payment.service.OrderService;
 import org.apache.kafka.streams.kstream.KStream;
@@ -33,5 +34,11 @@ public class OrderConsumer {
                 .foreach((key, event) -> {
                     orderService.save(event);
                 });
+    }
+
+    @Bean
+    public java.util.function.Consumer<KStream<String, OrderStatus>> pOrderStatus() {
+
+        return os -> os.foreach((key, status) -> orderService.update(status));
     }
 }

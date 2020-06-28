@@ -1,6 +1,10 @@
 package com.legacy.ingestor.stream;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.ingestor.config.Actions;
+import com.legacy.ingestor.dto.OrderStatus;
 import com.legacy.ingestor.events.*;
 import com.legacy.ingestor.service.OrderItemService;
 import com.legacy.ingestor.service.OrderService;
@@ -21,6 +25,8 @@ public class OrderStream {
     private OrderService orderService;
     @Autowired
     private OrderItemService orderItemService;
+    @Autowired
+    private ObjectMapper jsonMapper;
 
     @Bean
     public java.util.function.Consumer<KStream<String, OrderEvent>> iOrders() {
@@ -56,5 +62,21 @@ public class OrderStream {
         return cs -> cs.foreach((key, event) -> {
             orderItemService.eventHandler(event);
         });
+    }
+
+    @Bean
+    public java.util.function.Consumer<KStream<String, String>> iOrderStatus() {
+
+        return os -> os
+                .foreach((key, event) -> {
+                    OrderStatus status = null;
+                    try {
+                        JsonNode jsonNode = jsonMapper.readTree(event);
+                        status = jsonMapper.readValue(jsonNode.toString(), OrderStatus.class);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                    orderService.update(status);
+                });
     }
 }

@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -23,6 +24,8 @@ public class PaymentStream {
     private ObjectMapper jsonMapper;
     @Autowired
     private PaymentService paymentService;
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     @Bean
     public java.util.function.Consumer<KStream<String, String>> payments() {

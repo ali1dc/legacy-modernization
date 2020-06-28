@@ -1,6 +1,6 @@
 package com.legacy.ingestor.service;
 
-import com.legacy.ingestor.config.LegacyIdTopics;
+import com.legacy.ingestor.config.KafkaTopics;
 import com.legacy.ingestor.events.CategoryEvent;
 import com.legacy.ingestor.model.Category;
 import com.legacy.ingestor.repository.CategoryRepository;
@@ -34,7 +34,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         if (legacyCategory.isPresent()) {
             logger.info("category record exists, we do not need to insert it again!");
-            kafkaTemplate.send(LegacyIdTopics.CATEGORY, key, legacyCategory.get().getId().toString());
+            kafkaTemplate.send(KafkaTopics.CATEGORY, key, legacyCategory.get().getId().toString());
             return category;
         }
 
@@ -45,7 +45,7 @@ public class CategoryServiceImpl implements CategoryService {
                 category.getName());
 
         // we can set this with a transaction annotation.
-        kafkaTemplate.send(LegacyIdTopics.CATEGORY, key, category.getId().toString());
+        kafkaTemplate.send(KafkaTopics.CATEGORY, key, category.getId().toString());
         return category;
     }
 

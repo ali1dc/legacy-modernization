@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.Optional;
 
 @Service
@@ -54,7 +54,7 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setPhone(event.getAfter().getPhone());
             customer.setEmail(event.getAfter().getEmail());
             customer.setUpdatedBy(modCreatedBy);
-            customer.setUpdatedDate(new Date());
+            customer.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
         } else {
             customer = event.getAfter();
         }

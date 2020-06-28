@@ -1,6 +1,7 @@
 package com.legacy.order.consumer;
 
 import com.legacy.order.event.CustomerEvent;
+import com.legacy.order.event.OrderStatus;
 import com.legacy.order.event.ProductEvent;
 import com.legacy.order.service.CustomerService;
 import com.legacy.order.service.OrderItemService;
@@ -83,5 +84,11 @@ public class OrderConsumer {
                     Long legacyId = Long.parseLong(value);
                     orderItemService.update(id, legacyId);
                 });
+    }
+
+    @Bean
+    public java.util.function.Consumer<KStream<String, OrderStatus>> orderStatus() {
+
+        return os -> os.foreach((key, status) -> orderService.update(status));
     }
 }

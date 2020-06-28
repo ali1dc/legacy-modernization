@@ -1,6 +1,6 @@
 package com.legacy.ingestor.service;
 
-import com.legacy.ingestor.config.LegacyIdTopics;
+import com.legacy.ingestor.config.KafkaTopics;
 import com.legacy.ingestor.config.StateStores;
 import com.legacy.ingestor.dto.Product;
 import com.legacy.ingestor.events.ProductEvent;
@@ -47,7 +47,7 @@ public class ProductServiceImpl implements ProductService{
         if (productExists.isPresent()) {
             logger.info("duplicate product detected, do not insert it again!");
             LegacyProduct product = productExists.get();
-            kafkaTemplate.send(LegacyIdTopics.PRODUCT,
+            kafkaTemplate.send(KafkaTopics.PRODUCT,
                     event.getAfter().getId().toString(),
                     product.getId().toString());
             return product;
@@ -61,7 +61,7 @@ public class ProductServiceImpl implements ProductService{
                 .build();
 
         productRepository.save(product);
-        kafkaTemplate.send(LegacyIdTopics.PRODUCT,
+        kafkaTemplate.send(KafkaTopics.PRODUCT,
                 event.getAfter().getId().toString(),
                 product.getId().toString());
         return product;
@@ -145,7 +145,7 @@ public class ProductServiceImpl implements ProductService{
             legacyProduct.setId(null);
             productRepository.save(legacyProduct);
 
-            kafkaTemplate.send(LegacyIdTopics.PRODUCT,
+            kafkaTemplate.send(KafkaTopics.PRODUCT,
                     product.getId().toString(),
                     legacyProduct.getId().toString());
         }

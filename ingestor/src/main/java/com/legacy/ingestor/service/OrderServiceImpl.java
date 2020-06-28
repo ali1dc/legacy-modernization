@@ -1,8 +1,12 @@
 package com.legacy.ingestor.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.ingestor.config.Actions;
-import com.legacy.ingestor.config.LegacyIdTopics;
+import com.legacy.ingestor.config.KafkaTopics;
+import com.legacy.ingestor.config.OrderStatuses;
 import com.legacy.ingestor.dto.Order;
+import com.legacy.ingestor.dto.OrderStatus;
 import com.legacy.ingestor.events.OrderEvent;
 import com.legacy.ingestor.model.LegacyCustomer;
 import com.legacy.ingestor.model.LegacyOrder;
@@ -27,6 +31,8 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private CustomerRepository customerRepository;
     @Autowired
+    private ObjectMapper jsonMapper;
+    @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
     @Value(value = "${created-by.mod}")
     private String modCreatedBy;
@@ -48,7 +54,7 @@ public class OrderServiceImpl implements OrderService {
                     .build();
             orderRepository.save(legacyOrder);
             if (Objects.equals(event.getOp(), Actions.CREATE) || Objects.equals(event.getOp(), Actions.READ)) {
-                kafkaTemplate.send(LegacyIdTopics.ORDER,
+                kafkaTemplate.send(KafkaTopics.ORDER,
                         event.getAfter().getId().toString(),
                         legacyOrder.getOrderId().toString());
             }
@@ -57,7 +63,45 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void update(OrderEvent event) {
+
+        Optional<LegacyOrder> legacyOrder = orderRepository.findById(event.getAfter().getLegacyId());
+        legacyOrder.ifPresent(order -> {
+            if (!Objects.equals(order.getStatus(), event.getAfter().getStatus())) {
+                order.setStatus(event.getAfter().getStatus());
+                orderRepository.save(order);
+            }
+        });
+    }
+
+    @Override
+    public void update(OrderStatus status) {
+
         logger.info("updating order status when changed");
+        Optional<LegacyOrder> optionalLegacyOrder = orderRepository.findById(status.getLegacyOrderId());
+        optionalLegacyOrder.ifPresent(order -> {
+            if (!Objects.equals(order.getStatus(), status.getStatus())) {
+                order.setStatus(status.getStatus());
+                orderRepository.save(order);
+            }
+        });
+    }
+
+    @Override
+    public void sendOrderStatus(Long orderId, Long legacyOrderId, String status) {
+
+        OrderStatus orderStatus = OrderStatus.builder()
+                .orderId(orderId)
+                .Status(status)
+                .legacyOrderId(legacyOrderId)
+                .build();
+
+        try {
+            kafkaTemplate.send(KafkaTopics.ORDER_STATUS_TOPIC,
+                    orderStatus.getOrderId().toString(),
+                    jsonMapper.writeValueAsString(orderStatus));
+        } catch (JsonProcessingException e) {
+            logger.error(e.getMessage());
+        }
     }
 
     @Override

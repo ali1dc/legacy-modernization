@@ -25,36 +25,41 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic category() {
-        return new NewTopic(LegacyIdTopics.CATEGORY, 1, (short) 1);
+        return new NewTopic(KafkaTopics.CATEGORY, 1, (short) 1);
     }
 
     @Bean
     public NewTopic product() {
-        return new NewTopic(LegacyIdTopics.PRODUCT, 1, (short) 1);
+        return new NewTopic(KafkaTopics.PRODUCT, 1, (short) 1);
     }
 
     @Bean
     public NewTopic customer() {
-        return new NewTopic(LegacyIdTopics.CUSTOMER, 1, (short) 1);
+        return new NewTopic(KafkaTopics.CUSTOMER, 1, (short) 1);
     }
 
     @Bean
     public NewTopic order() {
-        return new NewTopic(LegacyIdTopics.ORDER, 1, (short) 1);
+        return new NewTopic(KafkaTopics.ORDER, 1, (short) 1);
     }
 
     @Bean
     public NewTopic orderItem() {
-        return new NewTopic(LegacyIdTopics.ORDER_ITEM, 1, (short) 1);
+        return new NewTopic(KafkaTopics.ORDER_ITEM, 1, (short) 1);
     }
 
     @Bean
     public NewTopic payment() {
-        return new NewTopic(LegacyIdTopics.PAYMENT, 1, (short) 1);
+        return new NewTopic(KafkaTopics.PAYMENT, 1, (short) 1);
     }
 
     @Bean
     public NewTopic shipment() {
-        return new NewTopic(LegacyIdTopics.SHIPPING, 1, (short) 1);
+        return new NewTopic(KafkaTopics.SHIPPING, 1, (short) 1);
+    }
+
+    @Bean
+    public NewTopic orderStatus() {
+        return new NewTopic(KafkaTopics.ORDER_STATUS_TOPIC, 1, (short) 1);
     }
 }
