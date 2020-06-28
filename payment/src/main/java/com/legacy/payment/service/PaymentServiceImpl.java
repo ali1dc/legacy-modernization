@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -95,7 +95,7 @@ public class PaymentServiceImpl implements PaymentService {
             if (payment.getLegacyId() == null) {
                 payment.setLegacyId(legacyId);
                 payment.setUpdatedBy(legacyCreatedBy);
-                payment.setUpdatedDate(new Date());
+                payment.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
                 paymentRepository.save(payment);
             }
         });

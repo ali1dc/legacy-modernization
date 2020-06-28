@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -98,7 +98,7 @@ public class CategoryServiceImpl implements CategoryService {
             if (cat.getLegacyId() == null) {
                 cat.setLegacyId(legacyId);
                 cat.setUpdatedBy(legacyCreatedBy);
-                cat.setUpdatedDate(new Date());
+                cat.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
                 categoryRepository.save(cat);
             }
         });

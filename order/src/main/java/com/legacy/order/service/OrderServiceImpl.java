@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -96,7 +95,7 @@ public class OrderServiceImpl implements OrderService {
 
         order.setStatus(event.getAfter().getStatus());
         order.setUpdatedBy(legacyCreatedBy);
-        order.setUpdatedDate(new Date());
+        order.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
         // handle customer id
         customerRepository.findTopByLegacyId(event.getAfter().getCustomerId()).ifPresent(customer -> {
             order.setCustomer(customer);
@@ -112,7 +111,7 @@ public class OrderServiceImpl implements OrderService {
             if (order.getLegacyId() == null) {
                 order.setLegacyId(legacyId);
                 order.setUpdatedBy(legacyCreatedBy);
-                order.setUpdatedDate(new Date());
+                order.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
                 orderRepository.save(order);
             }
         });

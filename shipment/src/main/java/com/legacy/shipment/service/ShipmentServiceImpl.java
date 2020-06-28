@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -88,7 +88,7 @@ public class ShipmentServiceImpl implements ShipmentService {
             if (shipment.getLegacyId() == null) {
                 shipment.setLegacyId(legacyId);
                 shipment.setUpdatedBy(legacyCreatedBy);
-                shipment.setUpdatedDate(new Date());
+                shipment.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
                 shipmentRepository.save(shipment);
             }
         });

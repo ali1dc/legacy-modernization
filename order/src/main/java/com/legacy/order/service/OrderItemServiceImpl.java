@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -80,7 +80,7 @@ public class OrderItemServiceImpl implements OrderItemService {
         orderItem.setLegacyOrderId(orderItem.getOrderId());
         orderItem.setLegacyProductId(orderItem.getProductId());
         orderItem.setCreatedBy(legacyCreatedBy);
-        orderItem.setCreatedDate(new Date());
+        orderItem.setCreatedDate(new Timestamp(System.currentTimeMillis()));
         orderItem.setId(null);
         // handle order-id product-id
         Optional<Product> optionalProduct = productRepository.findTopByLegacyId(orderItem.getProductId());
@@ -103,7 +103,7 @@ public class OrderItemServiceImpl implements OrderItemService {
         orderItem.setQuantity(event.getAfter().getQuantity());
         orderItem.setUnitPrice(event.getAfter().getUnitPrice());
         orderItem.setUpdatedBy(legacyCreatedBy);
-        orderItem.setUpdatedDate(new Date());
+        orderItem.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
         orderItemRepository.save(orderItem);
     }
 
@@ -115,7 +115,7 @@ public class OrderItemServiceImpl implements OrderItemService {
             if (item.getLegacyId() == null) {
                 item.setLegacyId(legacyId);
                 item.setUpdatedBy(legacyCreatedBy);
-                item.setUpdatedDate(new Date());
+                item.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
                 orderItemRepository.save(item);
             }
         });

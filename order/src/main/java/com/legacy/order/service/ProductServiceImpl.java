@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.Optional;
 
 @Service
@@ -54,7 +54,7 @@ public class ProductServiceImpl implements ProductService {
             product.setQuantity(event.getAfter().getQuantity());
             product.setLegacyId(event.getAfter().getLegacyId());
             product.setUpdatedBy(modCreatedBy);
-            product.setUpdatedDate(new Date());
+            product.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
         } else {
             product = event.getAfter();
         }

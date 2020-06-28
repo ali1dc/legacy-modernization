@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -146,7 +146,7 @@ public class CustomerServiceImpl implements CustomerService {
             if (customer.getLegacyId() == null) {
                 customer.setLegacyId(legacyId);
                 customer.setUpdatedBy(legacyCreatedBy);
-                customer.setUpdatedDate(new Date());
+                customer.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
                 customerRepository.save(customer);
             }
         });
