@@ -2,7 +2,7 @@ package com.legacy.ingestor.service;
 
 import com.legacy.ingestor.config.Actions;
 import com.legacy.ingestor.config.AddressTypes;
-import com.legacy.ingestor.config.LegacyIdTopics;
+import com.legacy.ingestor.config.KafkaTopics;
 import com.legacy.ingestor.config.StateStores;
 import com.legacy.ingestor.dto.Address;
 import com.legacy.ingestor.dto.Customer;
@@ -77,7 +77,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         // if it is a new record, send legacy id back to mod
         if (!optionalLegacyCustomer.isPresent()) {
-            kafkaTemplate.send(LegacyIdTopics.CUSTOMER,
+            kafkaTemplate.send(KafkaTopics.CUSTOMER,
                     customer.getCustomer().getId().toString(),
                     legacyCustomer.getId().toString());
         }
@@ -147,7 +147,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         customerRepository.save(legacyCustomer);
         if (Objects.equals(event.getOp(), Actions.CREATE) || Objects.equals(event.getOp(), Actions.READ)) {
-            kafkaTemplate.send(LegacyIdTopics.CUSTOMER,
+            kafkaTemplate.send(KafkaTopics.CUSTOMER,
                     event.getAfter().getId().toString(),
                     legacyCustomer.getId().toString());
         }

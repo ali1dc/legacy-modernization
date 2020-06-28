@@ -1,6 +1,8 @@
 package com.legacy.ingestor.service;
 
-import com.legacy.ingestor.config.LegacyIdTopics;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.legacy.ingestor.config.KafkaTopics;
+import com.legacy.ingestor.config.OrderStatuses;
 import com.legacy.ingestor.dto.Payment;
 import com.legacy.ingestor.events.PaymentEvent;
 import com.legacy.ingestor.model.LegacyOrder;
@@ -25,6 +27,10 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private PaymentRepository paymentRepository;
     @Autowired
+    private OrderService orderService;
+    @Autowired
+    private ObjectMapper jsonMapper;
+    @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
     @Value(value = "${created-by.mod}")
     private String modCreatedBy;
@@ -45,9 +51,12 @@ public class PaymentServiceImpl implements PaymentService {
                     .customer(order.getCustomer())
                     .build();
             paymentRepository.save(legacyPayment);
-            kafkaTemplate.send(LegacyIdTopics.PAYMENT,
+            kafkaTemplate.send(KafkaTopics.PAYMENT,
                     event.getAfter().getId().toString(),
                     legacyPayment.getId().toString());
+            orderService.sendOrderStatus(payment.getOrderId(),
+                    payment.getLegacyOrderId(),
+                    OrderStatuses.CHARGED);
         });
     }
 }

@@ -2,7 +2,7 @@ package com.legacy.ingestor.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.ingestor.config.Actions;
-import com.legacy.ingestor.config.LegacyIdTopics;
+import com.legacy.ingestor.config.KafkaTopics;
 import com.legacy.ingestor.dto.*;
 import com.legacy.ingestor.events.OrderItemEvent;
 import com.legacy.ingestor.model.LegacyOrder;
@@ -71,7 +71,7 @@ public class OrderItemServiceImpl implements OrderItemService {
                     .build();
             orderItemRepository.save(legacyOrderItem);
             if (Objects.equals(event.getOp(), Actions.CREATE) || Objects.equals(event.getOp(), Actions.READ)) {
-                kafkaTemplate.send(LegacyIdTopics.ORDER_ITEM,
+                kafkaTemplate.send(KafkaTopics.ORDER_ITEM,
                         event.getAfter().getId().toString(),
                         legacyOrderItem.getItemId().toString());
             }

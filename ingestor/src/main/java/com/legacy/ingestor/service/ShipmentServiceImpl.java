@@ -1,6 +1,7 @@
 package com.legacy.ingestor.service;
 
-import com.legacy.ingestor.config.LegacyIdTopics;
+import com.legacy.ingestor.config.KafkaTopics;
+import com.legacy.ingestor.config.OrderStatuses;
 import com.legacy.ingestor.dto.Shipment;
 import com.legacy.ingestor.events.ShipmentEvent;
 import com.legacy.ingestor.model.LegacyOrder;
@@ -25,6 +26,8 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Autowired
     private ShipmentRepository shipmentRepository;
     @Autowired
+    private OrderService orderService;
+    @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
     @Value(value = "${created-by.mod}")
     private String modCreatedBy;
@@ -43,9 +46,12 @@ public class ShipmentServiceImpl implements ShipmentService {
                     .order(order)
                     .build();
             shipmentRepository.save(legacyShipment);
-            kafkaTemplate.send(LegacyIdTopics.SHIPPING,
+            kafkaTemplate.send(KafkaTopics.SHIPPING,
                     event.getAfter().getId().toString(),
                     legacyShipment.getId().toString());
+            orderService.sendOrderStatus(shipment.getOrderId(),
+                    shipment.getLegacyOrderId(),
+                    OrderStatuses.SHIPPED);
         });
     }
 }
