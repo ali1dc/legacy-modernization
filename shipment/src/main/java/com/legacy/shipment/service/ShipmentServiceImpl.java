@@ -1,7 +1,11 @@
 package com.legacy.shipment.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.shipment.config.Actions;
+import com.legacy.shipment.config.KafkaTopics;
+import com.legacy.shipment.config.OrderStatuses;
+import com.legacy.shipment.dto.OrderStatus;
 import com.legacy.shipment.event.ShipmentEvent;
 import com.legacy.shipment.model.Order;
 import com.legacy.shipment.model.Shipment;
@@ -12,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -30,6 +35,8 @@ public class ShipmentServiceImpl implements ShipmentService {
     private ShipmentRepository shipmentRepository;
     @Autowired
     private ObjectMapper jsonMapper;
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     @Value(value = "${created-by.legacy}")
     private String legacyCreatedBy;
@@ -69,6 +76,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         optionalOrder.ifPresent(order -> {
             shipment.setOrder(order);
             shipmentRepository.save(shipment);
+            sendStatus(shipment);
         });
     }
 
@@ -84,5 +92,21 @@ public class ShipmentServiceImpl implements ShipmentService {
                 shipmentRepository.save(shipment);
             }
         });
+    }
+
+    private void sendStatus(Shipment shipment) {
+
+        OrderStatus status = OrderStatus.builder()
+                .orderId(shipment.getOrder().getId())
+                .Status(OrderStatuses.SHIPPED)
+                .legacyOrderId(shipment.getLegacyOrderId())
+                .build();
+        try {
+            kafkaTemplate.send(KafkaTopics.ORDER_STATUS_TOPIC,
+                    status.getOrderId().toString(),
+                    jsonMapper.writeValueAsString(status));
+        } catch (JsonProcessingException e) {
+            logger.error(e.getMessage());
+        }
     }
 }
