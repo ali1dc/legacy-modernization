@@ -18,16 +18,16 @@ created-by:
   legacy: legacy
 
 spring.datasource.driver-class-name: org.postgresql.Driver
-spring.datasource.url: jdbc:postgresql://localhost:5432/customer
-spring.datasource.username: postgres
-spring.datasource.password: postgres
+spring.datasource.url: ${CUSTOMER_DB_URL}
+spring.datasource.username: ${CUSTOMER_DB_USER}
+spring.datasource.password: ${CUSTOMER_DB_PASSWORD}
 spring.datasource.test-on-borrow: true
 spring.datasource.validation-query: SELECT 1
 spring.datasource.log-validation-errors: true
 spring.jpa.show-sql: true
 spring.jpa.hibernate.ddl-auto: none
 
-spring.kafka.bootstrap-servers: localhost:19092
+spring.kafka.bootstrap-servers: ${KAFKA_URL}
 spring.cloud.stream.kafka.stream.binder.application-id: customer-microservice
 spring.cloud.stream.function.definition: pCustomer;pAddress;pCustomerAddress;enrichedCustomers;legacyCustomers;legacyCustomerIds
 
@@ -52,9 +52,9 @@ spring.cloud.stream.kafka.bindings.products.consumer.max.poll.interval.ms: 10000
 
 flyway:
   driver-class-name: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:5432/customer
-  user: postgres
-  password: postgres
+  url: ${CUSTOMER_DB_URL}
+  user: ${CUSTOMER_DB_USER}
+  password: ${CUSTOMER_DB_PASSWORD}
   enable: true
   test-on-borrow: true
   validation-query: SELECT 1

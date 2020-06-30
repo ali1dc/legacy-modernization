@@ -18,16 +18,16 @@ created-by:
   legacy: legacy
 
 spring.datasource.driver-class-name: org.postgresql.Driver
-spring.datasource.url: jdbc:postgresql://localhost:5432/product
-spring.datasource.username: postgres
-spring.datasource.password: postgres
+spring.datasource.url: ${PRODUCT_DB_URL}
+spring.datasource.username: ${PRODUCT_DB_USER}
+spring.datasource.password: ${PRODUCT_DB_PASSWORD}
 spring.datasource.test-on-borrow: true
 spring.datasource.validation-query: SELECT 1
 spring.datasource.log-validation-errors: true
 spring.jpa.show-sql: true
 spring.jpa.hibernate.ddl-auto: none
 
-spring.kafka.bootstrap-servers: localhost:19092
+spring.kafka.bootstrap-servers: ${KAFKA_URL}
 spring.cloud.stream.function.definition: categories;products;pCategories;pProducts;pProductCategories;enrichedProducts;categoryLegacyIds;productLegacyIds
 spring.cloud.stream.bindings.categories-in-0.destination: legacy.legacy_order.categories
 spring.cloud.stream.bindings.products-in-0.destination: legacy.legacy_order.products
@@ -53,9 +53,9 @@ spring.cloud.stream.kafka.bindings.products.consumer.max.poll.interval.ms: 10000
 
 flyway:
   driver-class-name: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:5432/product
-  user: postgres
-  password: postgres
+  url: ${PRODUCT_DB_URL}
+  user: ${PRODUCT_DB_USER}
+  password: ${PRODUCT_DB_PASSWORD}
   enable: true
   test-on-borrow: true
   validation-query: SELECT 1

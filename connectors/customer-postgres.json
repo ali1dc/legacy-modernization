@@ -17,12 +17,12 @@
     "errors.tolerance": "all",
     "value.converter": "org.apache.kafka.connect.json.JsonConverter",
     "key.converter" : "org.apache.kafka.connect.json.JsonConverter",
-    "slot.name" : "customer_slot",
     "transforms": "ExtractField",
     "transforms.ExtractField.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
     "transforms.ExtractField.field": "id",
     "key.converter.schemas.enable": false,
     "value.converter.schemas.enable": false,
-    "key.ignore" : false
+    "key.ignore" : false,
+    "slot.name" : "customer_slot"
   }
 }
