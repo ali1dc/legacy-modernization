@@ -18,7 +18,7 @@ created-by:
   legacy: legacy
 
 spring.datasource.driver-class-name: org.postgresql.Driver
-spring.datasource.url: jdbc:postgresql://localhost:5432/payment
+spring.datasource.url: ${PAYMENT_DB_URL}
 spring.datasource.username: postgres
 spring.datasource.password: postgres
 spring.datasource.test-on-borrow: true
@@ -27,7 +27,7 @@ spring.datasource.log-validation-errors: true
 spring.jpa.show-sql: true
 spring.jpa.hibernate.ddl-auto: none
 
-spring.kafka.bootstrap-servers: localhost:19092
+spring.kafka.bootstrap-servers: ${KAFKA_URL}
 spring.cloud.stream.kafka.stream.binder.application-id: payment-microservice
 spring.cloud.stream.function.definition: pCustomers;pOrderTotal;pOrders1;payments;legacyPaymentIds;pOrderStatus
 spring.cloud.stream.bindings.pCustomers-in-0.destination: enriched-customers
@@ -43,7 +43,7 @@ spring.cloud.stream.kafka.streams.binder.state-store-retry.backoff-period: 10000
 
 flyway:
   driver-class-name: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:5432/payment
+  url: ${PAYMENT_DB_URL}
   user: postgres
   password: postgres
   enable: true

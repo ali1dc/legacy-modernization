@@ -18,16 +18,16 @@ created-by:
   legacy: legacy
 
 spring.datasource.driver-class-name: org.postgresql.Driver
-spring.datasource.url: jdbc:postgresql://localhost:5432/order
-spring.datasource.username: postgres
-spring.datasource.password: postgres
+spring.datasource.url: ${ORDER_DB_URL}
+spring.datasource.username: ${ORDER_DB_USER}
+spring.datasource.password: ${ORDER_DB_PASSWORD}
 spring.datasource.test-on-borrow: true
 spring.datasource.validation-query: SELECT 1
 spring.datasource.log-validation-errors: true
 spring.jpa.show-sql: true
 spring.jpa.hibernate.ddl-auto: none
 
-spring.kafka.bootstrap-servers: localhost:19092
+spring.kafka.bootstrap-servers: ${KAFKA_URL}
 spring.cloud.stream.kafka.stream.binder.application-id: order-microservice
 spring.cloud.stream.function.definition: oCustomers;oProducts;orders;orderItems;legacyOrderIds;legacyOrderItemIds;orderStatus
 spring.cloud.stream.bindings.oCustomers-in-0.destination: customer.public.customers
@@ -40,9 +40,9 @@ spring.cloud.stream.bindings.orderStatus-in-0.destination: order-status-events
 
 flyway:
   driver-class-name: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:5432/order
-  user: postgres
-  password: postgres
+  url: ${ORDER_DB_URL}
+  user: ${ORDER_DB_USER}
+  password: ${ORDER_DB_PASSWORD}
   enable: true
   test-on-borrow: true
   validation-query: SELECT 1

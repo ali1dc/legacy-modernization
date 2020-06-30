@@ -1,14 +1,6 @@
 version: '2'
 services:
-  my-dev-box:
-    image: openjdk:8
-    volumes:
-      - /Users/ali/confluent-5.1.0:/confluent
-    command: tail -F anything
-    environment:
-      ZK: zookeeper:2181
-      KAFKA: kafka:9092
-
+  ### INFRASTRUCTURE ###
   zookeeper:
     image: debezium/zookeeper:latest
     ports:
@@ -81,17 +73,103 @@ services:
      - OFFSET_STORAGE_TOPIC=my_connect_offsets
      - STATUS_STORAGE_TOPIC=my_connect_statuses
 
-  # schema-registry:
-  #   image: confluentinc/cp-schema-registry:5.1.2
-  #   restart: always
-  #   depends_on:
-  #     - zookeeper
-  #     - kafka
-  #   environment:
-  #     SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper:2181
-  #     SCHEMA_REGISTRY_HOST_NAME: schema-registry
-  #   ports:
-  #     - "8081:8081"
+  ### MODERNIZED MICROSERVICES ###
+  ingestor:
+    build: 
+      context: ./ingestor/container
+    container_name: ingestor
+    hostname: ingestor
+    ports:
+      - "8092:8092"
+    depends_on:
+      - kafka
+      - mysql
+    environment:
+      ZK_URL: zookeeper:2181
+      KAFKA_URL: kafka:9092
+      INGESTOR_DB_URL: jdbc:mysql://mysql:3306/legacy_order
+      INGESTOR_DB_USER: root
+      INGESTOR_DB_PASSWORD: root
+
+  product:
+    build: 
+      context: ./product/container
+    container_name: product
+    hostname: product
+    ports:
+      - "8091:8091"
+    depends_on:
+      - kafka
+      - postgres
+    environment:
+      KAFKA_URL: kafka:9092
+      PRODUCT_DB_URL: jdbc:postgresql://postgres:5432/product
+      PRODUCT_DB_USER: postgres
+      PRODUCT_DB_PASSWORD: postgres
+
+  customer:
+    build: 
+      context: ./customer/container
+    container_name: customer
+    hostname: customer
+    ports:
+      - "8093:8093"
+    depends_on:
+      - kafka
+      - postgres
+    environment:
+      KAFKA_URL: kafka:9092
+      CUSTOMER_DB_URL: jdbc:postgresql://postgres:5432/customer
+      CUSTOMER_DB_USER: postgres
+      CUSTOMER_DB_PASSWORD: postgres
+
+  order:
+    build: 
+      context: ./order/container
+    container_name: order
+    hostname: order
+    ports:
+      - "8094:8094"
+    depends_on:
+      - kafka
+      - postgres
+    environment:
+      KAFKA_URL: kafka:9092
+      ORDER_DB_URL: jdbc:postgresql://postgres:5432/order
+      ORDER_DB_USER: postgres
+      ORDER_DB_PASSWORD: postgres
+
+  payment:
+    build: 
+      context: ./payment/container
+    container_name: payment
+    hostname: payment
+    ports:
+      - "8095:8095"
+    depends_on:
+      - kafka
+      - postgres
+    environment:
+      KAFKA_URL: kafka:9092
+      PAYMENT_DB_URL: jdbc:postgresql://postgres:5432/payment
+      PAYMENT_DB_USER: postgres
+      PAYMENT_DB_PASSWORD: postgres
+
+  shipment:
+    build: 
+      context: ./shipment/container
+    container_name: shipment
+    hostname: shipment
+    ports:
+      - "8096:8096"
+    depends_on:
+      - kafka
+      - postgres
+    environment:
+      KAFKA_URL: kafka:9092
+      SHIPMENT_DB_URL: jdbc:postgresql://postgres:5432/shipment
+      SHIPMENT_DB_USER: postgres
+      SHIPMENT_DB_PASSWORD: postgres
 
   # elastic:
   #   image: docker.elastic.co/elasticsearch/elasticsearch:5.5.2
