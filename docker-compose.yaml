@@ -75,7 +75,7 @@ services:
 
   ### MODERNIZED MICROSERVICES ###
   ingestor:
-    build: 
+    build:
       context: ./ingestor/container
     container_name: ingestor
     hostname: ingestor
@@ -92,7 +92,7 @@ services:
       INGESTOR_DB_PASSWORD: root
 
   product:
-    build: 
+    build:
       context: ./product/container
     container_name: product
     hostname: product
@@ -108,7 +108,7 @@ services:
       PRODUCT_DB_PASSWORD: postgres
 
   customer:
-    build: 
+    build:
       context: ./customer/container
     container_name: customer
     hostname: customer
@@ -124,7 +124,7 @@ services:
       CUSTOMER_DB_PASSWORD: postgres
 
   order:
-    build: 
+    build:
       context: ./order/container
     container_name: order
     hostname: order
@@ -140,7 +140,7 @@ services:
       ORDER_DB_PASSWORD: postgres
 
   payment:
-    build: 
+    build:
       context: ./payment/container
     container_name: payment
     hostname: payment
@@ -156,7 +156,7 @@ services:
       PAYMENT_DB_PASSWORD: postgres
 
   shipment:
-    build: 
+    build:
       context: ./shipment/container
     container_name: shipment
     hostname: shipment
