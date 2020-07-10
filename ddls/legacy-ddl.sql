@@ -67,12 +67,10 @@ create table order_items(
 
 create table payments(
   payment_id INT AUTO_INCREMENT PRIMARY KEY,
-  customer_id int NOT NULL,
   order_id int NOT NULL,
   charged_amount decimal(15,2) NOT NULL,
   successful boolean,
   created_by VARCHAR(50),
-  FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
   FOREIGN KEY (order_id) REFERENCES orders(order_id)
 );
 
@@ -82,6 +80,5 @@ create table shipping(
   shipping_date datetime DEFAULT now(),
   delivered boolean,
   created_by VARCHAR(50),
-  FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
   FOREIGN KEY (order_id) REFERENCES orders(order_id)
 );
