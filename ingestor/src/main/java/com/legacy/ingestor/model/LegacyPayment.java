@@ -18,10 +18,6 @@ public class LegacyPayment {
     Long id;
 
     @ManyToOne
-    @JoinColumn(name="customer_id", nullable=false)
-    LegacyCustomer customer;
-
-    @ManyToOne
     @JoinColumn(name="order_id", nullable=false)
     LegacyOrder order;
 
