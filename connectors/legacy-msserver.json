@@ -1,0 +1,15 @@
+{
+  "name": "legacy-mysql",
+  "config": {
+    "connector.class": "io.debezium.connector.sqlserver.SqlServerConnector",
+    "tasks.max" : "1",
+    "database.hostname": "sql-server",
+    "database.port" : "1433",
+    "database.user": "sa",
+    "database.password": "SecretP@$$word",
+    "database.server.name": "legacy",
+    "database.dbname": "legacy_order",
+    "database.history.kafka.bootstrap.servers": "kafka:9092",
+    "database.history.kafka.topic": "dbhistory.legacy"
+  }
+}

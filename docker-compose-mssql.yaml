@@ -1,0 +1,58 @@
+version: '2'
+services:
+  ### INFRASTRUCTURE ###
+  zookeeper:
+    image: debezium/zookeeper:latest
+    ports:
+     - 2181:2181
+     - 2888:2888
+     - 3888:3888
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    hostname: kafka
+    ports:
+      - "19092:19092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_CLIENT_PORT: 19092
+      KAFKA_BROKER_ID: 1
+      KAFKA_BROKER_RACK: rack-a
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:19092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+  sqlserver:
+    image: microsoft/mssql-server-linux:2017-latest
+    hostname: sql-server
+    # volumes:
+    #   - mysql-data:/var/lib/mysql
+    ports:
+      - "1433:1433"
+    environment:
+     ACCEPT_EULA: "Y"
+     SA_PASSWORD: "SecretP@$$word"
+     MSSQL_PID: Standard
+     MSSQL_AGENT_ENABLED: "true"
+
+  connect:
+    image: debezium/connect:1.1.1.Final
+    ports:
+     - 8083:8083
+    links:
+     - kafka
+     - sqlserver
+    environment:
+     - BOOTSTRAP_SERVERS=kafka:9092
+     - GROUP_ID=1
+     - CONFIG_STORAGE_TOPIC=my_connect_configs
+     - OFFSET_STORAGE_TOPIC=my_connect_offsets
+     - STATUS_STORAGE_TOPIC=my_connect_statuses
+
+volumes:
+  pg-data:
+  mysql-data:
