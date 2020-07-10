@@ -48,7 +48,6 @@ public class PaymentServiceImpl implements PaymentService {
                     .amount(payment.getAmount())
                     .successful(payment.getSuccessful())
                     .order(order)
-                    .customer(order.getCustomer())
                     .build();
             paymentRepository.save(legacyPayment);
             kafkaTemplate.send(KafkaTopics.PAYMENT,
