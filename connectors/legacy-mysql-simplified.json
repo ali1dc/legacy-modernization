@@ -1,0 +1,29 @@
+{
+  "name": "legacy-mysql",
+  "config": {
+    "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+    "database.hostname": "mysql",
+    "database.port": "3306",
+    "database.user": "root",
+    "database.password": "root",
+    "database.server.id": "1000",
+    "database.server.name": "legacy",
+    "database.whitelist": "legacy_order",
+    "database.history.kafka.bootstrap.servers": "kafka:9092",
+    "database.history.kafka.topic": "dbhistory.legacy",
+    "include.schema.changes": true,
+    "database.tcpKeepAlive": true,
+    "tombstones.on.delete": true,
+    "decimal.handling.mode": "double",
+    "errors.tolerance": "all",
+    "schemas.enable": false,
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "internal.key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "internal.value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": false,
+    "value.converter.schemas.enable": false,
+    "key.ignore" : false,
+    "slot.name" : "legacy_order_slot"
+  }
+}
