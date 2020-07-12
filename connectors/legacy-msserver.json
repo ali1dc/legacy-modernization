@@ -1,15 +1,28 @@
 {
-  "name": "legacy-mysql",
+  "name": "legacy-mssql",
   "config": {
     "connector.class": "io.debezium.connector.sqlserver.SqlServerConnector",
     "tasks.max" : "1",
-    "database.hostname": "sql-server",
+    "database.server.name" : "legacy",
+    "database.hostname" : "mssql",
     "database.port" : "1433",
-    "database.user": "sa",
-    "database.password": "SecretP@$$word",
-    "database.server.name": "legacy",
-    "database.dbname": "legacy_order",
-    "database.history.kafka.bootstrap.servers": "kafka:9092",
-    "database.history.kafka.topic": "dbhistory.legacy"
+    "database.user" : "adminer",
+    "database.password" : "aBadPASSw0rd*",
+    "database.dbname" : "legacy_order",
+    "database.history.kafka.bootstrap.servers" : "kafka:9092",
+    "database.history.kafka.topic": "schema-changes.legacy",
+    "schemas.enable": false,
+    "errors.tolerance": "all",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "internal.key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "internal.value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "transforms": "ExtractField",
+    "transforms.ExtractField.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
+    "transforms.ExtractField.field": "id",
+    "key.converter.schemas.enable": false,
+    "value.converter.schemas.enable": false,
+    "key.ignore" : false,
+    "slot.name" : "legacy_order_slot"
   }
 }
