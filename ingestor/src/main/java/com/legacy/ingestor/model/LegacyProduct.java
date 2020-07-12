@@ -15,7 +15,6 @@ public class LegacyProduct {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name = "product_id")
     Long id;
 
     @Column(name = "product_name")

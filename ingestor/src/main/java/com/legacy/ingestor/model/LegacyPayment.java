@@ -14,7 +14,6 @@ public class LegacyPayment {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name = "payment_id")
     Long id;
 
     @ManyToOne
