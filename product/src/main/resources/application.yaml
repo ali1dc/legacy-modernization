@@ -28,10 +28,10 @@ spring.jpa.show-sql: true
 spring.jpa.hibernate.ddl-auto: none
 
 spring.kafka.bootstrap-servers: ${KAFKA_URL}
-spring.cloud.stream.function.definition: categories;products;pCategories;pProducts;pProductCategories;enrichedProducts;categoryLegacyIds;productLegacyIds
-spring.cloud.stream.bindings.categories-in-0.destination: legacy.legacy_order.categories
-spring.cloud.stream.bindings.products-in-0.destination: legacy.legacy_order.products
 spring.cloud.stream.kafka.stream.binder.application-id: product-microservice
+spring.cloud.stream.function.definition: categories;products;pCategories;pProducts;pProductCategories;enrichedProducts;categoryLegacyIds;productLegacyIds
+spring.cloud.stream.bindings.categories-in-0.destination: legacy.dbo.categories
+spring.cloud.stream.bindings.products-in-0.destination: legacy.dbo.products
 spring.cloud.stream.bindings.categoryLegacyIds-in-0.destination: category-legacy-ids
 spring.cloud.stream.bindings.productLegacyIds-in-0.destination: product-legacy-ids
 
