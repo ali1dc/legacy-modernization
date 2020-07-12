@@ -17,18 +17,16 @@ created-by:
 
 spring.jpa.show-sql: true
 spring.jpa.hibernate.ddl-auto: none
-# spring.datasource.url: jdbc:mysql://localhost:3306/legacy_order
-# spring.datasource.username: root
-# spring.datasource.password: root
 spring.datasource.url: ${INGESTOR_DB_URL}
 spring.datasource.username: ${INGESTOR_DB_USER}
 spring.datasource.password: ${INGESTOR_DB_PASSWORD}
+spring.datasource.driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.SQLServer2012Dialect
 
 # spring.kafka.bootstrap-servers: localhost:19092
 spring.kafka.bootstrap-servers: ${KAFKA_URL}
 spring.cloud.stream.kafka.stream.binder.application-id: ingestor-microservice
 spring.cloud.stream.function.definition: iProducts;iCategory;iProductUpdate;iOrders;iOrderItems;iOrderStatus;iCustomerStateStore;iCustomerInsert;iCustomerUpdate;iPayments;iShipments
-
 spring.cloud.stream.kafka.streams.binder.state-store-retry.max-attempts: 100
 spring.cloud.stream.kafka.streams.binder.state-store-retry.backoff-period: 10000
 # product microservice
