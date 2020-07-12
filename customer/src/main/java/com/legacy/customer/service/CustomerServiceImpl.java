@@ -1,7 +1,5 @@
 package com.legacy.customer.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.customer.config.Actions;
 import com.legacy.customer.config.AddressTypes;
@@ -45,17 +43,7 @@ public class CustomerServiceImpl implements CustomerService {
     private String modCreatedBy;
 
     @Override
-    public void eventHandler(String data){
-
-        JsonNode jsonNode = null;
-        LegacyCustomerEvent event = null;
-        try {
-            jsonNode = jsonMapper.readTree(data).at("/payload");
-            event = jsonMapper.readValue(jsonNode.toString(), LegacyCustomerEvent.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return;
-        }
+    public void eventHandler(LegacyCustomerEvent event){
 
         switch (event.getOp()) {
             case Actions.CREATE:

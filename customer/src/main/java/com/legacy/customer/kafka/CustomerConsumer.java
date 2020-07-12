@@ -1,5 +1,6 @@
 package com.legacy.customer.kafka;
 
+import com.legacy.customer.event.LegacyCustomerEvent;
 import com.legacy.customer.service.CustomerService;
 import org.apache.kafka.streams.kstream.KStream;
 import org.slf4j.Logger;
@@ -16,13 +17,9 @@ public class CustomerConsumer {
     private CustomerService customerService;
 
     @Bean
-    public java.util.function.Consumer<KStream<Object, String>> legacyCustomers() {
+    public java.util.function.Consumer<KStream<Object, LegacyCustomerEvent>> legacyCustomers() {
 
-        return input -> input
-                .foreach((key, value) -> {
-                    logger.info("start processing legacy messages");
-                    customerService.eventHandler(value);
-                });
+        return input -> input.foreach((key, event) -> customerService.eventHandler(event));
     }
 
     @Bean

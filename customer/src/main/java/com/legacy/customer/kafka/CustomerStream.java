@@ -43,30 +43,6 @@ public class CustomerStream {
                 .map((key, event) -> KeyValue.pair(key, event.getAfter()));
     }
 
-/**    @Bean
-    public Function<KStream<String, CustomerAddressEvent>,
-            Function<GlobalKTable<String, CustomerEvent>,
-                    Function<GlobalKTable<String, AddressEvent>,
-                            KStream<String, EnrichedCustomer>>>> coolCustomers() {
-        return customerAddresses -> (
-                customers -> (
-                        addresses -> (
-                                customerAddresses.leftJoin(customers,
-                                        (customerAddressId, customerAddress) -> customerAddress.getAfter().getCustomerId().toString(),
-                                        CustomerAddressCustomer::new)
-                                        .leftJoin(addresses,
-                                                (id, customerAddressCustomer) -> customerAddressCustomer.getCustomerAddressEvent().getAfter().getAddressId().toString(),
-                                                (customerAddressCustomer, address) -> EnrichedCustomer.builder()
-                                                        .customer(customerAddressCustomer.getCustomerEvent().getAfter())
-                                                        .customerAddress(customerAddressCustomer.getCustomerAddressEvent().getAfter())
-                                                        .address(address.getAfter())
-                                                        .build())
-                        )
-                )
-        );
-    }
-**/
-
     @Bean
     public Function<KStream<String, CustomerAddressDto>,
             Function<GlobalKTable<String, CustomerDto>,

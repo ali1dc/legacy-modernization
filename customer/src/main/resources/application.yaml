@@ -31,7 +31,7 @@ spring.kafka.bootstrap-servers: ${KAFKA_URL}
 spring.cloud.stream.kafka.stream.binder.application-id: customer-microservice
 spring.cloud.stream.function.definition: pCustomer;pAddress;pCustomerAddress;enrichedCustomers;legacyCustomers;legacyCustomerIds
 
-spring.cloud.stream.bindings.legacyCustomers-in-0.destination: legacy.legacy_order.customers
+spring.cloud.stream.bindings.legacyCustomers-in-0.destination: legacy.dbo.customers
 spring.cloud.stream.bindings.pCustomer-in-0.destination: customer.public.customers
 spring.cloud.stream.bindings.pCustomer-out-0.destination: clean-customers
 spring.cloud.stream.bindings.pAddress-in-0.destination: customer.public.addresses
