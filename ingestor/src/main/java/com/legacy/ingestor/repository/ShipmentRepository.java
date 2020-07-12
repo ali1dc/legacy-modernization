@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface ShipmentRepository extends CrudRepository<LegacyShipment, Long> {
 
-    Optional<LegacyShipment> findTopByOrderOrderId(Long orderId);
+    Optional<LegacyShipment> findTopByOrderId(Long orderId);
 }

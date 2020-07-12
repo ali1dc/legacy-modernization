@@ -10,7 +10,7 @@ public interface ProductRepository extends CrudRepository<LegacyProduct, Long> {
 
     Optional<LegacyProduct> findById(Long id);
     Optional<LegacyProduct> findTopByName(String name);
-    @Query(value = "SELECT product_id, product_name, description, list_price, quantity, category_id, created_by " +
-            "FROM products ORDER BY rand() LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT TOP 1 id, product_name, description, list_price, quantity, category_id, created_by " +
+            "FROM products ORDER BY NEWID()", nativeQuery = true)
     Optional<LegacyProduct> findRandom();
 }
