@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.ingestor.config.Actions;
 import com.legacy.ingestor.config.KafkaTopics;
-import com.legacy.ingestor.config.OrderStatuses;
 import com.legacy.ingestor.dto.Order;
 import com.legacy.ingestor.dto.OrderStatus;
 import com.legacy.ingestor.events.OrderEvent;
@@ -56,7 +55,7 @@ public class OrderServiceImpl implements OrderService {
             if (Objects.equals(event.getOp(), Actions.CREATE) || Objects.equals(event.getOp(), Actions.READ)) {
                 kafkaTemplate.send(KafkaTopics.ORDER,
                         event.getAfter().getId().toString(),
-                        legacyOrder.getOrderId().toString());
+                        legacyOrder.getId().toString());
             }
         });
     }

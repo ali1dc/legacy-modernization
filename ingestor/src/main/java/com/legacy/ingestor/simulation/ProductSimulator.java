@@ -61,7 +61,7 @@ public class ProductSimulator {
             "Apple - 61W USB-C Power Adapter", "Blue Microphones - Yeti USB Multi-Pattern Electret Condenser", "Logitech - HD Webcam C270",
             "Logitech - 4K Pro Webcam", "Seagate - Expansion 2TB External USB 3.0 Portable Hard Drive");
 
-    @Bean
+//    @Bean
     public void categoryAndProductInsert() {
         // insert categories
         List<Category> cats = new ArrayList<>();

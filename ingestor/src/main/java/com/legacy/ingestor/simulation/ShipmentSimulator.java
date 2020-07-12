@@ -48,7 +48,7 @@ public class ShipmentSimulator {
         logger.info("creating a random shipment");
         Optional<LegacyOrder> optionalOrder = orderRepository.findRandomShipped();
         optionalOrder.ifPresent(order -> {
-            Optional<LegacyShipment> optionalShipment = shipmentRepository.findTopByOrderOrderId(order.getOrderId());
+            Optional<LegacyShipment> optionalShipment = shipmentRepository.findTopByOrderId(order.getId());
             optionalShipment.ifPresent(shipment -> {
                 order.setStatus(OrderStatuses.DELIVERED);
                 orderRepository.save(order);

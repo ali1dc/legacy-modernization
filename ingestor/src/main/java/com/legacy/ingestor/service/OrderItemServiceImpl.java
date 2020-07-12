@@ -73,7 +73,7 @@ public class OrderItemServiceImpl implements OrderItemService {
             if (Objects.equals(event.getOp(), Actions.CREATE) || Objects.equals(event.getOp(), Actions.READ)) {
                 kafkaTemplate.send(KafkaTopics.ORDER_ITEM,
                         event.getAfter().getId().toString(),
-                        legacyOrderItem.getItemId().toString());
+                        legacyOrderItem.getId().toString());
             }
         }
     }

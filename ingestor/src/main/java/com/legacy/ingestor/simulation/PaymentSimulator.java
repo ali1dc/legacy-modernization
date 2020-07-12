@@ -35,7 +35,7 @@ public class PaymentSimulator {
         // get random order
         Optional<LegacyOrder> optionalOrder = orderRepository.findRandomPending();
         optionalOrder.ifPresent(order -> {
-            Optional<List<LegacyOrderItem>> optionalItems = orderItemRepository.findAllByOrderOrderId(order.getOrderId());
+            Optional<List<LegacyOrderItem>> optionalItems = orderItemRepository.findAllByOrderId(order.getId());
             optionalItems.ifPresent(items -> {
                 // calculate total
                 Float total = 0F;

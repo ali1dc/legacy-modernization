@@ -30,7 +30,7 @@ public class ProductController {
     public List<Category> categories() {
         List<Category> categories = new ArrayList<>();
         ReadOnlyKeyValueStore<Long, Category> store =
-                interactiveQueryService.getQueryableStore("category-store", QueryableStoreTypes.keyValueStore());
+                interactiveQueryService.getQueryableStore(StateStores.CATEGORY_STORE, QueryableStoreTypes.keyValueStore());
         KeyValueIterator<Long, Category> all = store.all();
         while (all.hasNext()) {
             KeyValue<Long, Category> value = all.next();
@@ -43,7 +43,7 @@ public class ProductController {
     public Category categoryById(@PathVariable Long id) {
         List<Category> categories = new ArrayList<>();
         ReadOnlyKeyValueStore<Long, Category> store =
-                interactiveQueryService.getQueryableStore("category-store", QueryableStoreTypes.keyValueStore());
+                interactiveQueryService.getQueryableStore(StateStores.CATEGORY_STORE, QueryableStoreTypes.keyValueStore());
         return store.get(id);
     }
 
