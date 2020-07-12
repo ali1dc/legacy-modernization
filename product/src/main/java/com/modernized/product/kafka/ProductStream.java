@@ -1,7 +1,6 @@
 package com.modernized.product.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.modernized.product.config.Actions;
 import com.modernized.product.dto.*;
 import com.modernized.product.event.CategoryEvent;
 import com.modernized.product.event.ProductCategoryEvent;
@@ -21,7 +20,6 @@ import org.springframework.kafka.support.serializer.JsonSerde;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.function.Function;
 
 @Component
@@ -40,63 +38,30 @@ public class ProductStream {
     }
 
     @Bean
-    public Function<KStream<String, ProductEvent>, KStream<String, ProductDto>> pProducts() {
-
-        return input -> input
-                .filter((key, event) -> !Objects.equals(event.getOp(), Actions.DELETE))
-                .map((key, event) -> {
-                    ProductDto product = mapper.map(event.getAfter(), ProductDto.class);
-                    return KeyValue.pair(key, product);
-                });
-    }
-
-    @Bean
-    public Function<KStream<String, CategoryEvent>, KStream<String, CategoryDto>> pCategories() {
-
-        return input -> input
-                .filter((key, event) -> !Objects.equals(event.getOp(), Actions.DELETE))
-                .map((key, event) -> {
-                    CategoryDto category = mapper.map(event.getAfter(), CategoryDto.class);
-                    return KeyValue.pair(key, category);
-                });
-    }
-
-    @Bean
-    public Function<KStream<String, ProductCategoryEvent>, KStream<String, ProductCategoryDto>> pProductCategories() {
-
-        return input -> input
-                .filter((key, event) -> !Objects.equals(event.getOp(), Actions.DELETE))
-                .map((key, event) -> {
-                    ProductCategoryDto productCategory = mapper.map(event.getAfter(), ProductCategoryDto.class);
-                    return KeyValue.pair(key, productCategory);
-                });
-    }
-
-    @Bean
-    public Function<KStream<String, ProductCategoryDto>,
-            Function<GlobalKTable<String, ProductDto>,
-                    Function<GlobalKTable<String, CategoryDto>,
+    public Function<KStream<String, ProductCategoryEvent>,
+            Function<GlobalKTable<String, ProductEvent>,
+                    Function<GlobalKTable<String, CategoryEvent>,
                             KStream<String, ProductDto>>>> enrichedProducts() {
         return productCategories -> (
                 products -> (
                         categories -> (
                                 productCategories.leftJoin(products,
-                                        (productCategoryId, productCategory) -> productCategory.getProductId().toString(),
+                                        (productCategoryId, productCategory) -> productCategory.getAfter().getProductId().toString(),
                                         ProductCategoryProduct::new)
                                         .leftJoin(categories,
-                                                (id, productCategoryProduct) -> productCategoryProduct.getProductCategory().getCategoryId().toString(),
+                                                (id, productCategoryProduct) -> productCategoryProduct.getProductCategoryEvent().getAfter().getCategoryId().toString(),
                                                 (productCategoryProduct, category) -> {
                                                     ArrayList<String> catNames = new ArrayList<>();
-                                                    ProductDto dto = productCategoryProduct.getProduct();
+                                                    ProductDto dto = mapper.map(productCategoryProduct.getProductEvent().getAfter(), ProductDto.class);
                                                     if (dto == null) {
                                                         dto = new ProductDto();
                                                     }
                                                     if (category != null) {
-                                                        catNames.add(category.getName());
+                                                        catNames.add(category.getAfter().getName());
                                                         dto.setCategories(catNames);
                                                     }
                                                     return dto;
-                                        })
+                                                })
                         )
                         .map((key, value) -> KeyValue.pair(value.getId().toString(), value))
                         .groupByKey(Grouped.with(Serdes.String(), productSerde))
