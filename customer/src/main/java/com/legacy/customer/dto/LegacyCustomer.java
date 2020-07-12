@@ -1,4 +1,4 @@
-package com.legacy.customer.model;
+package com.legacy.customer.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -9,8 +9,8 @@ import lombok.*;
 @Builder
 public class LegacyCustomer {
 
-    @JsonProperty("customer_id")
-    Long customerId;
+    @JsonProperty("id")
+    Long id;
 
     @JsonProperty("first_name")
     String firstName;

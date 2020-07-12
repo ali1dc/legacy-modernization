@@ -14,6 +14,8 @@ management:
 created-by:
   mod: modernized
   legacy: legacy
+simulator-enabled: false
+simulate-products-enabled: false
 
 spring.jpa.show-sql: true
 spring.jpa.hibernate.ddl-auto: none

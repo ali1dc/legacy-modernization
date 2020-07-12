@@ -11,6 +11,7 @@ import com.legacy.ingestor.repository.PaymentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -28,9 +29,13 @@ public class PaymentSimulator {
     private OrderItemRepository orderItemRepository;
     @Autowired
     private PaymentRepository paymentRepository;
+    @Value("#{new Boolean('${simulator-enabled}')}")
+    private Boolean simulatorEnabled;
 
     @Scheduled(fixedRate = 2000)
     public void makePayment() {
+
+        if(!simulatorEnabled) return;
 
         // get random order
         Optional<LegacyOrder> optionalOrder = orderRepository.findRandomPending();
