@@ -3,6 +3,7 @@
   "config": {
     "connector.class": "io.debezium.connector.sqlserver.SqlServerConnector",
     "tasks.max" : "1",
+    "decimal.handling.mode": "double",
     "database.server.name" : "legacy",
     "database.hostname" : "mssql",
     "database.port" : "1433",
