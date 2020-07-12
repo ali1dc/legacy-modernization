@@ -4,7 +4,7 @@ import com.modernized.product.event.CategoryEvent;
 
 public interface CategoryService {
 
-    void categoryHandler(String data);
+    void categoryHandler(CategoryEvent event);
     void insert(CategoryEvent event);
     void update(CategoryEvent event);
     void update(Long id, Long legacyId);

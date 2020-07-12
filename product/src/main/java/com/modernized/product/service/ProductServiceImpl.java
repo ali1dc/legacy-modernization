@@ -41,27 +41,19 @@ public class ProductServiceImpl implements ProductService {
     private String modCreatedBy;
 
     @Override
-    public void productHandler(String data) {
+    public void productHandler(ProductEvent event) {
 
-        try {
-            JsonNode jsonNode = jsonMapper.readTree(data).at("/payload");
-            ProductEvent event = jsonMapper.readValue(jsonNode.toString(), ProductEvent.class);
-            switch (event.getOp()) {
-                case Actions.CREATE:
-                case Actions.READ:
-                    insert(event);
-                    break;
-                case Actions.UPDATE:
-                    update(event);
-                    break;
-                case Actions.DELETE:
-                    delete(event);
-                    break;
-            }
-        } catch (MismatchedInputException me) {
-            logger.warn(me.getMessage());
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+        switch (event.getOp()) {
+            case Actions.CREATE:
+            case Actions.READ:
+                insert(event);
+                break;
+            case Actions.UPDATE:
+                update(event);
+                break;
+            case Actions.DELETE:
+                delete(event);
+                break;
         }
     }
 

@@ -1,15 +1,18 @@
 package com.modernized.product.kafka;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.modernized.product.config.Actions;
 import com.modernized.product.dto.*;
+import com.modernized.product.event.CategoryEvent;
+import com.modernized.product.event.ProductCategoryEvent;
+import com.modernized.product.event.ProductEvent;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.GlobalKTable;
 import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.kstream.KStream;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,7 @@ import org.springframework.kafka.support.serializer.JsonSerde;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.function.Function;
 
 @Component
@@ -26,6 +30,8 @@ public class ProductStream {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private ObjectMapper jsonMapper;
+    @Autowired(required = false )
+    private ModelMapper mapper;
 
     private final Serde<ProductDto> productSerde;
 
@@ -34,52 +40,34 @@ public class ProductStream {
     }
 
     @Bean
-    public Function<KStream<String, String>, KStream<String, ProductDto>> pProducts() {
+    public Function<KStream<String, ProductEvent>, KStream<String, ProductDto>> pProducts() {
 
         return input -> input
-                .map((key, value) -> {
-                    ProductDto product = null;
-                    try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/after");
-                        product = jsonMapper.readValue(jsonNode.toString(), ProductDto.class);
-                        logger.info("Key: {}, Value: {}", key, product.getId());
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
+                .filter((key, event) -> !Objects.equals(event.getOp(), Actions.DELETE))
+                .map((key, event) -> {
+                    ProductDto product = mapper.map(event.getAfter(), ProductDto.class);
                     return KeyValue.pair(key, product);
                 });
     }
 
     @Bean
-    public Function<KStream<String, String>, KStream<String, CategoryDto>> pCategories() {
+    public Function<KStream<String, CategoryEvent>, KStream<String, CategoryDto>> pCategories() {
 
         return input -> input
-                .map((key, value) -> {
-                    CategoryDto category = null;
-                    try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/after");
-                        category = jsonMapper.readValue(jsonNode.toString(), CategoryDto.class);
-                        logger.info("Key: {}, Value: {}", key, category.getId());
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
+                .filter((key, event) -> !Objects.equals(event.getOp(), Actions.DELETE))
+                .map((key, event) -> {
+                    CategoryDto category = mapper.map(event.getAfter(), CategoryDto.class);
                     return KeyValue.pair(key, category);
                 });
     }
 
     @Bean
-    public Function<KStream<String, String>, KStream<String, ProductCategoryDto>> pProductCategories() {
+    public Function<KStream<String, ProductCategoryEvent>, KStream<String, ProductCategoryDto>> pProductCategories() {
 
         return input -> input
-                .map((key, value) -> {
-                    ProductCategoryDto productCategory = null;
-                    try {
-                        JsonNode jsonNode = jsonMapper.readTree(value).at("/after");
-                        productCategory = jsonMapper.readValue(jsonNode.toString(), ProductCategoryDto.class);
-                        logger.info("Key: {}, Value: {}", key, productCategory.getId());
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
+                .filter((key, event) -> !Objects.equals(event.getOp(), Actions.DELETE))
+                .map((key, event) -> {
+                    ProductCategoryDto productCategory = mapper.map(event.getAfter(), ProductCategoryDto.class);
                     return KeyValue.pair(key, productCategory);
                 });
     }
