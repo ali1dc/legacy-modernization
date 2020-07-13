@@ -5,7 +5,7 @@ import com.modernized.product.event.ProductEvent;
 
 public interface ProductService {
 
-    void productHandler(String data);
+    void productHandler(ProductEvent event);
     void insert(ProductEvent event);
     void update(ProductEvent event);
     void update(Long id, Long legacyId);

@@ -5,6 +5,7 @@ import com.legacy.ingestor.repository.CustomerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,8 @@ public class CustomerSimulator {
     private final String createdBy = "random-generator";
     @Autowired
     private CustomerRepository customerRepository;
+    @Value("#{new Boolean('${simulator-enabled}')}")
+    private Boolean simulatorEnabled;
 
     private final List<String> firstNames = Arrays.asList("Lilly", "Brittany", "Tayyibah", "Alisha", "Ava",
             "Tanya", "Keri", "Essa", "Diana", "Henri", "Ocean", "Katlyn", "Ariel", "Brodie", "Aniya",
@@ -113,6 +116,8 @@ public class CustomerSimulator {
 
     @Scheduled(fixedRate = 1000)
     public void insertCustomer() {
+
+        if(!simulatorEnabled) return;
 
         Random random = new Random();
         String firstName = firstNames.get(random.nextInt(firstNames.size()));

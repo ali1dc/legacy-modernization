@@ -14,7 +14,6 @@ public class LegacyCustomer {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name = "customer_id")
     Long id;
 
     @Column(name = "first_name")

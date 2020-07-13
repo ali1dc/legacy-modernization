@@ -1,7 +1,5 @@
 package com.modernized.product.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.modernized.product.config.Actions;
 import com.modernized.product.event.CategoryEvent;
@@ -32,25 +30,19 @@ public class CategoryServiceImpl implements CategoryService {
     private String modCreatedBy;
 
     @Override
-    public void categoryHandler(String data) {
+    public void categoryHandler(CategoryEvent event) {
 
-        try {
-            JsonNode jsonNode = jsonMapper.readTree(data).at("/payload");
-            CategoryEvent event = jsonMapper.readValue(jsonNode.toString(), CategoryEvent.class);
-            switch (event.getOp()) {
-                case Actions.CREATE:
-                case Actions.READ:
-                    insert(event);
-                    break;
-                case Actions.UPDATE:
-                    update(event);
-                    break;
-                case Actions.DELETE:
-                    delete(event);
-                    break;
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+        switch (event.getOp()) {
+            case Actions.CREATE:
+            case Actions.READ:
+                insert(event);
+                break;
+            case Actions.UPDATE:
+                update(event);
+                break;
+            case Actions.DELETE:
+                delete(event);
+                break;
         }
     }
 

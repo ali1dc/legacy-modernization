@@ -1,7 +1,5 @@
 package com.legacy.shipment.stream;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.shipment.config.Actions;
 import com.legacy.shipment.event.ShipmentEvent;
@@ -25,15 +23,13 @@ public class ShipmentStream {
     private ShipmentService shipmentService;
 
     @Bean
-    public java.util.function.Consumer<KStream<String, String>> shipments() {
+    public java.util.function.Consumer<KStream<String, ShipmentEvent>> shipments() {
 
         return input -> input
-                .filter((key, value) -> {
-                    ShipmentEvent event = getShipmentEvent(value);
+                .filter((key, event) -> {
                     return !Objects.equals(event.getOp(), Actions.DELETE);
                 })
-                .foreach((key, value) -> {
-                    ShipmentEvent event = getShipmentEvent(value);
+                .foreach((key, event) -> {
                     shipmentService.eventHandler(event);
                 });
     }
@@ -47,21 +43,5 @@ public class ShipmentStream {
                     Long legacyId = Long.parseLong(value);
                     shipmentService.update(id, legacyId);
                 });
-    }
-
-    private ShipmentEvent getShipmentEvent(String data) {
-
-        JsonNode jsonNode;
-        ShipmentEvent event = null;
-        try {
-            jsonNode = jsonMapper.readTree(data).at("/payload");
-            Integer isDelivered = jsonNode.at("/after/delivered").asInt();
-            event = jsonMapper.readValue(jsonNode.toString(), ShipmentEvent.class);
-            event.getAfter().setDelivered(isDelivered == 1);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
-        return event;
     }
 }

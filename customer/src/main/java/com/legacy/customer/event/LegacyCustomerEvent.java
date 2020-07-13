@@ -1,7 +1,7 @@
 package com.legacy.customer.event;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.legacy.customer.model.LegacyCustomer;
+import com.legacy.customer.dto.LegacyCustomer;
 import lombok.*;
 
 import java.sql.Timestamp;

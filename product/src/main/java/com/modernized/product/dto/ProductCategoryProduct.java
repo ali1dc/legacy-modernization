@@ -1,5 +1,7 @@
 package com.modernized.product.dto;
 
+import com.modernized.product.event.ProductCategoryEvent;
+import com.modernized.product.event.ProductEvent;
 import lombok.*;
 
 @NoArgsConstructor
@@ -8,6 +10,6 @@ import lombok.*;
 @Getter @Setter
 public class ProductCategoryProduct {
 
-    ProductCategoryDto productCategory;
-    ProductDto product;
+    ProductCategoryEvent productCategoryEvent;
+    ProductEvent productEvent;
 }

@@ -1,7 +1,5 @@
 package com.legacy.payment.kafka;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.payment.config.Actions;
 import com.legacy.payment.event.PaymentEvent;
@@ -28,15 +26,11 @@ public class PaymentStream {
     private KafkaTemplate<String, String> kafkaTemplate;
 
     @Bean
-    public java.util.function.Consumer<KStream<String, String>> payments() {
+    public java.util.function.Consumer<KStream<String, PaymentEvent>> payments() {
 
         return input -> input
-                .filter((key, value) -> {
-                    PaymentEvent event = getPaymentEvent(value);
-                    return !Objects.equals(event.getOp(), Actions.DELETE);
-                })
-                .foreach((key, value) -> {
-                    PaymentEvent event = getPaymentEvent(value);
+                .filter((key, event) -> !Objects.equals(event.getOp(), Actions.DELETE))
+                .foreach((key, event) -> {
                     paymentService.eventHandler(event);
                 });
     }
@@ -50,21 +44,5 @@ public class PaymentStream {
                     Long legacyId = Long.parseLong(value);
                     paymentService.update(id, legacyId);
                 });
-    }
-
-    private PaymentEvent getPaymentEvent(String data) {
-
-        JsonNode jsonNode;
-        PaymentEvent event = null;
-        try {
-            jsonNode = jsonMapper.readTree(data).at("/payload");
-            Integer isSuccessful = jsonNode.at("/after/successful").asInt();
-            event = jsonMapper.readValue(jsonNode.toString(), PaymentEvent.class);
-            event.getAfter().setSuccessful(isSuccessful == 1);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
-        return event;
     }
 }

@@ -1,5 +1,7 @@
 package com.legacy.customer.dto;
 
+import com.legacy.customer.event.CustomerAddressEvent;
+import com.legacy.customer.event.CustomerEvent;
 import lombok.*;
 
 @NoArgsConstructor
@@ -8,6 +10,6 @@ import lombok.*;
 @Getter @Setter
 public class CustomerAddressCustomer {
 
-    CustomerAddressDto customerAddress;
-    CustomerDto customer;
+    CustomerAddressEvent customerAddressEvent;
+    CustomerEvent customerEvent;
 }

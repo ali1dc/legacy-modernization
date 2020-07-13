@@ -1,5 +1,7 @@
 package com.modernized.product.kafka;
 
+import com.modernized.product.event.CategoryEvent;
+import com.modernized.product.event.ProductEvent;
 import com.modernized.product.service.CategoryService;
 import com.modernized.product.service.ProductService;
 import org.apache.kafka.streams.kstream.KStream;
@@ -20,21 +22,15 @@ public class ProductConsumer {
     private CategoryService categoryService;
 
     @Bean
-    public java.util.function.Consumer<KStream<String, String>> categories() {
+    public java.util.function.Consumer<KStream<String, CategoryEvent>> categories() {
 
-        return input -> input
-                .foreach((key, value) -> {
-                    categoryService.categoryHandler(value);
-                });
+        return input -> input.foreach((key, event) -> categoryService.categoryHandler(event));
     }
 
     @Bean
-    public java.util.function.Consumer<KStream<String, String>> products() {
+    public java.util.function.Consumer<KStream<String, ProductEvent>> products() {
 
-        return input -> input
-                .foreach((key, value) -> {
-                    productService.productHandler(value);
-                });
+        return input -> input.foreach((key, event) -> productService.productHandler(event));
     }
 
     @Bean

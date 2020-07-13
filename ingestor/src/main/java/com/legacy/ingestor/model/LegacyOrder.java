@@ -16,8 +16,7 @@ public class LegacyOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_id")
-    Long orderId;
+    Long id;
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable=false)

@@ -7,6 +7,7 @@ import com.legacy.ingestor.repository.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +22,8 @@ public class ProductSimulator {
     private ProductRepository productRepository;
     @Autowired
     private CategoryRepository categoryRepository;
+    @Value("#{new Boolean('${simulate-products-enabled}')}")
+    private Boolean simulateProductsEnabled;
 
     private final List<String> categories = Arrays.asList("Electronics", "Arts", "Beverages", "Goods", "Clothing",
             "Computers", "Books", "Cleaning Supplies", "Tablets", "Small Appliances", "Appliances", "Tools",
@@ -63,6 +66,9 @@ public class ProductSimulator {
 
     @Bean
     public void categoryAndProductInsert() {
+
+        if(!simulateProductsEnabled) return;
+
         // insert categories
         List<Category> cats = new ArrayList<>();
         categories.forEach(category -> {

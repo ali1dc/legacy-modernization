@@ -17,7 +17,7 @@ public class OrderItem {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @JsonProperty("item_id")
+    @JsonProperty("id")
     Long id;
 
     @JsonIgnore

@@ -15,7 +15,6 @@ public class LegacyShipment {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name = "shipping_id")
     Long id;
 
     @ManyToOne

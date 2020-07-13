@@ -38,7 +38,7 @@ public class CustomerMapper {
                 .lastName(event.getAfter().getLastName())
                 .phone(event.getAfter().getPhone())
                 .email(event.getAfter().getEmail())
-                .legacyId(event.getAfter().getCustomerId())
+                .legacyId(event.getAfter().getId())
                 .build();
     }
 }

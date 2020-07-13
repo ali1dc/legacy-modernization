@@ -1,5 +1,6 @@
 package com.modernized.product.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -18,7 +19,7 @@ import java.util.Set;
 public class Category {
 
     @Id
-    @JsonProperty("category_id")
+    @JsonProperty("id")
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     Long id;
 
@@ -30,7 +31,7 @@ public class Category {
     Set<ProductCategory> productCategories;
 
     @JsonProperty("category_name")
-    @Column(name = "name")
+    @JsonAlias({"name"})
     String name;
 
     @Column(name = "description")
@@ -40,12 +41,15 @@ public class Category {
     @Column(name = "created_by")
     String createdBy;
 
+    @JsonProperty("created_date")
     @Column(name = "created_date")
     Date createdDate;
 
+    @JsonProperty("updated_by")
     @Column(name = "updated_by")
     String updatedBy;
 
+    @JsonProperty("updated_date")
     @Column(name = "updated_date")
     Date updatedDate;
 

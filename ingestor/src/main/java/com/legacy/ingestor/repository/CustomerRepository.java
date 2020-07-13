@@ -11,9 +11,9 @@ public interface CustomerRepository extends CrudRepository<LegacyCustomer, Long>
 
     Optional<LegacyCustomer> findById(Long id);
     Optional<LegacyCustomer> findTopByEmail(String Email);
-    @Query(value = "SELECT customer_id, first_name, last_name, billing_address1, billing_address2, billing_city, billing_state, " +
+    @Query(value = "SELECT TOP 1 id, first_name, last_name, billing_address1, billing_address2, billing_city, billing_state, " +
             "billing_zip, shipping_address1, shipping_address2, shipping_city, shipping_state, shipping_zip, email, " +
             "phone, created_by " +
-            "FROM customers ORDER BY rand() LIMIT 1", nativeQuery = true)
+            "FROM customers ORDER BY NEWID()", nativeQuery = true)
     Optional<LegacyCustomer> findRandom();
 }

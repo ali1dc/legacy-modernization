@@ -17,7 +17,7 @@ public class Shipment {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @JsonProperty("shipping_id")
+    @JsonProperty("id")
     Long id;
 
     @Transient
@@ -29,6 +29,8 @@ public class Shipment {
     @JoinColumn(name="order_id", nullable=false)
     Order order;
 
+    @JsonProperty("delivered")
+    @Column(name = "delivered")
     Boolean delivered;
 
     @JsonProperty("shipping_date")

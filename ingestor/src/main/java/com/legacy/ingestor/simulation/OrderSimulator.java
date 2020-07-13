@@ -12,6 +12,7 @@ import com.legacy.ingestor.repository.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -34,9 +35,13 @@ public class OrderSimulator {
     private OrderItemRepository orderItemRepository;
     @Autowired
     private ProductRepository productRepository;
+    @Value("#{new Boolean('${simulator-enabled}')}")
+    private Boolean simulatorEnabled;
 
     @Scheduled(fixedRate = 1000)
     public void insertOrder() {
+
+        if(!simulatorEnabled) return;
 
         logger.info("order generator!");
         Optional<LegacyCustomer> optionalCustomer = customerRepository.findRandom();

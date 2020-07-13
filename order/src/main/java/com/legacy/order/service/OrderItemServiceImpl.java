@@ -1,7 +1,5 @@
 package com.legacy.order.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.order.config.Actions;
 import com.legacy.order.event.OrderItemEvent;
@@ -40,21 +38,11 @@ public class OrderItemServiceImpl implements OrderItemService {
     private String modCreatedBy;
 
     @Override
-    public void eventHandler(String data) {
-
-
-        JsonNode jsonNode;
-        OrderItemEvent event;
-        try {
-            jsonNode = jsonMapper.readTree(data).at("/payload");
-            event = jsonMapper.readValue(jsonNode.toString(), OrderItemEvent.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return;
-        }
+    public void eventHandler(OrderItemEvent event) {
 
         switch (event.getOp()) {
             case Actions.CREATE:
+            case Actions.READ:
                 insert(event);
                 break;
             case Actions.UPDATE:

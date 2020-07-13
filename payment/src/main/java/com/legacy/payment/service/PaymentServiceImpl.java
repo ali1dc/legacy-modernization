@@ -75,16 +75,13 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setCreatedDate(event.getTimestamp());
         payment.setId(null);
 
-        Optional<Customer> optionalCustomer = customerRepository.findTopByLegacyId(payment.getCustomerId());
         Optional<Order> optionalOrder = orderRepository.findTopByLegacyId(payment.getOrderId());
-
-        if (optionalCustomer.isPresent() && optionalOrder.isPresent()) {
-            payment.setCustomer(optionalCustomer.get());
+        optionalOrder.ifPresent(order -> {
             payment.setOrder(optionalOrder.get());
             paymentRepository.save(payment);
             // produce event for changing order status
             sendStatus(payment);
-        }
+        });
     }
 
     @Override

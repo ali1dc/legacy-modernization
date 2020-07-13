@@ -8,6 +8,7 @@ import com.legacy.ingestor.repository.ShipmentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -23,9 +24,13 @@ public class ShipmentSimulator {
     private OrderRepository orderRepository;
     @Autowired
     private ShipmentRepository shipmentRepository;
+    @Value("#{new Boolean('${simulator-enabled}')}")
+    private Boolean simulatorEnabled;
 
     @Scheduled(fixedRate = 4000)
     public void createShipment() {
+
+        if(!simulatorEnabled) return;
 
         logger.info("creating a random shipment");
         Optional<LegacyOrder> optionalOrder = orderRepository.findRandomCharged();
@@ -45,10 +50,12 @@ public class ShipmentSimulator {
     @Scheduled(fixedRate = 5000)
     public void setDelivered() {
 
+        if(!simulatorEnabled) return;
+
         logger.info("creating a random shipment");
         Optional<LegacyOrder> optionalOrder = orderRepository.findRandomShipped();
         optionalOrder.ifPresent(order -> {
-            Optional<LegacyShipment> optionalShipment = shipmentRepository.findTopByOrderOrderId(order.getOrderId());
+            Optional<LegacyShipment> optionalShipment = shipmentRepository.findTopByOrderId(order.getId());
             optionalShipment.ifPresent(shipment -> {
                 order.setStatus(OrderStatuses.DELIVERED);
                 orderRepository.save(order);
