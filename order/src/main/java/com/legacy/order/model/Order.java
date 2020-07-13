@@ -17,7 +17,7 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @JsonProperty("order_id")
+    @JsonProperty("id")
     Long id;
 
     @Transient

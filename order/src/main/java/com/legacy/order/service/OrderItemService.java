@@ -4,7 +4,7 @@ import com.legacy.order.event.OrderItemEvent;
 
 public interface OrderItemService {
 
-    void eventHandler(String data);
+    void eventHandler(OrderItemEvent event);
 
     void insert(OrderItemEvent event);
     void update(OrderItemEvent event);
