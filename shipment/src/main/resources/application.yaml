@@ -36,7 +36,7 @@ spring.cloud.stream.function.definition: shCustomers;shOrders;shipments;legacySh
 
 spring.cloud.stream.bindings.shCustomers-in-0.destination: enriched-customers
 spring.cloud.stream.bindings.shOrders-in-0.destination: order.public.orders
-spring.cloud.stream.bindings.shipments-in-0.destination: legacy.legacy_order.shipping
+spring.cloud.stream.bindings.shipments-in-0.destination: legacy.dbo.shipping
 spring.cloud.stream.bindings.legacyShipmentIds-in-0.destination: shipping-legacy-ids
 spring.cloud.stream.bindings.shOrderStatus-in-0.destination: order-status-events
 
