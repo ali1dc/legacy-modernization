@@ -24,7 +24,7 @@ public class OrderConsumer {
     private OrderService orderService;
 
     @Bean
-    public java.util.function.Consumer<KStream<String, OrderEvent>> pOrders1() {
+    public java.util.function.Consumer<KStream<String, OrderEvent>> pOrders() {
 
         return input -> input
                 .filter((key, event) -> {

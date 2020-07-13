@@ -17,21 +17,12 @@ public class Payment {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @JsonProperty("payment_id")
+    @JsonProperty("id")
     Long id;
-
-    @Transient
-    @JsonProperty("customer_id")
-    Long customerId;
 
     @Transient
     @JsonProperty("order_id")
     Long orderId;
-
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name="customer_id", nullable=false)
-    Customer customer;
 
     @JsonIgnore
     @ManyToOne
