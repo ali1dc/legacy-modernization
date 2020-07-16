@@ -28,7 +28,7 @@ spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.SQLServer2012Dial
 # spring.kafka.bootstrap-servers: localhost:19092
 spring.kafka.bootstrap-servers: ${KAFKA_URL}
 spring.cloud.stream.kafka.stream.binder.application-id: ingestor-microservice
-spring.cloud.stream.function.definition: iProducts;iCategory;iProductUpdate;iOrders;iOrderItems;iOrderStatus;iCustomerStateStore;iCustomerInsert;iCustomerUpdate;iPayments;iShipments
+spring.cloud.stream.function.definition: iProducts;iCategory;iProductUpdate;iOrders;iOrderItems;iOrderStatus;iCustomers;iPayments;iShipments
 spring.cloud.stream.kafka.streams.binder.state-store-retry.max-attempts: 100
 spring.cloud.stream.kafka.streams.binder.state-store-retry.backoff-period: 10000
 # product microservice
@@ -37,9 +37,7 @@ spring.cloud.stream.bindings.iCategory-out-0.destination: processed-categories
 spring.cloud.stream.bindings.iProducts-in-0.destination: enriched-products
 spring.cloud.stream.bindings.iProductUpdate-in-0.destination: product.public.products
 # customer microservice
-spring.cloud.stream.bindings.iCustomerInsert-in-0.destination: enriched-customers
-spring.cloud.stream.bindings.iCustomerUpdate-in-0.destination: customer.public.customers
-spring.cloud.stream.bindings.iCustomerStateStore-in-0.destination: customer.public.customers
+spring.cloud.stream.bindings.iCustomers-in-0.destination: customer.public.events
 # order microservice
 spring.cloud.stream.bindings.iOrders-in-0.destination: order.public.orders
 spring.cloud.stream.bindings.iOrderItems-in-0.destination: order.public.order_items

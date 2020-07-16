@@ -2,14 +2,13 @@ package com.legacy.ingestor.dto;
 
 import lombok.*;
 
-import java.util.List;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter @Setter
-public class EnrichedCustomer {
+public class EventAcknowledge {
 
-    Customer customer;
-    List<Address> addresses;
+    Long EventId;
+    Long id;
+    Long legacyId;
 }
