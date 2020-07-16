@@ -9,7 +9,8 @@ CREATE TABLE public.addresses
   created_by VARCHAR(50) NOT NULL,
   created_date TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_by VARCHAR(50),
-  updated_date TIMESTAMP WITHOUT TIME ZONE
+  updated_date TIMESTAMP WITHOUT TIME ZONE,
+  legacy_id INT
 )
 WITH (
   OIDS = FALSE
