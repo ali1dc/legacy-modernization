@@ -10,7 +10,7 @@
     "database.dbname": "customer",
     "database.server.name": "customer",
     "database.tcpKeepAlive": true,
-    "table.blacklist": "public.flyway_schema_history",
+    "table.whitelist": "public.events",
     "schema.whitelist": "public",
     "decimal.handling.mode": "double",
     "schemas.enable": false,
