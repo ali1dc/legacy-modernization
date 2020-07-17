@@ -30,6 +30,12 @@ public class Address {
     @JsonProperty("zip")
     String zip;
 
+    @JsonProperty("address_type")
+    String addressType;
+
+    @JsonProperty("is_default")
+    Boolean isDefault;
+
     @JsonProperty("created_by")
     String createdBy;
 

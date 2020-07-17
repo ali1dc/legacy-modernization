@@ -16,6 +16,7 @@ management:
 created-by:
   mod: modernized
   legacy: legacy
+simulator-enabled: true
 
 spring.datasource.driver-class-name: org.postgresql.Driver
 spring.datasource.url: ${CUSTOMER_DB_URL}
@@ -29,17 +30,9 @@ spring.jpa.hibernate.ddl-auto: none
 
 spring.kafka.bootstrap-servers: ${KAFKA_URL}
 spring.cloud.stream.kafka.stream.binder.application-id: customer-microservice
-spring.cloud.stream.function.definition: enrichedCustomers;legacyCustomers;legacyCustomerIds
-
+spring.cloud.stream.function.definition: legacyCustomers;legacyCustomerIds
 spring.cloud.stream.bindings.legacyCustomers-in-0.destination: legacy.dbo.customers
-spring.cloud.stream.bindings.enrichedCustomers-in-0.destination:  customer.public.customer_addresses
-spring.cloud.stream.bindings.enrichedCustomers-in-1.destination: customer.public.customers
-spring.cloud.stream.bindings.enrichedCustomers-in-2.destination: customer.public.addresses
-
-spring.cloud.stream.bindings.enrichedCustomers-out-0.destination: enriched-customers
-
 spring.cloud.stream.bindings.legacyCustomerIds-in-0.destination: customer-legacy-ids
-
 spring.cloud.stream.kafka.streams.binder.state-store-retry.max-attempts: 100
 spring.cloud.stream.kafka.streams.binder.state-store-retry.backoff-period: 10000
 spring.cloud.stream.kafka.bindings.products.consumer.max.poll.interval.ms: 10000

@@ -1,8 +1,11 @@
 package com.legacy.ingestor.events;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.legacy.ingestor.dto.Customer;
-import lombok.*;
+import com.legacy.ingestor.dto.Outbox;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 
@@ -19,8 +22,8 @@ public class CustomerEvent {
     Timestamp timestamp;
 
     @JsonProperty("before")
-    Customer before;
+    Outbox before;
 
     @JsonProperty("after")
-    Customer after;
+    Outbox after;
 }

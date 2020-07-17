@@ -16,26 +16,6 @@ create table categories(
   category_name VARCHAR(255) NOT NULL,
   created_by VARCHAR(50)
 );
-INSERT INTO categories (category_name, created_by)
-  VALUES ('Beverages', 'legacy');
-INSERT INTO categories (category_name, created_by)
-  VALUES ('Bakery', 'legacy');
-INSERT INTO categories (category_name, created_by)
-  VALUES ('Goods', 'legacy');
-INSERT INTO categories (category_name, created_by)
-  VALUES ('Electronics', 'legacy');
-INSERT INTO categories (category_name, created_by)
-  VALUES ('Laptop', 'legacy');
-INSERT INTO categories (category_name, created_by)
-  VALUES ('Mobil', 'legacy');
-INSERT INTO categories (category_name, created_by)
-  VALUES ('Flowers', 'legacy');
-INSERT INTO categories (category_name, created_by)
-  VALUES ('Books', 'legacy');
-INSERT INTO categories (category_name, created_by)
-  VALUES ('Cleaning Supplies', 'legacy');
-INSERT INTO categories (category_name, created_by)
-  VALUES ('Medical Supplies', 'legacy');
 EXEC sys.sp_cdc_enable_table @source_schema = 'dbo', @source_name = 'categories', @role_name = NULL, @supports_net_changes = 0;
 
 -- Create our products table and enable CDC

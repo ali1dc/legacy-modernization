@@ -17,7 +17,7 @@ import java.util.Random;
 public class CustomerSimulator {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final String createdBy = "random-generator";
+    private final String createdBy = "legacy-random-generator";
     @Autowired
     private CustomerRepository customerRepository;
     @Value("#{new Boolean('${simulator-enabled}')}")

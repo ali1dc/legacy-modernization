@@ -29,6 +29,12 @@ public class AddressDto {
     @JsonProperty("zip")
     String zip;
 
+    @JsonProperty("address_type")
+    String addressType;
+
+    @JsonProperty("is_default")
+    Boolean isDefault;
+
     @JsonProperty("legacy_id")
     Long legacyId;
 

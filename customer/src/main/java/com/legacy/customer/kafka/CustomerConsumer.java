@@ -1,5 +1,6 @@
 package com.legacy.customer.kafka;
 
+import com.legacy.customer.dto.EventAcknowledge;
 import com.legacy.customer.event.LegacyCustomerEvent;
 import com.legacy.customer.service.CustomerService;
 import org.apache.kafka.streams.kstream.KStream;
@@ -23,13 +24,11 @@ public class CustomerConsumer {
     }
 
     @Bean
-    public java.util.function.Consumer<KStream<String, String>> legacyCustomerIds() {
+    public java.util.function.Consumer<KStream<String, EventAcknowledge>> legacyCustomerIds() {
 
         return input -> input
                 .foreach((key, value) -> {
-                    Long id = Long.parseLong(key);
-                    Long legacyId = Long.parseLong(value);
-                    customerService.update(id, legacyId);
+                    customerService.update(value);
                 });
     }
 }

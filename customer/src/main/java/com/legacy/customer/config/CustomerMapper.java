@@ -1,44 +1,37 @@
 package com.legacy.customer.config;
 
-import com.legacy.customer.event.LegacyCustomerEvent;
-import com.legacy.customer.model.Address;
-import com.legacy.customer.model.Customer;
+import com.legacy.customer.dto.AddressDto;
+import com.legacy.customer.dto.LegacyCustomer;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class CustomerMapper {
 
-    public Address eventToAddress(LegacyCustomerEvent event, Boolean isBilling) {
+    public List<AddressDto> eventToAddress(LegacyCustomer legacyCustomer) {
 
-        Address address = null;
-        if (isBilling) {
-            address = Address.builder()
-                    .address1(event.getAfter().getBillingAddress1())
-                    .address2(event.getAfter().getBillingAddress2())
-                    .city(event.getAfter().getBillingCity())
-                    .state(event.getAfter().getBillingState())
-                    .zip(event.getAfter().getBillingZip())
-                    .build();
-        } else {
-            address = Address.builder()
-                    .address1(event.getAfter().getShippingAddress1())
-                    .address2(event.getAfter().getShippingAddress2())
-                    .city(event.getAfter().getShippingCity())
-                    .state(event.getAfter().getShippingState())
-                    .zip(event.getAfter().getShippingZip())
-                    .build();
-        }
-        return address;
-    }
+        List<AddressDto> addresses = new ArrayList<>();
+        addresses.add(AddressDto.builder()
+                .address1(legacyCustomer.getBillingAddress1())
+                .address2(legacyCustomer.getBillingAddress2())
+                .city(legacyCustomer.getBillingCity())
+                .state(legacyCustomer.getBillingState())
+                .zip(legacyCustomer.getBillingZip())
+                .addressType(AddressTypes.BILLING)
+                .isDefault(true)
+                .build());
+        addresses.add(AddressDto.builder()
+                .address1(legacyCustomer.getShippingAddress1())
+                .address2(legacyCustomer.getShippingAddress2())
+                .city(legacyCustomer.getShippingCity())
+                .state(legacyCustomer.getShippingState())
+                .zip(legacyCustomer.getShippingZip())
+                .addressType(AddressTypes.SHIPPING)
+                .isDefault(false)
+                .build());
 
-    public Customer eventToCustomer(LegacyCustomerEvent event) {
-
-        return Customer.builder()
-                .firstName(event.getAfter().getFirstName())
-                .lastName(event.getAfter().getLastName())
-                .phone(event.getAfter().getPhone())
-                .email(event.getAfter().getEmail())
-                .legacyId(event.getAfter().getId())
-                .build();
+        return addresses;
     }
 }
