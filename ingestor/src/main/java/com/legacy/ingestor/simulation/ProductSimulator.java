@@ -22,7 +22,7 @@ public class ProductSimulator {
     private ProductRepository productRepository;
     @Autowired
     private CategoryRepository categoryRepository;
-    @Value("#{new Boolean('${simulate-products-enabled}')}")
+    @Value("#{new Boolean('${product-simulator-enabled}')}")
     private Boolean simulateProductsEnabled;
 
     private final List<String> categories = Arrays.asList("Electronics", "Arts", "Beverages", "Goods", "Clothing",

@@ -24,7 +24,7 @@ public class ShipmentSimulator {
     private OrderRepository orderRepository;
     @Autowired
     private ShipmentRepository shipmentRepository;
-    @Value("#{new Boolean('${simulator-enabled}')}")
+    @Value("#{new Boolean('${shipment-simulator-enabled}')}")
     private Boolean simulatorEnabled;
 
     @Scheduled(fixedRate = 4000)

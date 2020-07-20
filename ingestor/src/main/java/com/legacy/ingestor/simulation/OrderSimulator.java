@@ -35,7 +35,7 @@ public class OrderSimulator {
     private OrderItemRepository orderItemRepository;
     @Autowired
     private ProductRepository productRepository;
-    @Value("#{new Boolean('${simulator-enabled}')}")
+    @Value("#{new Boolean('${order-simulator-enabled}')}")
     private Boolean simulatorEnabled;
 
     @Scheduled(fixedRate = 1000)

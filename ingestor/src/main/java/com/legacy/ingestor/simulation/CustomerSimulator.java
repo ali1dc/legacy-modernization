@@ -20,7 +20,7 @@ public class CustomerSimulator {
     private final String createdBy = "legacy-random-generator";
     @Autowired
     private CustomerRepository customerRepository;
-    @Value("#{new Boolean('${simulator-enabled}')}")
+    @Value("#{new Boolean('${customer-simulator-enabled}')}")
     private Boolean simulatorEnabled;
 
     private final List<String> firstNames = Arrays.asList("Lilly", "Brittany", "Tayyibah", "Alisha", "Ava",

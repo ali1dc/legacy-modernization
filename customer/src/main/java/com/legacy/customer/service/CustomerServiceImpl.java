@@ -16,6 +16,7 @@ import com.legacy.customer.repository.CustomerAddressRepository;
 import com.legacy.customer.repository.CustomerRepository;
 import com.legacy.customer.repository.OutboxEventRepository;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -84,10 +86,11 @@ public class CustomerServiceImpl implements CustomerService {
             return;
         }
         CustomerDto customerDto = mapper.map(legacyCustomer, CustomerDto.class);
+        customerDto.setId(null);
         customerDto.setCreatedBy(legacyCreatedBy);
         customerDto.setCreatedDate(event.getTimestamp());
 
-        List<AddressDto> addresses = customerMapper.eventToAddress(event.getAfter());
+        List<AddressDto> addresses = customerMapper.addressToAddressDtoList(event.getAfter());
         addresses.forEach(add -> {
             add.setCreatedDate(event.getTimestamp());
             add.setCreatedBy(legacyCreatedBy);
@@ -96,30 +99,57 @@ public class CustomerServiceImpl implements CustomerService {
         insert(EnrichedCustomer.builder()
                 .customer(customerDto)
                 .addresses(addresses)
-                .build());
+                .build(), legacyCreatedBy);
     }
 
     @Override
     @Transactional
-    public void insert(EnrichedCustomer event) {
+    public void insert(EnrichedCustomer enrichedCustomer, String creator) {
 
-        Customer customer = mapper.map(event.getCustomer(), Customer.class);
+        Customer customer = mapper.map(enrichedCustomer.getCustomer(), Customer.class);
         customerRepository.save(customer);
-        List<AddressDto> addresses = event.getAddresses();
+        List<AddressDto> addresses = enrichedCustomer.getAddresses();
         addresses.forEach(addressDto -> {
             Address address = mapper.map(addressDto, Address.class);
             addressRepository.save(address);
             customerAddressRepository.save(CustomerAddress.builder()
                     .customer(customer)
                     .address(address)
-                    .addressType(addressDto.getAddressType())
-                    .isDefault(addressDto.getIsDefault())
                     .build());
             addressDto.setId(address.getId());
         });
         // create outbox event
         CustomerDto customerDto = mapper.map(customer, CustomerDto.class);
-        OutboxEvent outboxEvent = getOutboxEvent(customerDto, addresses);
+        OutboxEvent outboxEvent = getOutboxEvent(customerDto, addresses, creator);
+        outboxEventRepository.save(outboxEvent);
+    }
+
+    @Override
+    @Transactional
+    public void update(EnrichedCustomer enrichedCustomer, String creator) {
+
+        Optional<Customer> optionalCustomer = customerRepository.findById(enrichedCustomer.getCustomer().getId());
+        if (!optionalCustomer.isPresent()) {
+            logger.info("customer id: {} does not exist, so no action!", enrichedCustomer.getCustomer().getId());
+            return;
+        }
+
+        Customer customer = mapper.map(enrichedCustomer.getCustomer(), Customer.class);
+        customerRepository.save(customer);
+
+        List<Address> addresses = new ArrayList<>();
+        enrichedCustomer.getAddresses().forEach(addressDto -> {
+            Optional<Address> optionalAddress = addressRepository.findById(addressDto.getId());
+            optionalAddress.ifPresent(before -> {
+                Address address = mapper.map(addressDto, Address.class);
+                addresses.add(address);
+            });
+        });
+        addressRepository.saveAll(addresses);
+        CustomerDto customerDto = mapper.map(customer, CustomerDto.class);
+        List<AddressDto> addressList = mapper.map(addresses, new TypeToken<List<AddressDto>>() {}.getType());
+        OutboxEvent outboxEvent = getOutboxEvent(customerDto, addressList, creator);
+        outboxEvent.setAction(Actions.UPDATE);
         outboxEventRepository.save(outboxEvent);
     }
 
@@ -174,7 +204,13 @@ public class CustomerServiceImpl implements CustomerService {
         logger.info("deleting records; not implemented yet!");
     }
 
-    private OutboxEvent getOutboxEvent(CustomerDto customer, List<AddressDto> addresses) {
+    @Override
+    public Optional<Customer> findByEmail(String email) {
+
+        return customerRepository.findTopByEmail(email);
+    }
+
+    private OutboxEvent getOutboxEvent(CustomerDto customer, List<AddressDto> addresses, String creator) {
 
         ObjectNode payload = jsonMapper.createObjectNode();
         payload.put("id", customer.getId());
@@ -185,10 +221,10 @@ public class CustomerServiceImpl implements CustomerService {
 
         return OutboxEvent.builder()
                 .type("CustomerEvent")
-                .action("c")
-                .processed(false)
+                .action(Actions.CREATE)
+                .processed(Objects.equals(creator, legacyCreatedBy))
                 .payload(payload)
-                .createBy(customer.getCreatedBy())
+                .createBy(creator)
                 .createdDate(new Timestamp(System.currentTimeMillis()))
                 .build();
     }

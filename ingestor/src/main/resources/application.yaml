@@ -14,8 +14,11 @@ management:
 created-by:
   mod: modernized
   legacy: legacy
-simulator-enabled: false
-simulate-products-enabled: false
+product-simulator-enabled: false
+customer-simulator-enabled: true
+order-simulator-enabled: false
+payment-simulator-enabled: false
+shipment-simulator-enabled: false
 
 spring.jpa.show-sql: true
 spring.jpa.hibernate.ddl-auto: none

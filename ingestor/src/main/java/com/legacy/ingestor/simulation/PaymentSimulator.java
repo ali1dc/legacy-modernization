@@ -29,7 +29,7 @@ public class PaymentSimulator {
     private OrderItemRepository orderItemRepository;
     @Autowired
     private PaymentRepository paymentRepository;
-    @Value("#{new Boolean('${simulator-enabled}')}")
+    @Value("#{new Boolean('${payment-simulator-enabled}')}")
     private Boolean simulatorEnabled;
 
     @Scheduled(fixedRate = 2000)

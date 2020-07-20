@@ -17,8 +17,7 @@ import java.util.Set;
 @Table(name = "customers")
 public class Customer {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @JsonProperty("id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @JsonProperty("first_name")
@@ -36,10 +35,8 @@ public class Customer {
     @Transient
     Set<Address> addresses;
 
-    @JsonProperty("email")
     String email;
 
-    @JsonProperty("phone")
     String phone;
 
     @JsonProperty("legacy_id")
