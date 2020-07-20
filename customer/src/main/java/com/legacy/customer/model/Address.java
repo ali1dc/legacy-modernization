@@ -17,8 +17,7 @@ import java.util.Set;
 @Table(name = "addresses")
 public class Address {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @JsonProperty("id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @JsonProperty("address_1")
@@ -29,14 +28,15 @@ public class Address {
     @Column(name = "address_2")
     String address2;
 
-    @JsonProperty("city")
     String city;
 
-    @JsonProperty("state")
     String state;
 
-    @JsonProperty("zip")
     String zip;
+
+    @JsonProperty("address_type")
+    @Column(name = "address_type")
+    String addressType;
 
     @JsonIgnore
     @OneToMany(mappedBy = "address")

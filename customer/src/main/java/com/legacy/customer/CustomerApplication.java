@@ -4,6 +4,7 @@ import com.legacy.customer.config.AddressTypes;
 import com.legacy.customer.dto.AddressDto;
 import com.legacy.customer.dto.CustomerDto;
 import com.legacy.customer.dto.EnrichedCustomer;
+import com.legacy.customer.model.Customer;
 import com.legacy.customer.service.CustomerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +16,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @SpringBootApplication
 @EnableScheduling
@@ -36,6 +34,8 @@ public class CustomerApplication {
 	private CustomerService customerService;
 	@Value("#{new Boolean('${simulator-enabled}')}")
 	private Boolean simulatorEnabled;
+	@Value(value = "${created-by.mod}")
+	private String modCreatedBy;
 
 	private final List<String> firstNames = Arrays.asList("Lilly", "Brittany", "Tayyibah", "Alisha", "Ava",
 			"Tanya", "Keri", "Essa", "Diana", "Henri", "Ocean", "Katlyn", "Ariel", "Brodie", "Aniya",
@@ -161,7 +161,6 @@ public class CustomerApplication {
 				.createdBy(createdBy)
 				.createdDate(new Timestamp(System.currentTimeMillis()))
 				.addressType(AddressTypes.BILLING)
-				.isDefault(true)
 				.createdBy(createdBy)
 				.createdDate(new Timestamp(System.currentTimeMillis()))
 				.build());
@@ -174,14 +173,22 @@ public class CustomerApplication {
 				.createdBy(createdBy)
 				.createdDate(new Timestamp(System.currentTimeMillis()))
 				.addressType(AddressTypes.SHIPPING)
-				.isDefault(false)
 				.createdBy(createdBy)
 				.createdDate(new Timestamp(System.currentTimeMillis()))
 				.build());
-
-		customerService.insert(EnrichedCustomer.builder()
+		// if we have same email, then update instead of insert
+		Optional<Customer> optionalCustomer = customerService.findByEmail(email);
+		EnrichedCustomer enrichedCustomer = EnrichedCustomer.builder()
 				.customer(customer)
 				.addresses(addresses)
-				.build());
+				.build();
+
+		if (optionalCustomer.isPresent()) {
+			enrichedCustomer.getCustomer().setUpdatedBy(createdBy);
+			enrichedCustomer.getCustomer().setUpdatedDate(new Timestamp(System.currentTimeMillis()));
+			customerService.update(enrichedCustomer, modCreatedBy);
+		} else {
+			customerService.insert(enrichedCustomer, modCreatedBy);
+		}
 	}
 }

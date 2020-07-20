@@ -10,7 +10,7 @@ import java.util.List;
 @Component
 public class CustomerMapper {
 
-    public List<AddressDto> eventToAddress(LegacyCustomer legacyCustomer) {
+    public List<AddressDto> addressToAddressDtoList(LegacyCustomer legacyCustomer) {
 
         List<AddressDto> addresses = new ArrayList<>();
         addresses.add(AddressDto.builder()
@@ -20,7 +20,6 @@ public class CustomerMapper {
                 .state(legacyCustomer.getBillingState())
                 .zip(legacyCustomer.getBillingZip())
                 .addressType(AddressTypes.BILLING)
-                .isDefault(true)
                 .build());
         addresses.add(AddressDto.builder()
                 .address1(legacyCustomer.getShippingAddress1())
@@ -29,7 +28,6 @@ public class CustomerMapper {
                 .state(legacyCustomer.getShippingState())
                 .zip(legacyCustomer.getShippingZip())
                 .addressType(AddressTypes.SHIPPING)
-                .isDefault(false)
                 .build());
 
         return addresses;

@@ -10,8 +10,6 @@ import java.util.List;
 @Getter @Setter
 public class EnrichedCustomer {
 
-    Long id;
-    Long legacyId;
     CustomerDto customer;
     List<AddressDto> addresses;
 }

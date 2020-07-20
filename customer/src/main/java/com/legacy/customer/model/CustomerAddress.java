@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Table(name = "customer_addresses")
 public class CustomerAddress {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty("id")
     Long id;
 
@@ -24,10 +24,4 @@ public class CustomerAddress {
     @ManyToOne
     @JoinColumn(name = "address_id")
     Address address;
-
-    @JsonProperty("address_type")
-    String addressType;
-
-    @JsonProperty("is_default")
-    Boolean isDefault;
 }
