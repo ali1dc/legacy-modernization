@@ -1,5 +1,6 @@
 package com.legacy.order.consumer;
 
+import com.legacy.order.dto.OrderStatus;
 import com.legacy.order.event.*;
 import com.legacy.order.service.CustomerService;
 import com.legacy.order.service.OrderItemService;
