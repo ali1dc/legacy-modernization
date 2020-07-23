@@ -30,7 +30,7 @@ spring.jpa.hibernate.ddl-auto: none
 spring.kafka.bootstrap-servers: ${KAFKA_URL}
 spring.cloud.stream.kafka.stream.binder.application-id: order-microservice
 spring.cloud.stream.function.definition: oCustomers;oProducts;orders;orderItems;legacyOrderIds;legacyOrderItemIds;orderStatus
-spring.cloud.stream.bindings.oCustomers-in-0.destination: customer.public.customers
+spring.cloud.stream.bindings.oCustomers-in-0.destination: customer.public.events
 spring.cloud.stream.bindings.oProducts-in-0.destination: product.public.products
 spring.cloud.stream.bindings.orders-in-0.destination: legacy.dbo.orders
 spring.cloud.stream.bindings.orderItems-in-0.destination: legacy.dbo.order_items

@@ -1,7 +1,7 @@
 package com.legacy.order.event;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.legacy.order.model.Customer;
+import com.legacy.order.dto.Outbox;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,8 +23,8 @@ public class CustomerEvent {
     Timestamp timestamp;
 
     @JsonProperty("before")
-    Customer before;
+    Outbox before;
 
     @JsonProperty("after")
-    Customer after;
+    Outbox after;
 }

@@ -35,6 +35,7 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka-streams:3.0.4.RELEASE'
 
 	compileOnly 'org.projectlombok:lombok'
+	compile group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'

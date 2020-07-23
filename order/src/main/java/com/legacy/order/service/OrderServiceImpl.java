@@ -3,7 +3,7 @@ package com.legacy.order.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.order.config.Actions;
 import com.legacy.order.event.OrderEvent;
-import com.legacy.order.event.OrderStatus;
+import com.legacy.order.dto.OrderStatus;
 import com.legacy.order.model.Order;
 import com.legacy.order.repository.CustomerRepository;
 import com.legacy.order.repository.OrderRepository;

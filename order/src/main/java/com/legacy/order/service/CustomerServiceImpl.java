@@ -1,18 +1,19 @@
 package com.legacy.order.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.legacy.order.config.Actions;
+import com.legacy.order.dto.Outbox;
 import com.legacy.order.event.CustomerEvent;
 import com.legacy.order.model.Customer;
 import com.legacy.order.repository.CustomerRepository;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.sql.Timestamp;
-import java.util.Optional;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -20,6 +21,8 @@ public class CustomerServiceImpl implements CustomerService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private ObjectMapper jsonMapper;
+    @Autowired(required = false)
+    private ModelMapper mapper;
     @Autowired
     private CustomerRepository customerRepository;
 
@@ -31,7 +34,6 @@ public class CustomerServiceImpl implements CustomerService {
 
         switch (event.getOp()) {
             case Actions.CREATE:
-            case Actions.UPDATE:
             case Actions.READ:
                 save(event);
                 break;
@@ -44,22 +46,16 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public void save(CustomerEvent event) {
 
-        Optional<Customer> optionalCustomer = customerRepository.findById(event.getAfter().getId());
-        Customer customer;
-        if (optionalCustomer.isPresent()) {
-            customer = optionalCustomer.get();
-            customer.setFirstName(event.getAfter().getFirstName());
-            customer.setLastName(event.getAfter().getLastName());
-            customer.setLegacyId(event.getAfter().getLegacyId());
-            customer.setPhone(event.getAfter().getPhone());
-            customer.setEmail(event.getAfter().getEmail());
-            customer.setUpdatedBy(modCreatedBy);
-            customer.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
-        } else {
-            customer = event.getAfter();
-        }
+        Outbox outbox = event.getAfter();
 
-        customerRepository.save(customer);
+        try {
+            JsonNode node = jsonMapper.readTree(outbox.getPayload().asText());
+            Customer customer = jsonMapper.convertValue(node.at("/customer"), Customer.class);
+
+            customerRepository.save(customer);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

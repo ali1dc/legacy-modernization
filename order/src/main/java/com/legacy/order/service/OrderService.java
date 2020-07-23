@@ -1,7 +1,7 @@
 package com.legacy.order.service;
 
 import com.legacy.order.event.OrderEvent;
-import com.legacy.order.event.OrderStatus;
+import com.legacy.order.dto.OrderStatus;
 
 public interface OrderService {
 
